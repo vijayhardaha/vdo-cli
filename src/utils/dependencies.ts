@@ -2,9 +2,10 @@ import { exec, spawn } from 'child_process';
 import type { DependencyCheck, CommandResult } from '../types/index.js';
 
 /**
- * Check if a command exists
- * @param command - Command to check
- * @returns Promise<boolean>
+ * Check if a command exists in the system PATH
+ *
+ * @param command - Command name to check (e.g., 'ffmpeg', 'yt-dlp')
+ * @returns Promise<boolean> - True if command exists, false otherwise
  */
 export function checkCommand(command: string): Promise<boolean> {
   return new Promise(resolve => {
@@ -15,8 +16,9 @@ export function checkCommand(command: string): Promise<boolean> {
 }
 
 /**
- * Check if required dependencies are installed
- * @returns Promise<DependencyCheck>
+ * Check if required dependencies (ffmpeg and yt-dlp) are installed
+ *
+ * @returns Promise<DependencyCheck> - Object with ok status and array of missing dependencies
  */
 export async function checkDependencies(): Promise<DependencyCheck> {
   const missing: string[] = [];
@@ -38,10 +40,12 @@ export async function checkDependencies(): Promise<DependencyCheck> {
 }
 
 /**
- * Run a command and capture output
- * @param command - Command to run
- * @param onOutput - Callback for output lines
- * @returns Promise<CommandResult>
+ * Run a shell command and capture stdout/stderr output
+ *
+ * @param command - Shell command to execute
+ * @param onOutput - Optional callback function for real-time output handling (receives data chunks and type)
+ * @returns Promise<CommandResult> - Object containing stdout and stderr strings
+ * @throws Error if command exits with non-zero code or process error occurs
  */
 export function runCommand(
   command: string,

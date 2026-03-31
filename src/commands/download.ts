@@ -9,6 +9,14 @@ import type { DownloadOptions } from '../types/index.js';
 
 const ALLOWED_FORMATS = ['mp4', 'mkv', 'mp3'];
 
+/**
+ * Download action - downloads video from URL using yt-dlp
+ *
+ * @param url - Video URL to download (must be valid HTTP/HTTPS URL)
+ * @param options - Download configuration options including output filename and format
+ * @returns Promise that resolves when download is complete
+ * @throws Exits process with code 1 if dependencies missing, URL invalid, or download fails
+ */
 export async function downloadAction(url: string, options: DownloadOptions): Promise<void> {
   try {
     // Check dependencies
@@ -69,6 +77,12 @@ export async function downloadAction(url: string, options: DownloadOptions): Pro
   }
 }
 
+/**
+ * Setup download command with Commander.js
+ *
+ * @param program - Commander program instance to register the command on
+ * @returns void
+ */
 export function setupDownload(program: Command): void {
   program
     .command('download <url>')

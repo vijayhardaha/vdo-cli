@@ -3,11 +3,13 @@ import { parseYtDlpProgress } from './progress.js';
 
 /**
  * Download video from URL using yt-dlp
- * @param url - Video URL
- * @param outputPath - Output file path
- * @param format - Desired format (mp4, mkv, mp3)
- * @param onProgress - Progress callback
- * @returns Promise<void>
+ *
+ * @param url - Video URL to download (must be HTTP or HTTPS)
+ * @param outputPath - Path for the output video file
+ * @param format - Desired output format: 'mp4', 'mkv', or 'mp3' (default: 'mp4')
+ * @param onProgress - Optional callback function for download progress updates
+ * @returns Promise that resolves when download is complete
+ * @throws Error if yt-dlp execution fails, URL is invalid, or network error occurs
  */
 export async function downloadVideo(
   url: string,
@@ -44,9 +46,11 @@ export async function downloadVideo(
 }
 
 /**
- * Get video info from URL
- * @param url - Video URL
- * @returns Promise<unknown> Video information
+ * Get detailed video information from URL using yt-dlp
+ *
+ * @param url - Video URL to fetch information from
+ * @returns Promise containing video metadata object with title, duration, and other details
+ * @throws Error if yt-dlp execution fails or JSON parsing fails
  */
 export async function getVideoInfo(url: string): Promise<unknown> {
   const command = `yt-dlp --dump-json "${url}"`;
@@ -60,9 +64,11 @@ export async function getVideoInfo(url: string): Promise<unknown> {
 }
 
 /**
- * Check if URL is supported by yt-dlp
- * @param url - URL to check
- * @returns Promise<boolean>
+ * Check if a URL is supported by yt-dlp
+ *
+ * @param url - URL to check for support (must be HTTP or HTTPS)
+ * @returns Promise<boolean> - True if URL appears to be supported, false otherwise
+ * @throws Never throws errors; returns false on any failure
  */
 export async function isSupportedURL(url: string): Promise<boolean> {
   try {

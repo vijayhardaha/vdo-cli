@@ -14,7 +14,9 @@ describe('Commands Setup', () => {
     program = new Command();
   });
 
+  // Tests for download command setup
   describe('download command', () => {
+    // Should register download command with correct options
     it('should register download command with correct options', () => {
       setupDownload(program);
       const commands = program.commands;
@@ -25,6 +27,7 @@ describe('Commands Setup', () => {
       expect(commands[0]?.options).toHaveLength(2);
     });
 
+    // Should have output option
     it('should have output option', () => {
       setupDownload(program);
       const cmd = program.commands[0];
@@ -33,6 +36,7 @@ describe('Commands Setup', () => {
       expect(outputOption).toBeDefined();
     });
 
+    // Should have format option
     it('should have format option', () => {
       setupDownload(program);
       const cmd = program.commands[0];
@@ -41,7 +45,9 @@ describe('Commands Setup', () => {
     });
   });
 
+  // Tests for convert command setup
   describe('convert command', () => {
+    // Should register convert command with correct options
     it('should register convert command with correct options', () => {
       setupConvert(program);
       const commands = program.commands;
@@ -51,12 +57,14 @@ describe('Commands Setup', () => {
       expect(commands[0]?.aliases()).toContain('cv');
     });
 
+    // Should have to option
     it('should have to option', () => {
       setupConvert(program);
       const cmd = program.commands[0];
       expect(cmd?.options).toHaveLength(3);
     });
 
+    // Should have preset option
     it('should have preset option', () => {
       setupConvert(program);
       const cmd = program.commands[0];
@@ -66,7 +74,9 @@ describe('Commands Setup', () => {
     });
   });
 
+  // Tests for compress command setup
   describe('compress command', () => {
+    // Should register compress command with correct options
     it('should register compress command with correct options', () => {
       setupCompress(program);
       const commands = program.commands;
@@ -76,6 +86,7 @@ describe('Commands Setup', () => {
       expect(commands[0]?.aliases()).toContain('cm');
     });
 
+    // Should have crf option
     it('should have crf option', () => {
       setupCompress(program);
       const cmd = program.commands[0];
@@ -84,6 +95,7 @@ describe('Commands Setup', () => {
       expect(crfOption).toBeDefined();
     });
 
+    // Should have preset option
     it('should have preset option', () => {
       setupCompress(program);
       const cmd = program.commands[0];
@@ -93,7 +105,9 @@ describe('Commands Setup', () => {
     });
   });
 
+  // Tests for speedup command setup
   describe('speedup command', () => {
+    // Should register speedup command with correct options
     it('should register speedup command with correct options', () => {
       setupSpeedup(program);
       const commands = program.commands;
@@ -103,6 +117,7 @@ describe('Commands Setup', () => {
       expect(commands[0]?.aliases()).toContain('sp');
     });
 
+    // Should have rate option
     it('should have rate option', () => {
       setupSpeedup(program);
       const cmd = program.commands[0];
@@ -112,7 +127,9 @@ describe('Commands Setup', () => {
     });
   });
 
+  // Tests for audio command setup
   describe('audio command', () => {
+    // Should register audio command with correct options
     it('should register audio command with correct options', () => {
       setupAudio(program);
       const commands = program.commands;
@@ -122,6 +139,7 @@ describe('Commands Setup', () => {
       expect(commands[0]?.aliases()).toContain('au');
     });
 
+    // Should have format option
     it('should have format option', () => {
       setupAudio(program);
       const cmd = program.commands[0];
@@ -130,6 +148,7 @@ describe('Commands Setup', () => {
       expect(formatOption).toBeDefined();
     });
 
+    // Should have bitrate option
     it('should have bitrate option', () => {
       setupAudio(program);
       const cmd = program.commands[0];
@@ -139,7 +158,9 @@ describe('Commands Setup', () => {
     });
   });
 
+  // Tests for auto command setup
   describe('auto command', () => {
+    // Should register auto command with correct options
     it('should register auto command with correct options', () => {
       setupAuto(program);
       const commands = program.commands;
@@ -149,6 +170,7 @@ describe('Commands Setup', () => {
       expect(commands[0]?.aliases()).toContain('a');
     });
 
+    // Should have format option
     it('should have format option', () => {
       setupAuto(program);
       const cmd = program.commands[0];

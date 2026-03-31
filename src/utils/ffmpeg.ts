@@ -3,12 +3,14 @@ import { parseFFmpegProgress } from './progress.js';
 
 /**
  * Convert video to different format using ffmpeg
- * @param inputPath - Input file path
- * @param outputPath - Output file path
- * @param format - Target format
- * @param preset - Encoding preset
- * @param onProgress - Progress callback
- * @returns Promise<void>
+ *
+ * @param inputPath - Path to the input video file
+ * @param outputPath - Path for the output video file
+ * @param format - Target video format (default: 'mp4')
+ * @param preset - Encoding preset for quality/speed trade-off (default: 'fast')
+ * @param onProgress - Optional callback function for progress updates
+ * @returns Promise that resolves when conversion is complete
+ * @throws Error if ffmpeg execution fails or input file is invalid
  */
 export async function convertVideo(
   inputPath: string,
@@ -55,13 +57,15 @@ export async function convertVideo(
 }
 
 /**
- * Compress video using ffmpeg
- * @param inputPath - Input file path
- * @param outputPath - Output file path
- * @param crf - CRF value (0-51)
- * @param preset - Encoding preset
- * @param onProgress - Progress callback
- * @returns Promise<void>
+ * Compress video using ffmpeg with CRF (Constant Rate Factor)
+ *
+ * @param inputPath - Path to the input video file
+ * @param outputPath - Path for the output video file
+ * @param crf - Compression quality factor, 0-51 (lower = better quality, default: 28)
+ * @param preset - Encoding preset for quality/speed trade-off (default: 'medium')
+ * @param onProgress - Optional callback function for progress updates
+ * @returns Promise that resolves when compression is complete
+ * @throws Error if ffmpeg execution fails or input file is invalid
  */
 export async function compressVideo(
   inputPath: string,
@@ -98,12 +102,14 @@ export async function compressVideo(
 }
 
 /**
- * Speed up or slow down video
- * @param inputPath - Input file path
- * @param outputPath - Output file path
- * @param rate - Speed rate (1 = normal, 2 = 2x faster, 0.5 = 2x slower)
- * @param onProgress - Progress callback
- * @returns Promise<void>
+ * Speed up or slow down video playback using ffmpeg
+ *
+ * @param inputPath - Path to the input video file
+ * @param outputPath - Path for the output video file
+ * @param rate - Playback speed rate (1.0 = normal, 2.0 = 2x faster, 0.5 = 2x slower)
+ * @param onProgress - Optional callback function for progress updates
+ * @returns Promise that resolves when speed adjustment is complete
+ * @throws Error if ffmpeg execution fails or input file is invalid
  */
 export async function speedUpVideo(
   inputPath: string,
@@ -168,12 +174,14 @@ export async function speedUpVideo(
 }
 
 /**
- * Extract audio from video
- * @param inputPath - Input file path
- * @param outputPath - Output file path
- * @param format - Audio format (mp3, wav, aac)
- * @param bitrate - Audio bitrate
- * @returns Promise<void>
+ * Extract audio track from video using ffmpeg
+ *
+ * @param inputPath - Path to the input video file
+ * @param outputPath - Path for the output audio file
+ * @param format - Audio format: 'mp3', 'wav', or 'aac' (default: 'mp3')
+ * @param bitrate - Audio bitrate (default: '192k')
+ * @returns Promise that resolves when audio extraction is complete
+ * @throws Error if ffmpeg execution fails or input file is invalid
  */
 export async function extractAudio(
   inputPath: string,

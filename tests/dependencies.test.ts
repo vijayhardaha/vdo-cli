@@ -9,12 +9,15 @@ vi.mock('child_process', () => ({
   spawn: vi.fn(),
 }));
 
+// Test suite for dependency utility functions
 describe('dependencies', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
+  // Tests for checkCommand function
   describe('checkCommand', () => {
+    // Should return true when command exists
     it('should return true when command exists', async () => {
       const cp = await import('child_process');
       (cp.exec as unknown as MockFn).mockImplementation((_cmd: string, cb: ExecCallback) => {
@@ -24,6 +27,7 @@ describe('dependencies', () => {
       expect(result).toBe(true);
     });
 
+    // Should return false when command does not exist
     it('should return false when command does not exist', async () => {
       const cp = await import('child_process');
       (cp.exec as unknown as MockFn).mockImplementation((_cmd: string, cb: ExecCallback) => {
@@ -34,7 +38,9 @@ describe('dependencies', () => {
     });
   });
 
+  // Tests for checkDependencies function
   describe('checkDependencies', () => {
+    // Should return ok=true when all dependencies are present
     it('should return ok=true when all dependencies are present', async () => {
       const cp = await import('child_process');
       (cp.exec as unknown as MockFn).mockImplementation((_cmd: string, cb: ExecCallback) => {
@@ -45,6 +51,7 @@ describe('dependencies', () => {
       expect(result.missing).toHaveLength(0);
     });
 
+    // Should return ok=false with missing ffmpeg
     it('should return ok=false with missing ffmpeg', async () => {
       const cp = await import('child_process');
       (cp.exec as unknown as MockFn).mockImplementation((cmd: string, cb: ExecCallback) => {
@@ -56,6 +63,7 @@ describe('dependencies', () => {
       expect(result.missing).toContain('ffmpeg');
     });
 
+    // Should return ok=false with missing yt-dlp
     it('should return ok=false with missing yt-dlp', async () => {
       const cp = await import('child_process');
       (cp.exec as unknown as MockFn).mockImplementation((cmd: string, cb: ExecCallback) => {
@@ -67,6 +75,7 @@ describe('dependencies', () => {
       expect(result.missing).toContain('yt-dlp');
     });
 
+    // Should return both missing when neither installed
     it('should return both missing when neither installed', async () => {
       const cp = await import('child_process');
       (cp.exec as unknown as MockFn).mockImplementation((_cmd: string, cb: ExecCallback) => {
@@ -79,6 +88,7 @@ describe('dependencies', () => {
     });
   });
 
+  // Tests for runCommand function
   describe('runCommand', () => {
     function makeMockProcess() {
       return {
@@ -88,6 +98,7 @@ describe('dependencies', () => {
       };
     }
 
+    // Should resolve with stdout and stderr on exit code 0
     it('should resolve with stdout and stderr on exit code 0', async () => {
       const cp = await import('child_process');
       const mock = makeMockProcess();
@@ -106,6 +117,7 @@ describe('dependencies', () => {
       expect(result.stderr).toBe('some warning');
     });
 
+    // Should call onOutput callback for stdout and stderr
     it('should call onOutput callback for stdout and stderr', async () => {
       const cp = await import('child_process');
       const mock = makeMockProcess();
@@ -125,6 +137,7 @@ describe('dependencies', () => {
       expect(onOutput).toHaveBeenCalledWith('stderr line', 'stderr');
     });
 
+    // Should reject when exit code is non-zero
     it('should reject when exit code is non-zero', async () => {
       const cp = await import('child_process');
       const mock = makeMockProcess();
@@ -139,6 +152,7 @@ describe('dependencies', () => {
       await expect(runCommand('failing-command')).rejects.toThrow('Command failed with code 1');
     });
 
+    // Should reject on process error event
     it('should reject on process error event', async () => {
       const cp = await import('child_process');
       const mock = makeMockProcess();
@@ -151,6 +165,7 @@ describe('dependencies', () => {
       await expect(runCommand('bad-command')).rejects.toThrow('spawn ENOENT');
     });
 
+    // Should work without onOutput callback (null)
     it('should work without onOutput callback (null)', async () => {
       const cp = await import('child_process');
       const mock = makeMockProcess();

@@ -15,6 +15,10 @@ const packageJson = require('../../package.json');
 // Create the CLI program
 const program = new Command();
 
+/**
+ * Configure and run the VDO CLI program
+ */
+
 // Configure the program
 program
   .name('vdo')

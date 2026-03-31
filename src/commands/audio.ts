@@ -8,6 +8,14 @@ import type { AudioOptions } from '../types/index.js';
 
 const ALLOWED_FORMATS = ['mp3', 'wav', 'aac'];
 
+/**
+ * Audio action - extracts audio track from video using ffmpeg
+ *
+ * @param input - Path to the input video file
+ * @param options - Audio extraction configuration options including output filename, format, and bitrate
+ * @returns Promise that resolves when audio extraction is complete
+ * @throws Exits process with code 1 if dependencies missing, file not found, invalid format/bitrate, or extraction fails
+ */
 export async function audioAction(input: string, options: AudioOptions): Promise<void> {
   try {
     // Check dependencies
@@ -54,6 +62,12 @@ export async function audioAction(input: string, options: AudioOptions): Promise
   }
 }
 
+/**
+ * Setup audio command with Commander.js
+ *
+ * @param program - Commander program instance to register the command on
+ * @returns void
+ */
 export function setupAudio(program: Command): void {
   program
     .command('audio <input>')

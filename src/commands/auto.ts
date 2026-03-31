@@ -9,6 +9,14 @@ import { convertVideo } from '../utils/ffmpeg.js';
 import { createProgressBar } from '../utils/progress.js';
 import type { AutoOptions } from '../types/index.js';
 
+/**
+ * Auto action - automatically detects whether input is a URL or local file and processes accordingly
+ *
+ * @param input - URL to download from or path to local video file
+ * @param options - Configuration options including output filename and format
+ * @returns Promise that resolves when processing is complete
+ * @throws Exits process with code 1 if dependencies missing, input invalid, or processing fails
+ */
 export async function autoAction(input: string, options: AutoOptions): Promise<void> {
   try {
     // Check dependencies
@@ -100,6 +108,12 @@ export async function autoAction(input: string, options: AutoOptions): Promise<v
   }
 }
 
+/**
+ * Setup auto command with Commander.js
+ *
+ * @param program - Commander program instance to register the command on
+ * @returns void
+ */
 export function setupAuto(program: Command): void {
   program
     .command('auto <input|url>')

@@ -11,7 +11,9 @@ vi.mock('module', () => ({
   createRequire: vi.fn(() => () => ({ version: '1.0.0', name: 'vdo' })),
 }));
 
+// Test suite for bin/vdo CLI entry point
 describe('bin/vdo', () => {
+  // Should register all 6 commands on the program
   it('should register all 6 commands on the program', async () => {
     const { setupDownload } = await import('../src/commands/download.js');
     const { setupConvert } = await import('../src/commands/convert.js');
@@ -39,6 +41,7 @@ describe('bin/vdo', () => {
     expect(setupAuto).toHaveBeenCalledWith(program);
   });
 
+  // Should configure program name and description
   it('should configure program name and description', () => {
     const program = new Command();
     program.name('vdo').description('A Node.js CLI tool for video utilities').version('1.0.0');
