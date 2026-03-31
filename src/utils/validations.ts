@@ -4,9 +4,9 @@ import { extname, dirname, basename, join } from 'path';
 /**
  * Validate if a file exists
  *
- * @param filePath - Path to the file to check
- * @returns Promise that resolves if file exists
- * @throws Error with message "File not found: {filePath}" if file does not exist
+ * @param {string} filePath - Path to the file to check
+ * @returns {Promise<void>} Promise that resolves if file exists
+ * @throws {Error} With message "File not found: {filePath}" if file does not exist
  */
 export async function validateFileExists(filePath: string): Promise<void> {
   try {
@@ -19,8 +19,8 @@ export async function validateFileExists(filePath: string): Promise<void> {
 /**
  * Validate if a URL is valid (HTTP or HTTPS protocol)
  *
- * @param url - URL string to validate
- * @returns True if URL is valid HTTP or HTTPS URL, false otherwise
+ * @param {string} url - URL string to validate
+ * @returns {boolean} True if URL is valid HTTP or HTTPS URL, false otherwise
  */
 export function validateUrl(url: string): boolean {
   try {
@@ -34,10 +34,10 @@ export function validateUrl(url: string): boolean {
 /**
  * Validate format option against allowed formats
  *
- * @param format - Format string to validate
- * @param allowedFormats - Array of allowed format strings
- * @returns void
- * @throws Error if format is not in the allowed formats list
+ * @param {string} format - Format string to validate
+ * @param {string[]} allowedFormats - Array of allowed format strings
+ * @returns {void}
+ * @throws {Error} If format is not in the allowed formats list
  */
 export function validateFormat(format: string, allowedFormats: string[]): void {
   if (!allowedFormats.includes(format.toLowerCase())) {
@@ -48,10 +48,10 @@ export function validateFormat(format: string, allowedFormats: string[]): void {
 /**
  * Validate preset option against allowed presets
  *
- * @param preset - Preset string to validate
- * @param allowedPresets - Array of allowed preset strings
- * @returns void
- * @throws Error if preset is not in the allowed presets list
+ * @param {string} preset - Preset string to validate
+ * @param {string[]} allowedPresets - Array of allowed preset strings
+ * @returns {void}
+ * @throws {Error} If preset is not in the allowed presets list
  */
 export function validatePreset(preset: string, allowedPresets: string[]): void {
   if (!allowedPresets.includes(preset.toLowerCase())) {
@@ -62,9 +62,9 @@ export function validatePreset(preset: string, allowedPresets: string[]): void {
 /**
  * Validate CRF (Constant Rate Factor) value
  *
- * @param crf - CRF value to validate (number or string)
- * @returns void
- * @throws Error if CRF is not a number or is outside the valid range 0-51
+ * @param {number | string} crf - CRF value to validate (number or string)
+ * @returns {void}
+ * @throws {Error} If CRF is not a number or is outside the valid range 0-51
  */
 export function validateCRF(crf: number | string): void {
   const crfValue = typeof crf === 'string' ? parseInt(crf, 10) : crf;
@@ -76,9 +76,9 @@ export function validateCRF(crf: number | string): void {
 /**
  * Validate speed rate value
  *
- * @param rate - Speed rate to validate (number or string)
- * @returns void
- * @throws Error if rate is not a number or is outside the valid range (>0 and ≤16)
+ * @param {number | string} rate - Speed rate to validate (number or string)
+ * @returns {void}
+ * @throws {Error} If rate is not a number or is outside the valid range (>0 and ≤16)
  */
 export function validateSpeedRate(rate: number | string): void {
   const rateValue = typeof rate === 'string' ? parseFloat(rate) : rate;
@@ -90,9 +90,9 @@ export function validateSpeedRate(rate: number | string): void {
 /**
  * Validate bitrate format
  *
- * @param bitrate - Bitrate string to validate (e.g., "192k", "128M")
- * @returns void
- * @throws Error if bitrate format is invalid (must be number optionally followed by k, K, m, or M)
+ * @param {string} bitrate - Bitrate string to validate (e.g., "192k", "128M")
+ * @returns {void}
+ * @throws {Error} If bitrate format is invalid (must be number optionally followed by k, K, m, or M)
  */
 export function validateBitrate(bitrate: string): void {
   const bitrateRegex = /^\d+[kKmM]?$/;
@@ -106,8 +106,8 @@ export function validateBitrate(bitrate: string): void {
 /**
  * Get file extension from path
  *
- * @param filePath - File path to extract extension from
- * @returns Lowercase file extension without the dot, or empty string if no extension
+ * @param {string} filePath - File path to extract extension from
+ * @returns {string} Lowercase file extension without the dot, or empty string if no extension
  */
 export function getFileExtension(filePath: string): string {
   return extname(filePath).slice(1).toLowerCase();
@@ -116,9 +116,9 @@ export function getFileExtension(filePath: string): string {
 /**
  * Generate output filename based on input path and desired format
  *
- * @param inputPath - Original input file path
- * @param format - Desired output format (extension)
- * @returns Generated output file path with new format extension in same directory
+ * @param {string} inputPath - Original input file path
+ * @param {string} format - Desired output format (extension)
+ * @returns {string} Generated output file path with new format extension in same directory
  */
 export function generateOutputFilename(inputPath: string, format: string): string {
   const dir = dirname(inputPath);

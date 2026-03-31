@@ -4,17 +4,17 @@ import { parseYtDlpProgress } from './progress.js';
 /**
  * Download video from URL using yt-dlp
  *
- * @param url - Video URL to download (must be HTTP or HTTPS)
- * @param outputPath - Path for the output video file
- * @param format - Desired output format: 'mp4', 'mkv', or 'mp3' (default: 'mp4')
- * @param onProgress - Optional callback function for download progress updates
- * @returns Promise that resolves when download is complete
- * @throws Error if yt-dlp execution fails, URL is invalid, or network error occurs
+ * @param {string} url - Video URL to download (must be HTTP or HTTPS)
+ * @param {string} outputPath - Path for the output video file
+ * @param {string} [format='mp4'] - Desired output format: 'mp4', 'mkv', or 'mp3' (default: 'mp4')
+ * @param {((percentage: number, size: number, unit: string) => void) | null} [onProgress=null] - Optional callback function for download progress updates
+ * @returns {Promise<void>} Promise that resolves when download is complete
+ * @throws {Error} If yt-dlp execution fails, URL is invalid, or network error occurs
  */
 export async function downloadVideo(
   url: string,
   outputPath: string,
-  format = 'mp4',
+  format: string = 'mp4',
   onProgress: ((percentage: number, size: number, unit: string) => void) | null = null
 ): Promise<void> {
   const formatMap: Record<string, string> = {
@@ -48,9 +48,9 @@ export async function downloadVideo(
 /**
  * Get detailed video information from URL using yt-dlp
  *
- * @param url - Video URL to fetch information from
- * @returns Promise containing video metadata object with title, duration, and other details
- * @throws Error if yt-dlp execution fails or JSON parsing fails
+ * @param {string} url - Video URL to fetch information from
+ * @returns {Promise<unknown>} Promise containing video metadata object with title, duration, and other details
+ * @throws {Error} If yt-dlp execution fails or JSON parsing fails
  */
 export async function getVideoInfo(url: string): Promise<unknown> {
   const command = `yt-dlp --dump-json "${url}"`;
@@ -66,8 +66,8 @@ export async function getVideoInfo(url: string): Promise<unknown> {
 /**
  * Check if a URL is supported by yt-dlp
  *
- * @param url - URL to check for support (must be HTTP or HTTPS)
- * @returns Promise<boolean> - True if URL appears to be supported, false otherwise
+ * @param {string} url - URL to check for support (must be HTTP or HTTPS)
+ * @returns {Promise<boolean>} - True if URL appears to be supported, false otherwise
  * @throws Never throws errors; returns false on any failure
  */
 export async function isSupportedURL(url: string): Promise<boolean> {

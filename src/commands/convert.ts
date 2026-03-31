@@ -13,10 +13,10 @@ const ALLOWED_PRESETS = ['ultrafast', 'fast', 'medium', 'slow', 'high-quality'];
 /**
  * Convert action - converts video to different format using ffmpeg
  *
- * @param input - Path to the input video file
- * @param options - Conversion configuration options including output filename, target format, and preset
- * @returns Promise that resolves when conversion is complete
- * @throws Exits process with code 1 if dependencies missing, file not found, or conversion fails
+ * @param {string} input - Path to the input video file
+ * @param {ConvertOptions} options - Conversion configuration options including output filename, target format, and preset
+ * @returns {Promise<void>} Promise that resolves when conversion is complete
+ * @throws {void} Exits process with code 1 if dependencies missing, file not found, or conversion fails
  */
 export async function convertAction(input: string, options: ConvertOptions): Promise<void> {
   try {
@@ -80,8 +80,8 @@ export async function convertAction(input: string, options: ConvertOptions): Pro
 /**
  * Setup convert command with Commander.js
  *
- * @param program - Commander program instance to register the command on
- * @returns void
+ * @param {Command} program - Commander program instance to register the command on
+ * @returns {void}
  */
 export function setupConvert(program: Command): void {
   program

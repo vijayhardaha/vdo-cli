@@ -12,10 +12,10 @@ const ALLOWED_PRESETS = ['ultrafast', 'fast', 'medium', 'slow'];
 /**
  * Compress action - compresses video to reduce file size using ffmpeg with CRF
  *
- * @param input - Path to the input video file
- * @param options - Compression configuration options including output filename, CRF value, and preset
- * @returns Promise that resolves when compression is complete
- * @throws Exits process with code 1 if dependencies missing, file not found, or compression fails
+ * @param {string} input - Path to the input video file
+ * @param {CompressOptions} options - Compression configuration options including output filename, CRF value, and preset
+ * @returns {Promise<void>} Promise that resolves when compression is complete
+ * @throws {void} Exits process with code 1 if dependencies missing, file not found, or compression fails
  */
 export async function compressAction(input: string, options: CompressOptions): Promise<void> {
   try {
@@ -79,8 +79,8 @@ export async function compressAction(input: string, options: CompressOptions): P
 /**
  * Setup compress command with Commander.js
  *
- * @param program - Commander program instance to register the command on
- * @returns void
+ * @param {Command} program - Commander program instance to register the command on
+ * @returns {void}
  */
 export function setupCompress(program: Command): void {
   program

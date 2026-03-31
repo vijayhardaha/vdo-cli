@@ -4,8 +4,8 @@ import type { ProgressInfo } from '../types/index.js';
 /**
  * Create a progress bar instance for displaying CLI progress
  *
- * @param message - Message to display above the progress bar (default: 'Processing')
- * @returns New cli-progress SingleBar instance configured with classic shades preset
+ * @param {string} [message='Processing'] - Message to display above the progress bar (default: 'Processing')
+ * @returns {cliProgress.SingleBar} New cli-progress SingleBar instance configured with classic shades preset
  */
 export function createProgressBar(message = 'Processing'): cliProgress.SingleBar {
   return new cliProgress.SingleBar(
@@ -22,8 +22,8 @@ export function createProgressBar(message = 'Processing'): cliProgress.SingleBar
 /**
  * Parse ffmpeg output line to extract progress information
  *
- * @param line - Single output line from ffmpeg stderr
- * @returns ProgressInfo object with time, size, or fps data if matched; null if no progress found
+ * @param {string} line - Single output line from ffmpeg stderr
+ * @returns {ProgressInfo | null} ProgressInfo object with time, size, or fps data if matched; null if no progress found
  */
 export function parseFFmpegProgress(line: string): ProgressInfo | null {
   // Match time progress
@@ -56,8 +56,8 @@ export function parseFFmpegProgress(line: string): ProgressInfo | null {
 /**
  * Parse yt-dlp output line to extract download progress information
  *
- * @param line - Single output line from yt-dlp stdout/stderr
- * @returns ProgressInfo object with download percentage and size if matched; null if no progress found
+ * @param {string} line - Single output line from yt-dlp stdout/stderr
+ * @returns {ProgressInfo | null} ProgressInfo object with download percentage and size if matched; null if no progress found
  */
 export function parseYtDlpProgress(line: string): ProgressInfo | null {
   // Match percentage: [download]  45.3% of 100.00MiB
@@ -86,8 +86,8 @@ export function parseYtDlpProgress(line: string): ProgressInfo | null {
 /**
  * Convert kilobytes to megabytes
  *
- * @param kb - Size in kilobytes
- * @returns Size in megabytes
+ * @param {number} kb - Size in kilobytes
+ * @returns {number} Size in megabytes
  */
 export function kbToMB(kb: number): number {
   return kb / 1024;
@@ -96,9 +96,9 @@ export function kbToMB(kb: number): number {
 /**
  * Convert various size units to megabytes
  *
- * @param size - Numeric size value
- * @param unit - Unit of measurement ('KiB', 'MiB', 'GiB', or other)
- * @returns Size converted to megabytes
+ * @param {number} size - Numeric size value
+ * @param {string} unit - Unit of measurement ('KiB', 'MiB', 'GiB', or other)
+ * @returns {number} Size converted to megabytes
  */
 export function convertToMB(size: number, unit: string): number {
   switch (unit) {

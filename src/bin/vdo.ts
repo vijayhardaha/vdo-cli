@@ -17,6 +17,8 @@ const program = new Command();
 
 /**
  * Configure and run the VDO CLI program
+ *
+ * @returns {void}
  */
 
 // Configure the program

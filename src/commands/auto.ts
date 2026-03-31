@@ -12,10 +12,10 @@ import type { AutoOptions } from '../types/index.js';
 /**
  * Auto action - automatically detects whether input is a URL or local file and processes accordingly
  *
- * @param input - URL to download from or path to local video file
- * @param options - Configuration options including output filename and format
- * @returns Promise that resolves when processing is complete
- * @throws Exits process with code 1 if dependencies missing, input invalid, or processing fails
+ * @param {string} input - URL to download from or path to local video file
+ * @param {AutoOptions} options - Configuration options including output filename and format
+ * @returns {Promise<void>} Promise that resolves when processing is complete
+ * @throws {void} Exits process with code 1 if dependencies missing, input invalid, or processing fails
  */
 export async function autoAction(input: string, options: AutoOptions): Promise<void> {
   try {
@@ -111,8 +111,8 @@ export async function autoAction(input: string, options: AutoOptions): Promise<v
 /**
  * Setup auto command with Commander.js
  *
- * @param program - Commander program instance to register the command on
- * @returns void
+ * @param {Command} program - Commander program instance to register the command on
+ * @returns {void}
  */
 export function setupAuto(program: Command): void {
   program

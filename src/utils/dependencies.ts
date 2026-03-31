@@ -4,8 +4,8 @@ import type { DependencyCheck, CommandResult } from '../types/index.js';
 /**
  * Check if a command exists in the system PATH
  *
- * @param command - Command name to check (e.g., 'ffmpeg', 'yt-dlp')
- * @returns Promise<boolean> - True if command exists, false otherwise
+ * @param {string} command - Command name to check (e.g., 'ffmpeg', 'yt-dlp')
+ * @returns {Promise<boolean>} - True if command exists, false otherwise
  */
 export function checkCommand(command: string): Promise<boolean> {
   return new Promise(resolve => {
@@ -18,7 +18,7 @@ export function checkCommand(command: string): Promise<boolean> {
 /**
  * Check if required dependencies (ffmpeg and yt-dlp) are installed
  *
- * @returns Promise<DependencyCheck> - Object with ok status and array of missing dependencies
+ * @returns {Promise<DependencyCheck>} - Object with ok status and array of missing dependencies
  */
 export async function checkDependencies(): Promise<DependencyCheck> {
   const missing: string[] = [];
@@ -42,10 +42,10 @@ export async function checkDependencies(): Promise<DependencyCheck> {
 /**
  * Run a shell command and capture stdout/stderr output
  *
- * @param command - Shell command to execute
- * @param onOutput - Optional callback function for real-time output handling (receives data chunks and type)
- * @returns Promise<CommandResult> - Object containing stdout and stderr strings
- * @throws Error if command exits with non-zero code or process error occurs
+ * @param {string} command - Shell command to execute
+ * @param {((data: string, type: 'stdout' | 'stderr') => void) | null} [onOutput=null] - Optional callback function for real-time output handling (receives data chunks and type)
+ * @returns {Promise<CommandResult>} - Object containing stdout and stderr strings
+ * @throws {Error} If command exits with non-zero code or process error occurs
  */
 export function runCommand(
   command: string,

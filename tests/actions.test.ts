@@ -249,6 +249,26 @@ describe('Command actions', () => {
       expect(callArgs?.[2]).toBe('mkv');
     });
 
+    it('should use provided output as-is when it already has extension', async () => {
+      const { checkDependencies } = await import('../src/utils/dependencies.js');
+      const { validateUrl, validateFormat } = await import('../src/utils/validations.js');
+      const { downloadVideo } = await import('../src/utils/ytdlp.js');
+      const { createProgressBar, convertToMB } = await import('../src/utils/progress.js');
+
+      vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
+      vi.mocked(validateUrl).mockReturnValue(true);
+      vi.mocked(validateFormat).mockReturnValue(undefined);
+      vi.mocked(downloadVideo).mockResolvedValue(undefined);
+      vi.mocked(createProgressBar).mockReturnValue(mockProgressBar as never);
+      vi.mocked(convertToMB).mockReturnValue(50);
+
+      await downloadAction('https://example.com', { output: 'myvideo.mkv', format: 'mkv' });
+
+      const callArgs = vi.mocked(downloadVideo).mock.calls[0];
+      expect(callArgs?.[1]).toBe('myvideo.mkv');
+      expect(callArgs?.[2]).toBe('mkv');
+    });
+
     it('should not update progress bar when progressCallback called with no progressBar', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateUrl, validateFormat } = await import('../src/utils/validations.js');

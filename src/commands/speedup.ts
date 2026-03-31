@@ -10,10 +10,10 @@ import type { SpeedupOptions } from '../types/index.js';
 /**
  * Speedup action - speeds up or slows down video playback using ffmpeg
  *
- * @param input - Path to the input video file
- * @param options - Speed adjustment configuration options including output filename and speed rate
- * @returns Promise that resolves when speed adjustment is complete
- * @throws Exits process with code 1 if dependencies missing, file not found, invalid speed rate, or operation fails
+ * @param {string} input - Path to the input video file
+ * @param {SpeedupOptions} options - Speed adjustment configuration options including output filename and speed rate
+ * @returns {Promise<void>} Promise that resolves when speed adjustment is complete
+ * @throws {void} Exits process with code 1 if dependencies missing, file not found, invalid speed rate, or operation fails
  */
 export async function speedupAction(input: string, options: SpeedupOptions): Promise<void> {
   try {
@@ -78,8 +78,8 @@ export async function speedupAction(input: string, options: SpeedupOptions): Pro
 /**
  * Setup speedup command with Commander.js
  *
- * @param program - Commander program instance to register the command on
- * @returns void
+ * @param {Command} program - Commander program instance to register the command on
+ * @returns {void}
  */
 export function setupSpeedup(program: Command): void {
   program
