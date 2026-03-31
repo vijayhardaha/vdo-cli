@@ -1,0 +1,66 @@
+import type { Command } from 'commander';
+import ora from 'ora';
+import { resolve, dirname, basename, extname, join } from 'path';
+import { checkDependencies } from '../utils/dependencies.js';
+import { validateFileExists, validateFormat, validateBitrate } from '../utils/validations.js';
+import { extractAudio } from '../utils/ffmpeg.js';
+import type { AudioOptions } from '../types/index.js';
+
+const ALLOWED_FORMATS = ['mp3', 'wav', 'aac'];
+
+export async function audioAction(input: string, options: AudioOptions): Promise<void> {
+  try {
+    // Check dependencies
+    const deps = await checkDependencies();
+    if (!deps.ok) {
+      console.error(`Error: Missing required dependencies: ${deps.missing.join(', ')}`);
+      console.error('Please install them using:');
+      console.error('  brew install ffmpeg yt-dlp');
+      process.exit(1);
+    }
+
+    // Validate input file
+    await validateFileExists(input);
+
+    // Validate format
+    const format = options.format || 'mp3';
+    validateFormat(format, ALLOWED_FORMATS);
+
+    // Validate bitrate
+    const bitrate = options.bitrate || '192k';
+    validateBitrate(bitrate);
+
+    // Determine output filename
+    let outputFile = options.output;
+    if (!outputFile) {
+      const dir = dirname(input);
+      const name = basename(input, extname(input));
+      outputFile = join(dir, `${name}.${format}`);
+    }
+
+    // Show spinner while processing
+    const spinner = ora('Extracting audio...').start();
+
+    // Extract audio
+    await extractAudio(input, outputFile, format, bitrate);
+
+    spinner.succeed('Audio extraction completed!');
+    console.log(`  Output file: ${resolve(outputFile)}`);
+    console.log(`  Format: ${format.toUpperCase()}`);
+    console.log(`  Bitrate: ${bitrate}`);
+  } catch (error) {
+    console.error('\n✗ Error:', error instanceof Error ? error.message : String(error));
+    process.exit(1);
+  }
+}
+
+export function setupAudio(program: Command): void {
+  program
+    .command('audio <input>')
+    .alias('au')
+    .description('Extract audio from video')
+    .option('-o, --output <file>', 'Output file name')
+    .option('--format <format>', 'Audio format (mp3, wav, aac)', 'mp3')
+    .option('--bitrate <value>', 'Audio bitrate (e.g., 192k, 128k)', '192k')
+    .action(audioAction);
+}

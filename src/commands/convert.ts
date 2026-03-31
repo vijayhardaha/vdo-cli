@@ -1,0 +1,81 @@
+import type { Command } from 'commander';
+import ora from 'ora';
+import { resolve, dirname, basename, extname, join } from 'path';
+import { checkDependencies } from '../utils/dependencies.js';
+import { validateFileExists, validateFormat, validatePreset } from '../utils/validations.js';
+import { convertVideo } from '../utils/ffmpeg.js';
+import { createProgressBar } from '../utils/progress.js';
+import type { ConvertOptions } from '../types/index.js';
+
+const ALLOWED_FORMATS = ['mp4', 'mkv', 'avi', 'mov', 'webm', 'flv'];
+const ALLOWED_PRESETS = ['ultrafast', 'fast', 'medium', 'slow', 'high-quality'];
+
+export async function convertAction(input: string, options: ConvertOptions): Promise<void> {
+  try {
+    // Check dependencies
+    const deps = await checkDependencies();
+    if (!deps.ok) {
+      console.error(`Error: Missing required dependencies: ${deps.missing.join(', ')}`);
+      console.error('Please install them using:');
+      console.error('  brew install ffmpeg yt-dlp');
+      process.exit(1);
+    }
+
+    // Validate input file
+    await validateFileExists(input);
+
+    // Validate format
+    const format = options.to || 'mp4';
+    validateFormat(format, ALLOWED_FORMATS);
+
+    // Validate preset
+    const preset = options.preset || 'fast';
+    validatePreset(preset, ALLOWED_PRESETS);
+
+    // Determine output filename
+    let outputFile = options.output;
+    if (!outputFile) {
+      const dir = dirname(input);
+      const name = basename(input, extname(input));
+      outputFile = join(dir, `${name}_converted.${format}`);
+    }
+
+    // Show spinner while preparing
+    const spinner = ora('Preparing conversion...').start();
+
+    const progressCallback = (percentage: number) => {
+      if (progressBar && percentage > 0) {
+        progressBar.update(percentage);
+      }
+    };
+
+    spinner.succeed('Conversion started');
+
+    // Create progress bar
+    const progressBar = createProgressBar('Converting');
+    progressBar.start(100, 0);
+
+    // Convert video
+    await convertVideo(input, outputFile, format, preset, progressCallback);
+
+    progressBar.stop();
+    console.log('\n✓ Conversion completed successfully!');
+    console.log(`  Output file: ${resolve(outputFile)}`);
+    console.log(`  Format: ${format.toUpperCase()}`);
+    console.log(`  Preset: ${preset}`);
+  } catch (error) {
+    console.error('\n✗ Error:', error instanceof Error ? error.message : String(error));
+    process.exit(1);
+  }
+}
+
+export function setupConvert(program: Command): void {
+  program
+    .command('convert <input>')
+    .alias('cv')
+    .description('Convert local video to different format')
+    .option('-o, --output <file>', 'Output file name')
+    .option('--to <format>', 'Target format (mp4, mkv, avi, mov, webm, flv)', 'mp4')
+    .option('--preset <preset>', 'Encoding preset (fast, high-quality, custom)', 'fast')
+    .action(convertAction);
+}

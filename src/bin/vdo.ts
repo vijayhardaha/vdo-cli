@@ -1,0 +1,56 @@
+#!/usr/bin/env node
+
+import { Command } from 'commander';
+import { createRequire } from 'module';
+import { setupDownload } from '../commands/download.js';
+import { setupConvert } from '../commands/convert.js';
+import { setupCompress } from '../commands/compress.js';
+import { setupSpeedup } from '../commands/speedup.js';
+import { setupAudio } from '../commands/audio.js';
+import { setupAuto } from '../commands/auto.js';
+
+const require = createRequire(import.meta.url);
+const packageJson = require('../../package.json');
+
+// Create the CLI program
+const program = new Command();
+
+// Configure the program
+program
+  .name('vdo')
+  .description('A Node.js CLI tool for video utilities using yt-dlp and ffmpeg')
+  .version(packageJson.version);
+
+// Setup all commands
+setupDownload(program);
+setupConvert(program);
+setupCompress(program);
+setupSpeedup(program);
+setupAudio(program);
+setupAuto(program);
+
+// Add some examples
+program.addHelpText(
+  'after',
+  `
+
+Examples:
+  $ vdo download https://youtube.com/watch?v=example -o myvideo.mp4
+  $ vdo convert input.avi --to mp4 --preset fast
+  $ vdo compress video.mp4 --crf 23 --preset slow
+  $ vdo speedup video.mp4 --rate 1.5
+  $ vdo audio video.mp4 --format mp3 --bitrate 320k
+  $ vdo auto https://youtube.com/watch?v=example
+  $ vdo auto ./local-video.avi
+
+For more information, visit: https://github.com/yourusername/vdo
+`
+);
+
+// Parse command line arguments
+program.parse(process.argv);
+
+// Show help if no command provided
+if (!process.argv.slice(2).length) {
+  program.outputHelp();
+}

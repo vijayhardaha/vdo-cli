@@ -1,0 +1,65 @@
+{
+  "name": "vdo",
+  "version": "1.0.0",
+  "description": "A Node.js CLI tool for video utilities using yt-dlp and ffmpeg",
+  "type": "module",
+  "main": "./dist/bin/vdo.js",
+  "bin": {
+    "vdo": "./dist/bin/vdo.js"
+  },
+  "scripts": {
+    "dev": "tsx src/bin/vdo.ts",
+    "build": "vite build",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "pnpm run build && pnpm run test:run && pnpm run lint"
+  },
+  "keywords": [
+    "video",
+    "cli",
+    "ffmpeg",
+    "yt-dlp",
+    "download",
+    "convert",
+    "compress",
+    "audio",
+    "extract"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "packageManager": "pnpm@10.33.0",
+  "dependencies": {
+    "axios": "^1.14.0",
+    "cli-progress": "^3.12.0",
+    "commander": "^14.0.3",
+    "ora": "^9.3.0"
+  },
+  "devDependencies": {
+    "@types/cli-progress": "^3.11.6",
+    "@types/node": "^25.5.0",
+    "@vitest/coverage-v8": "^4.1.2",
+    "eslint": "9.39.0",
+    "eslint-config-prettier": "9.1.2",
+    "eslint-plugin-prettier": "^5.5.5",
+    "prettier": "^3.8.1",
+    "tsx": "^4.21.0",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.58.0",
+    "vite": "^8.0.3",
+    "vitest": "^4.1.2"
+  },
+  "files": [
+    "dist/",
+    "LICENSE",
+    "README.md"
+  ]
+}
