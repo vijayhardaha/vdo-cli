@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import {
   validateUrl,
   validateFormat,
@@ -8,9 +8,30 @@ import {
   validateBitrate,
   getFileExtension,
   generateOutputFilename,
+  validateFileExists,
 } from '../src/utils/validations.js';
 
+vi.mock('fs/promises', () => ({
+  access: vi.fn(),
+}));
+
 describe('Validations', () => {
+  describe('validateFileExists', () => {
+    it('should resolve when file exists', async () => {
+      const fs = await import('fs/promises');
+      vi.mocked(fs.access).mockResolvedValue(undefined);
+      await expect(validateFileExists('exists.mp4')).resolves.toBeUndefined();
+    });
+
+    it('should throw when file does not exist', async () => {
+      const fs = await import('fs/promises');
+      vi.mocked(fs.access).mockRejectedValue(new Error('ENOENT'));
+      await expect(validateFileExists('missing.mp4')).rejects.toThrow(
+        'File not found: missing.mp4'
+      );
+    });
+  });
+
   describe('validateUrl', () => {
     it('should return true for valid HTTP URLs', () => {
       expect(validateUrl('http://example.com')).toBe(true);

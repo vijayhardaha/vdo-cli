@@ -1,12 +1,33 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import {
   parseFFmpegProgress,
   parseYtDlpProgress,
   kbToMB,
   convertToMB,
+  createProgressBar,
 } from '../src/utils/progress.js';
 
+vi.mock('cli-progress', () => ({
+  default: {
+    SingleBar: vi.fn().mockImplementation(function () {
+      return { start: vi.fn(), stop: vi.fn(), update: vi.fn() };
+    }),
+    Presets: { shades_classic: {} },
+  },
+}));
+
 describe('Progress', () => {
+  describe('createProgressBar', () => {
+    it('should return a SingleBar instance', async () => {
+      const bar = createProgressBar('Testing');
+      expect(bar).toBeDefined();
+    });
+
+    it('should use default message when not provided', () => {
+      const bar = createProgressBar();
+      expect(bar).toBeDefined();
+    });
+  });
   describe('parseFFmpegProgress', () => {
     it('should parse time progress correctly', () => {
       const line = 'frame= 1234 fps= 30 size=   12345kB time=00:01:23.45 bitrate= 1234.5kbits/s';
@@ -42,6 +63,20 @@ describe('Progress', () => {
       const result = parseFFmpegProgress(line);
 
       expect(result).toBeNull();
+    });
+
+    it('should parse size-only line', () => {
+      const result = parseFFmpegProgress('size=   5432kB speed=1.2x');
+      expect(result).not.toBeNull();
+      expect(result?.type).toBe('size');
+      expect(result?.value).toBe(5432);
+    });
+
+    it('should parse fps-only line', () => {
+      const result = parseFFmpegProgress('fps=30 q=28.0');
+      expect(result).not.toBeNull();
+      expect(result?.type).toBe('fps');
+      expect(result?.value).toBe(30);
     });
   });
 

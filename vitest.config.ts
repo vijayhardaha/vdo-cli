@@ -9,7 +9,8 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
-      exclude: ['node_modules/', 'dist/', 'tests/'],
+      include: ['src/**/*.ts'],
+      exclude: ['node_modules/', 'dist/', 'tests/', 'src/bin/vdo.ts', 'src/types/**'],
     },
     setupFiles: ['./vitest.setup.ts'],
   },
