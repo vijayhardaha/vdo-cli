@@ -29,8 +29,11 @@ src/
 ├── commands/*.ts        # setup<Name>() + <name>Action()
 ├── utils/
 │   ├── dependencies.ts  # checkDependencies(), runCommand()
-│   ├── validations.ts   # Input validation helpers
+│   ├── icons.ts         # Nerd icons (info, success, warning, error)
+│   ├── log.ts           # Logging utility (log.succeed, log.fail, etc.)
 │   ├── progress.ts      # Progress bar utilities
+│   ├── sanitize.ts      # Filename sanitization
+│   ├── validations.ts   # Input validation helpers
 │   ├── ffmpeg.ts        # FFmpeg wrappers
 │   └── ytdlp.ts         # yt-dlp wrappers
 └── types/index.ts       # All shared interfaces
@@ -121,11 +124,12 @@ if (isAuthenticated) {
 
 ### Imports
 
-- **ESM with `.js` extension** (even for `.ts` files):
-  ```ts
-  import { runCommand } from "./dependencies.js"; // correct
-  import { runCommand } from "./dependencies"; // wrong
-  ```
+ESM imports with `moduleResolution: bundler`:
+
+```ts
+import { runCommand } from "./dependencies.js";
+import { log } from "./log.js";
+```
 
 ### TypeScript
 
@@ -139,8 +143,8 @@ Every action must:
 
 1. Call `checkDependencies()` first → `process.exit(1)` if missing
 2. Validate all inputs before spawning processes
-3. Catch errors → `console.error('\n✗ Error: <message>')` → `process.exit(1)`
-4. On success → `console.log('\n✓ <Action> completed successfully!')`
+3. Catch errors → `log.fail('<message>')` → `process.exit(1)`
+4. On success → `log.succeed('<Action> completed successfully!')`
 
 ## Testing
 
