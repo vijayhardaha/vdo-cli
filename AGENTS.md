@@ -62,6 +62,7 @@ bun run format:check    # Check formatting
 ```ts
 /**
  * {Description of what the function does}
+ *
  * @param {Type} name - {Description of parameter}
  * @returns {Type} - {Description of return value}
  * @throws {Type} - {Description of when error is thrown}
