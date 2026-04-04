@@ -9,7 +9,11 @@ import { speedupAction } from '../src/commands/speedup.js';
 // Mock all external dependencies
 vi.mock('../src/utils/dependencies.js', () => ({ checkDependencies: vi.fn() }));
 
-vi.mock('../src/utils/ytdlp.js', () => ({ downloadVideo: vi.fn() }));
+vi.mock('../src/utils/ytdlp.js', () => ({
+  downloadVideo: vi.fn(),
+  getVideoInfo: vi.fn(),
+  generateFilename: vi.fn((info, format) => `${info.title}_${info.video_id}.${format}`),
+}));
 
 vi.mock('../src/utils/ffmpeg.js', () => ({
   convertVideo: vi.fn(),
@@ -82,12 +86,13 @@ describe('Command actions', () => {
     it('should download video with default options', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateUrl, validateFormat } = await import('../src/utils/validations.js');
-      const { downloadVideo } = await import('../src/utils/ytdlp.js');
+      const { downloadVideo, getVideoInfo } = await import('../src/utils/ytdlp.js');
       const { createProgressBar, convertToMB } = await import('../src/utils/progress.js');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateUrl).mockReturnValue(true);
       vi.mocked(validateFormat).mockReturnValue(undefined);
+      vi.mocked(getVideoInfo).mockResolvedValue({ title: 'Test Video', video_id: 'abc123', ext: 'mp4' });
       vi.mocked(downloadVideo).mockResolvedValue(undefined);
       vi.mocked(createProgressBar).mockReturnValue(mockProgressBar as never);
       vi.mocked(convertToMB).mockReturnValue(50);
@@ -101,19 +106,21 @@ describe('Command actions', () => {
     it('should use provided output and format options', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateUrl, validateFormat } = await import('../src/utils/validations.js');
-      const { downloadVideo } = await import('../src/utils/ytdlp.js');
+      const { downloadVideo, getVideoInfo } = await import('../src/utils/ytdlp.js');
       const { createProgressBar } = await import('../src/utils/progress.js');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateUrl).mockReturnValue(true);
       vi.mocked(validateFormat).mockReturnValue(undefined);
+      vi.mocked(getVideoInfo).mockResolvedValue({ title: 'Test', video_id: '123', ext: 'mp4' });
       vi.mocked(downloadVideo).mockResolvedValue(undefined);
       vi.mocked(createProgressBar).mockReturnValue(mockProgressBar as never);
 
       await downloadAction('https://example.com', { output: 'myvideo', format: 'mkv' });
 
+      // When user provides output without extension, uses videoInfo.ext (not requested format)
       const callArgs = vi.mocked(downloadVideo).mock.calls[0];
-      expect(callArgs?.[1]).toBe('myvideo.mkv');
+      expect(callArgs?.[1]).toBe('myvideo.mp4');
       expect(callArgs?.[2]).toBe('mkv');
     });
 
@@ -121,12 +128,13 @@ describe('Command actions', () => {
     it('should append extension when output has no dot', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateUrl, validateFormat } = await import('../src/utils/validations.js');
-      const { downloadVideo } = await import('../src/utils/ytdlp.js');
+      const { downloadVideo, getVideoInfo } = await import('../src/utils/ytdlp.js');
       const { createProgressBar } = await import('../src/utils/progress.js');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateUrl).mockReturnValue(true);
       vi.mocked(validateFormat).mockReturnValue(undefined);
+      vi.mocked(getVideoInfo).mockResolvedValue({ title: 'Test', video_id: '123', ext: 'mp4' });
       vi.mocked(downloadVideo).mockResolvedValue(undefined);
       vi.mocked(createProgressBar).mockReturnValue(mockProgressBar as never);
 
@@ -140,12 +148,13 @@ describe('Command actions', () => {
     it('should call progressCallback and update progress bar', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateUrl, validateFormat } = await import('../src/utils/validations.js');
-      const { downloadVideo } = await import('../src/utils/ytdlp.js');
+      const { downloadVideo, getVideoInfo } = await import('../src/utils/ytdlp.js');
       const { createProgressBar, convertToMB } = await import('../src/utils/progress.js');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateUrl).mockReturnValue(true);
       vi.mocked(validateFormat).mockReturnValue(undefined);
+      vi.mocked(getVideoInfo).mockResolvedValue({ title: 'Test', video_id: '123', ext: 'mp4' });
       vi.mocked(convertToMB).mockReturnValue(100);
       vi.mocked(createProgressBar).mockReturnValue(mockProgressBar as never);
       vi.mocked(downloadVideo).mockImplementation(async (_url, _out, _fmt, onProgress) => {
@@ -154,7 +163,6 @@ describe('Command actions', () => {
 
       await downloadAction('https://example.com', {});
 
-      // Expect progress bar to be updated with percentage and total
       expect(mockProgressBar.update).toHaveBeenCalledWith(50, { total: 100 });
     });
 
@@ -162,12 +170,13 @@ describe('Command actions', () => {
     it('should handle thrown errors and exit 1', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateUrl, validateFormat } = await import('../src/utils/validations.js');
-      const { downloadVideo } = await import('../src/utils/ytdlp.js');
+      const { downloadVideo, getVideoInfo } = await import('../src/utils/ytdlp.js');
       const { createProgressBar } = await import('../src/utils/progress.js');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateUrl).mockReturnValue(true);
       vi.mocked(validateFormat).mockReturnValue(undefined);
+      vi.mocked(getVideoInfo).mockResolvedValue({ title: 'Test', video_id: '123', ext: 'mp4' });
       vi.mocked(createProgressBar).mockReturnValue(mockProgressBar as never);
       vi.mocked(downloadVideo).mockRejectedValue(new Error('network error'));
       const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
@@ -180,14 +189,14 @@ describe('Command actions', () => {
     it('should handle non-Error thrown values', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateUrl, validateFormat } = await import('../src/utils/validations.js');
-      const { downloadVideo } = await import('../src/utils/ytdlp.js');
+      const { downloadVideo, getVideoInfo } = await import('../src/utils/ytdlp.js');
       const { createProgressBar } = await import('../src/utils/progress.js');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateUrl).mockReturnValue(true);
       vi.mocked(validateFormat).mockReturnValue(undefined);
+      vi.mocked(getVideoInfo).mockResolvedValue({ title: 'Test', video_id: '123', ext: 'mp4' });
       vi.mocked(createProgressBar).mockReturnValue(mockProgressBar as never);
-      // Reject with string to hit String(error) branch
       vi.mocked(downloadVideo).mockRejectedValue('string error');
       const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
 
@@ -199,52 +208,57 @@ describe('Command actions', () => {
     it('should use mp3 extension when format is mp3 and no output provided', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateUrl, validateFormat } = await import('../src/utils/validations.js');
-      const { downloadVideo } = await import('../src/utils/ytdlp.js');
+      const { downloadVideo, getVideoInfo } = await import('../src/utils/ytdlp.js');
       const { createProgressBar, convertToMB } = await import('../src/utils/progress.js');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateUrl).mockReturnValue(true);
       vi.mocked(validateFormat).mockReturnValue(undefined);
+      vi.mocked(getVideoInfo).mockResolvedValue({ title: 'Test', video_id: '123', ext: 'mp4' });
       vi.mocked(downloadVideo).mockResolvedValue(undefined);
       vi.mocked(createProgressBar).mockReturnValue(mockProgressBar as never);
       vi.mocked(convertToMB).mockReturnValue(50);
 
       await downloadAction('https://example.com', { format: 'mp3' });
 
+      // When no output provided, uses generateFilename which uses requested format
       const callArgs = vi.mocked(downloadVideo).mock.calls[0];
-      expect(callArgs?.[1]).toBe('download.mp3');
+      expect(callArgs?.[1]).toBe('Test_123.mp3');
       expect(callArgs?.[2]).toBe('mp3');
     });
 
     it('should append format extension when output has no dot', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateUrl, validateFormat } = await import('../src/utils/validations.js');
-      const { downloadVideo } = await import('../src/utils/ytdlp.js');
+      const { downloadVideo, getVideoInfo } = await import('../src/utils/ytdlp.js');
       const { createProgressBar, convertToMB } = await import('../src/utils/progress.js');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateUrl).mockReturnValue(true);
       vi.mocked(validateFormat).mockReturnValue(undefined);
+      vi.mocked(getVideoInfo).mockResolvedValue({ title: 'Test', video_id: '123', ext: 'mp4' });
       vi.mocked(downloadVideo).mockResolvedValue(undefined);
       vi.mocked(createProgressBar).mockReturnValue(mockProgressBar as never);
       vi.mocked(convertToMB).mockReturnValue(50);
 
       await downloadAction('https://example.com', { output: 'myvideo', format: 'mkv' });
 
+      // When user provides output without extension, uses videoInfo.ext (not requested format)
       const callArgs = vi.mocked(downloadVideo).mock.calls[0];
-      expect(callArgs?.[1]).toBe('myvideo.mkv');
+      expect(callArgs?.[1]).toBe('myvideo.mp4');
       expect(callArgs?.[2]).toBe('mkv');
     });
 
     it('should use provided output as-is when it already has extension', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateUrl, validateFormat } = await import('../src/utils/validations.js');
-      const { downloadVideo } = await import('../src/utils/ytdlp.js');
+      const { downloadVideo, getVideoInfo } = await import('../src/utils/ytdlp.js');
       const { createProgressBar, convertToMB } = await import('../src/utils/progress.js');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateUrl).mockReturnValue(true);
       vi.mocked(validateFormat).mockReturnValue(undefined);
+      vi.mocked(getVideoInfo).mockResolvedValue({ title: 'Test', video_id: '123', ext: 'mp4' });
       vi.mocked(downloadVideo).mockResolvedValue(undefined);
       vi.mocked(createProgressBar).mockReturnValue(mockProgressBar as never);
       vi.mocked(convertToMB).mockReturnValue(50);
@@ -259,14 +273,14 @@ describe('Command actions', () => {
     it('should not update progress bar when progressCallback called with no progressBar', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateUrl, validateFormat } = await import('../src/utils/validations.js');
-      const { downloadVideo } = await import('../src/utils/ytdlp.js');
+      const { downloadVideo, getVideoInfo } = await import('../src/utils/ytdlp.js');
       const { createProgressBar, convertToMB } = await import('../src/utils/progress.js');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateUrl).mockReturnValue(true);
       vi.mocked(validateFormat).mockReturnValue(undefined);
+      vi.mocked(getVideoInfo).mockResolvedValue({ title: 'Test', video_id: '123', ext: 'mp4' });
       vi.mocked(convertToMB).mockReturnValue(50);
-      // Return falsy progressBar to hit the !progressBar branch
       vi.mocked(createProgressBar).mockReturnValue(null as never);
       vi.mocked(downloadVideo).mockImplementation(async (_url, _out, _fmt, onProgress) => {
         if (onProgress) onProgress(50, 100, 'MiB');
@@ -274,7 +288,6 @@ describe('Command actions', () => {
       const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
 
       await downloadAction('https://example.com', {});
-      // null progressBar causes .start() to throw, caught by outer catch
       expect(exitSpy).toHaveBeenCalledWith(1);
     });
   });
