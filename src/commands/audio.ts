@@ -12,7 +12,7 @@ const ALLOWED_FORMATS = ['mp3', 'wav', 'aac'];
 
 export async function audioAction(input: string, options: AudioOptions): Promise<void> {
   try {
-    log.spinner('Preparing audio extraction...');
+    log.loading('Preparing audio extraction...');
 
     const deps = await checkDependencies();
     if (!deps.ok) {
