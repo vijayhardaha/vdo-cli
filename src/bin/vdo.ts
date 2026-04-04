@@ -5,7 +5,6 @@ import { createRequire } from 'module';
 import { Command } from 'commander';
 
 import { setupAudio } from '../commands/audio.js';
-import { setupAuto } from '../commands/auto.js';
 import { setupCompress } from '../commands/compress.js';
 import { setupConvert } from '../commands/convert.js';
 import { setupDownload } from '../commands/download.js';
@@ -35,7 +34,6 @@ setupConvert(program);
 setupCompress(program);
 setupSpeedup(program);
 setupAudio(program);
-setupAuto(program);
 
 // Add some examples
 program.addHelpText(
@@ -48,10 +46,8 @@ Examples:
   $ vdo compress video.mp4 --crf 23 --preset slow
   $ vdo speedup video.mp4 --rate 1.5
   $ vdo audio video.mp4 --format mp3 --bitrate 320k
-  $ vdo auto https://youtube.com/watch?v=example
-  $ vdo auto ./local-video.avi
 
-For more information, visit: https://github.com/yourusername/vdo
+For more information, visit: https://github.com/vijayhardaha/vdo-cli
 `
 );
 

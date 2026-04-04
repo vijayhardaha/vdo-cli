@@ -88,11 +88,3 @@ export interface AudioOptions {
   format?: AudioFormat;
   bitrate?: string;
 }
-
-/**
- * Options for auto command
- */
-export interface AutoOptions {
-  output?: string;
-  format?: DownloadFormat;
-}
