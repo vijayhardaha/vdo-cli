@@ -2,6 +2,8 @@ import { resolve, dirname, basename, extname, join } from 'path';
 
 import type { Command } from 'commander';
 
+import { loading } from '@/utils/icons.js';
+
 import type { SpeedupOptions } from '../types/index.js';
 import { checkDependencies } from '../utils/dependencies.js';
 import { speedUpVideo } from '../utils/ffmpeg.js';
@@ -11,7 +13,7 @@ import { validateFileExists, validateSpeedRate } from '../utils/validations.js';
 
 export async function speedupAction(input: string, options: SpeedupOptions): Promise<void> {
   try {
-    log.spinner('Preparing speed adjustment...');
+    log.loading('Preparing speed adjustment...');
 
     const deps = await checkDependencies();
     if (!deps.ok) {
@@ -44,7 +46,7 @@ export async function speedupAction(input: string, options: SpeedupOptions): Pro
 
     log.succeed('Speed adjustment started');
 
-    const progressBar = createProgressBar('Processing');
+    const progressBar = createProgressBar(`${loading} Processing`);
 
     const progressCallback = (percentage: number) => {
       if (progressBar && percentage > 0) {
