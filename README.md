@@ -345,47 +345,59 @@ source ~/.bashrc
 ### Running Tests
 
 ```bash
-npm test
+bun test
 ```
 
 ### Running Tests with Coverage
 
 ```bash
-npm run test:coverage
+bun run test:coverage
 ```
 
 ### Linting
 
 ```bash
-npm run lint
+bun run lint
+```
+
+### Type Checking
+
+```bash
+bun run tsc
 ```
 
 ## Project Structure
 
 ```
 vdo/
-├── bin/
-│   └── vdo.js              # Main entry point
-├── commands/
-│   ├── download.js         # Download command
-│   ├── convert.js          # Convert command
-│   ├── compress.js         # Compress command
-│   ├── speedup.js          # Speed adjustment command
-│   ├── audio.js            # Audio extraction command
-
-├── utils/
-│   ├── dependencies.js     # Dependency checking utilities
-│   ├── validations.js      # Input validation utilities
-│   ├── ffmpeg.js           # FFmpeg wrapper functions
-│   ├── ytdlp.js            # yt-dlp wrapper functions
-│   └── progress.js         # Progress bar utilities
+├── src/
+│   ├── bin/
+│   │   └── vdo.ts              # Main entry point
+│   ├── commands/
+│   │   ├── download.ts         # Download command
+│   │   ├── convert.ts          # Convert command
+│   │   ├── compress.ts         # Compress command
+│   │   ├── speedup.ts          # Speed adjustment command
+│   │   └── audio.ts            # Audio extraction command
+│   ├── utils/
+│   │   ├── dependencies.ts     # Dependency checking utilities
+│   │   ├── validations.ts      # Input validation utilities
+│   │   ├── icons.ts            # Nerd icons
+│   │   ├── log.ts              # Logging utility
+│   │   ├── ffmpeg.ts           # FFmpeg wrapper functions
+│   │   ├── ytdlp.ts            # yt-dlp wrapper functions
+│   │   └── progress.ts         # Progress bar utilities
+│   └── types/
+│       └── index.ts             # TypeScript type definitions
 ├── tests/
-│   ├── validations.test.js
-│   ├── dependencies.test.js
-│   ├── progress.test.js
-│   └── commands.test.js
+│   ├── actions.test.ts
+│   ├── dependencies.test.ts
+│   ├── ffmpeg.test.ts
+│   ├── progress.test.ts
+│   ├── sanitize.test.ts
+│   └── ytdlp.test.ts
 ├── package.json
-├── jest.config.js
+├── vitest.config.ts
 └── README.md
 ```
 
@@ -409,7 +421,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - [ffmpeg](https://ffmpeg.org/) - The complete, cross-platform solution for video/audio processing
 - [Commander.js](https://github.com/tj/commander.js) - Complete node.js command-line interface
 - [cli-progress](https://github.com/npkgz/cli-progress) - Progress bars for CLI applications
-- [ora](https://github.com/sindresorhus/ora) - Terminal spinners
+- [yoctocolors](https://github.com/yoctocolors/yoctocolors) - Terminal colors
 
 ## Support
 
