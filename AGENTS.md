@@ -8,7 +8,7 @@
 
 - **Runtime:** Node.js ≥ 20, ESM only, bun package manager
 - **Language:** TypeScript 5, strict mode, `moduleResolution: bundler`
-- **Build:** Vite (SSR/Node target) → `dist/bin/vdo.js`
+- **Build:** Vite (SSR/Node target) → `dist/vdo.js`
 - **Tests:** Vitest with globals enabled
 
 ## Commands
@@ -42,7 +42,7 @@ src/
 
 ```bash
 bun dev -- <command>   # Run CLI in development
-bun run build          # Build to dist/bin/vdo.js
+bun run build          # Build to dist/vdo.js
 bun test               # Vitest watch mode
 bun run test:run       # Vitest single run
 bun run tsc            # TypeScript check

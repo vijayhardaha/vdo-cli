@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "A Node.js CLI tool for video utilities using yt-dlp and ffmpeg",
   "type": "module",
-  "main": "./dist/bin/vdo.js",
+  "main": "./dist/vdo.js",
   "bin": {
-    "vdo": "./dist/bin/vdo.js"
+    "vdo": "./dist/vdo.js"
   },
   "homepage": "https://github.com/vijayhardaha/vdo-cli",
   "repository": {
