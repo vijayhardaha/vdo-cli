@@ -33,14 +33,14 @@ export default defineConfig({
     lib: { entry: resolve(__dirname, 'src/bin/vdo.ts'), name: 'vdo', fileName: 'vdo', formats: ['es'] },
 
     rollupOptions: {
-      // Mark Node built-ins and runtime deps as external
       external: [
         ...builtinModules,
         ...builtinModules.map((m) => `node:${m}`),
         'commander',
         'cli-progress',
-        'ora',
         'axios',
+        'is-unicode-supported',
+        'yoctocolors',
       ],
       output: { preserveModules: false, entryFileNames: '[name].js' },
     },
