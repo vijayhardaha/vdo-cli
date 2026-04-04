@@ -1,12 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 
-import {
-  parseFFmpegProgress,
-  parseYtDlpProgress,
-  kbToMB,
-  convertToMB,
-  createProgressBar,
-} from '../src/utils/progress.js';
+import { parseFFmpegProgress, parseYtDlpProgress, kbToMB, createProgressBar } from '../src/utils/progress.js';
 
 vi.mock('cli-progress', () => ({
   default: {
@@ -132,29 +126,6 @@ describe('Progress', () => {
       expect(kbToMB(1024)).toBe(1);
       expect(kbToMB(512)).toBe(0.5);
       expect(kbToMB(2048)).toBe(2);
-    });
-  });
-
-  // Tests for convertToMB function
-  describe('convertToMB', () => {
-    // Should convert KiB to MB
-    it('should convert KiB to MB', () => {
-      expect(convertToMB(1024, 'KiB')).toBe(1);
-    });
-
-    // Should convert MiB to MB
-    it('should convert MiB to MB', () => {
-      expect(convertToMB(100, 'MiB')).toBe(100);
-    });
-
-    // Should convert GiB to MB
-    it('should convert GiB to MB', () => {
-      expect(convertToMB(1, 'GiB')).toBe(1024);
-    });
-
-    // Should return same value for unknown units
-    it('should return same value for unknown units', () => {
-      expect(convertToMB(100, 'Unknown')).toBe(100);
     });
   });
 });
