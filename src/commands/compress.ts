@@ -2,6 +2,8 @@ import { resolve, dirname, basename, extname, join } from 'path';
 
 import type { Command } from 'commander';
 
+import { loading } from '@/utils/icons.js';
+
 import type { CompressOptions } from '../types/index.js';
 import { checkDependencies } from '../utils/dependencies.js';
 import { compressVideo } from '../utils/ffmpeg.js';
@@ -13,7 +15,7 @@ const ALLOWED_PRESETS = ['ultrafast', 'fast', 'medium', 'slow'];
 
 export async function compressAction(input: string, options: CompressOptions): Promise<void> {
   try {
-    log.spinner('Preparing compression...');
+    log.loading('Preparing compression...');
 
     const deps = await checkDependencies();
     if (!deps.ok) {
@@ -54,7 +56,7 @@ export async function compressAction(input: string, options: CompressOptions): P
 
     log.succeed('Compression started');
 
-    const progressBar = createProgressBar('Compressing');
+    const progressBar = createProgressBar(`${loading} Compressing`);
 
     const progressCallback = (percentage: number) => {
       if (progressBar && percentage > 0) {
