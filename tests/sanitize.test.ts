@@ -70,6 +70,28 @@ describe('sanitize utils', () => {
       // expect: control character is removed
       expect(result).toBe('testvideo');
     });
+
+    // it: should remove trailing dots and spaces on Windows
+    it('should remove trailing dots and spaces on Windows', () => {
+      const platformMock = vi.spyOn(process, 'platform', 'get');
+      platformMock.mockReturnValue('win32');
+
+      const result = sanitizeFilename('test video...   ');
+
+      // expect: trailing dots and spaces are removed
+      expect(result).toBe('test-video');
+
+      platformMock.mockRestore();
+    });
+
+    // it: should truncate without punctuation when no cutoff symbols exist
+    it('should truncate without punctuation when no cutoff symbols exist', () => {
+      const longName = 'a'.repeat(250);
+      const result = sanitizeFilename(longName, 100);
+
+      // expect: result is truncated at maxLength
+      expect(result.length).toBe(100);
+    });
   });
 
   // describe: slugify

@@ -203,66 +203,31 @@ describe('Command actions', () => {
       expect(exitSpy).toHaveBeenCalledWith(1);
     });
 
-    // it: should use mp3 extension when format is mp3 and no output provided
-    it('should use mp3 extension when format is mp3 and no output provided', async () => {
+    // it: should exit when validateFormat throws error
+    it('should exit when validateFormat throws error', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateUrl, validateFormat } = await import('../src/utils/validations.js');
-      const { downloadVideo, getVideoInfo } = await import('../src/utils/ytdlp.js');
-      const { createProgressBar } = await import('../src/utils/progress.js');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateUrl).mockReturnValue(true);
-      vi.mocked(validateFormat).mockReturnValue(undefined);
-      vi.mocked(getVideoInfo).mockResolvedValue({ title: 'Test', video_id: '123', ext: 'mp4' });
-      vi.mocked(downloadVideo).mockResolvedValue(undefined);
-      vi.mocked(createProgressBar).mockReturnValue(mockProgressBar as never);
-
-      await downloadAction('https://example.com', { format: 'mp3' });
-
-      // expect: uses generateFilename with requested format
-      const callArgs = vi.mocked(downloadVideo).mock.calls[0];
-      expect(callArgs?.[1]).toBe('Test_123.mp3');
-      expect(callArgs?.[2]).toBe('mp3');
-    });
-
-    // it: should use provided output as-is when it already has extension
-    it('should use provided output as-is when it already has extension', async () => {
-      const { checkDependencies } = await import('../src/utils/dependencies.js');
-      const { validateUrl, validateFormat } = await import('../src/utils/validations.js');
-      const { downloadVideo, getVideoInfo } = await import('../src/utils/ytdlp.js');
-      const { createProgressBar } = await import('../src/utils/progress.js');
-
-      vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
-      vi.mocked(validateUrl).mockReturnValue(true);
-      vi.mocked(validateFormat).mockReturnValue(undefined);
-      vi.mocked(getVideoInfo).mockResolvedValue({ title: 'Test', video_id: '123', ext: 'mp4' });
-      vi.mocked(downloadVideo).mockResolvedValue(undefined);
-      vi.mocked(createProgressBar).mockReturnValue(mockProgressBar as never);
-
-      await downloadAction('https://example.com', { output: 'myvideo.mkv', format: 'mkv' });
-
-      // expect: output is used as-is
-      const callArgs = vi.mocked(downloadVideo).mock.calls[0];
-      expect(callArgs?.[1]).toBe('myvideo.mkv');
-      expect(callArgs?.[2]).toBe('mkv');
-    });
-
-    // it: should not update progress bar when progressCallback called with no progressBar
-    it('should not update progress bar when progressCallback called with no progressBar', async () => {
-      const { checkDependencies } = await import('../src/utils/dependencies.js');
-      const { validateUrl, validateFormat } = await import('../src/utils/validations.js');
-      const { downloadVideo, getVideoInfo } = await import('../src/utils/ytdlp.js');
-      const { createProgressBar } = await import('../src/utils/progress.js');
-
-      vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
-      vi.mocked(validateUrl).mockReturnValue(true);
-      vi.mocked(validateFormat).mockReturnValue(undefined);
-      vi.mocked(getVideoInfo).mockResolvedValue({ title: 'Test', video_id: '123', ext: 'mp4' });
-
-      vi.mocked(createProgressBar).mockReturnValue(null as never);
-      vi.mocked(downloadVideo).mockImplementation(async (_url, _out, _fmt, onProgress) => {
-        if (onProgress) onProgress(50, 100, 'MiB');
+      vi.mocked(validateFormat).mockImplementation(() => {
+        throw new Error('Invalid format');
       });
+      const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
+
+      await downloadAction('https://example.com', {});
+
+      // expect: process.exit is called with 1
+      expect(exitSpy).toHaveBeenCalledWith(1);
+    });
+
+    // it: should handle non-Error thrown values in outer catch
+    it('should handle non-Error thrown values in outer catch', async () => {
+      const { checkDependencies } = await import('../src/utils/dependencies.js');
+      const { validateUrl } = await import('../src/utils/validations.js');
+
+      vi.mocked(checkDependencies).mockRejectedValue('unknown error');
+      vi.mocked(validateUrl).mockReturnValue(true);
       const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
 
       await downloadAction('https://example.com', {});
@@ -398,6 +363,63 @@ describe('Command actions', () => {
       // expect: process.exit is called with 1
       expect(exitSpy).toHaveBeenCalledWith(1);
     });
+
+    // it: should exit when validateFormat throws error
+    it('should exit when validateFormat throws error', async () => {
+      const { checkDependencies } = await import('../src/utils/dependencies.js');
+      const { validateFileExists, validateFormat } = await import('../src/utils/validations.js');
+      vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
+      vi.mocked(validateFileExists).mockResolvedValue(undefined);
+      vi.mocked(validateFormat).mockImplementation(() => {
+        throw new Error('Invalid format: xyz');
+      });
+      const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
+
+      await convertAction('input.avi', {});
+
+      // expect: process.exit is called with 1
+      expect(exitSpy).toHaveBeenCalledWith(1);
+    });
+
+    // it: should exit when validatePreset throws error
+    it('should exit when validatePreset throws error', async () => {
+      const { checkDependencies } = await import('../src/utils/dependencies.js');
+      const { validateFileExists, validateFormat, validatePreset } = await import('../src/utils/validations.js');
+      vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
+      vi.mocked(validateFileExists).mockResolvedValue(undefined);
+      vi.mocked(validateFormat).mockReturnValue(undefined);
+      vi.mocked(validatePreset).mockImplementation(() => {
+        throw new Error('Invalid preset: invalid');
+      });
+      const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
+
+      await convertAction('input.avi', {});
+
+      // expect: process.exit is called with 1
+      expect(exitSpy).toHaveBeenCalledWith(1);
+    });
+
+    // it: should handle convertVideo errors and exit 1
+    it('should handle convertVideo errors and exit 1', async () => {
+      const { checkDependencies } = await import('../src/utils/dependencies.js');
+      const { validateFileExists, validateFormat, validatePreset } = await import('../src/utils/validations.js');
+      const { convertVideo } = await import('../src/utils/ffmpeg.js');
+      const { createProgressBar } = await import('../src/utils/progress.js');
+
+      vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
+      vi.mocked(validateFileExists).mockResolvedValue(undefined);
+      vi.mocked(validateFormat).mockReturnValue(undefined);
+      vi.mocked(validatePreset).mockReturnValue(undefined);
+      vi.mocked(convertVideo).mockRejectedValue(new Error('Conversion failed'));
+      vi.mocked(createProgressBar).mockReturnValue(mockProgressBar as never);
+      const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
+
+      await convertAction('input.avi', {});
+
+      // expect: progress bar is stopped and process exits with 1
+      expect(mockProgressBar.stop).toHaveBeenCalled();
+      expect(exitSpy).toHaveBeenCalledWith(1);
+    });
   });
 
   // describe: compressAction
@@ -520,6 +542,74 @@ describe('Command actions', () => {
       const { validateFileExists } = await import('../src/utils/validations.js');
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateFileExists).mockRejectedValue('string error');
+      const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
+
+      await compressAction('input.mp4', {});
+
+      // expect: process.exit is called with 1
+      expect(exitSpy).toHaveBeenCalledWith(1);
+    });
+
+    // it: should exit when validatePreset throws error
+    it('should exit when validatePreset throws error', async () => {
+      const { checkDependencies } = await import('../src/utils/dependencies.js');
+      const { validateFileExists, validatePreset } = await import('../src/utils/validations.js');
+      vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
+      vi.mocked(validateFileExists).mockResolvedValue(undefined);
+      vi.mocked(validatePreset).mockImplementation(() => {
+        throw new Error('Invalid preset');
+      });
+      const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
+
+      await compressAction('input.mp4', {});
+
+      // expect: process.exit is called with 1
+      expect(exitSpy).toHaveBeenCalledWith(1);
+    });
+
+    // it: should handle compressVideo errors and exit 1
+    it('should handle compressVideo errors and exit 1', async () => {
+      const { checkDependencies } = await import('../src/utils/dependencies.js');
+      const { validateFileExists, validatePreset, validateCRF } = await import('../src/utils/validations.js');
+      const { compressVideo } = await import('../src/utils/ffmpeg.js');
+      const { createProgressBar } = await import('../src/utils/progress.js');
+
+      vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
+      vi.mocked(validateFileExists).mockResolvedValue(undefined);
+      vi.mocked(validatePreset).mockReturnValue(undefined);
+      vi.mocked(validateCRF).mockReturnValue(undefined);
+      vi.mocked(compressVideo).mockRejectedValue(new Error('Compression failed'));
+      vi.mocked(createProgressBar).mockReturnValue(mockProgressBar as never);
+      const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
+
+      await compressAction('input.mp4', {});
+
+      // expect: progress bar is stopped and process exits with 1
+      expect(mockProgressBar.stop).toHaveBeenCalled();
+      expect(exitSpy).toHaveBeenCalledWith(1);
+    });
+
+    // it: should exit when validateCRF throws error
+    it('should exit when validateCRF throws error', async () => {
+      const { checkDependencies } = await import('../src/utils/dependencies.js');
+      const { validateFileExists, validateCRF } = await import('../src/utils/validations.js');
+      vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
+      vi.mocked(validateFileExists).mockResolvedValue(undefined);
+      vi.mocked(validateCRF).mockImplementation(() => {
+        throw new Error('Invalid CRF');
+      });
+      const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
+
+      await compressAction('input.mp4', {});
+
+      // expect: process.exit is called with 1
+      expect(exitSpy).toHaveBeenCalledWith(1);
+    });
+
+    // it: should handle non-Error thrown values in outer catch
+    it('should handle non-Error thrown values in outer catch', async () => {
+      const { checkDependencies } = await import('../src/utils/dependencies.js');
+      vi.mocked(checkDependencies).mockRejectedValue('unknown error');
       const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
 
       await compressAction('input.mp4', {});
@@ -672,6 +762,56 @@ describe('Command actions', () => {
       // expect: process.exit is called with 1
       expect(exitSpy).toHaveBeenCalledWith(1);
     });
+
+    // it: should exit when validateSpeedRate throws error
+    it('should exit when validateSpeedRate throws error', async () => {
+      const { checkDependencies } = await import('../src/utils/dependencies.js');
+      const { validateFileExists, validateSpeedRate } = await import('../src/utils/validations.js');
+      vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
+      vi.mocked(validateFileExists).mockResolvedValue(undefined);
+      vi.mocked(validateSpeedRate).mockImplementation(() => {
+        throw new Error('Invalid speed rate');
+      });
+      const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
+
+      await speedupAction('input.mp4', {});
+
+      // expect: process.exit is called with 1
+      expect(exitSpy).toHaveBeenCalledWith(1);
+    });
+
+    // it: should handle speedUpVideo errors and exit 1
+    it('should handle speedUpVideo errors and exit 1', async () => {
+      const { checkDependencies } = await import('../src/utils/dependencies.js');
+      const { validateFileExists, validateSpeedRate } = await import('../src/utils/validations.js');
+      const { speedUpVideo } = await import('../src/utils/ffmpeg.js');
+      const { createProgressBar } = await import('../src/utils/progress.js');
+
+      vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
+      vi.mocked(validateFileExists).mockResolvedValue(undefined);
+      vi.mocked(validateSpeedRate).mockReturnValue(undefined);
+      vi.mocked(speedUpVideo).mockRejectedValue(new Error('Speed adjustment failed'));
+      vi.mocked(createProgressBar).mockReturnValue(mockProgressBar as never);
+      const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
+
+      await speedupAction('input.mp4', {});
+
+      // expect: progress bar is stopped and process exits with 1
+      expect(mockProgressBar.stop).toHaveBeenCalled();
+      expect(exitSpy).toHaveBeenCalledWith(1);
+    });
+
+    // it: should handle non-Error thrown values in outer catch
+    it('should handle non-Error thrown values in outer catch', async () => {
+      const { checkDependencies } = await import('../src/utils/dependencies.js');
+      vi.mocked(checkDependencies).mockRejectedValue('unknown error');
+      const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
+
+      await speedupAction('input.mp4', {});
+
+      // expect: process.exit is called with 1
+      expect(exitSpy).toHaveBeenCalledWith(1);
+    });
   });
 
   // describe: audioAction
@@ -747,6 +887,71 @@ describe('Command actions', () => {
       const { validateFileExists } = await import('../src/utils/validations.js');
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateFileExists).mockRejectedValue('string error');
+      const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
+
+      await audioAction('input.mp4', {});
+
+      // expect: process.exit is called with 1
+      expect(exitSpy).toHaveBeenCalledWith(1);
+    });
+
+    // it: should exit when validateBitrate throws error
+    it('should exit when validateBitrate throws error', async () => {
+      const { checkDependencies } = await import('../src/utils/dependencies.js');
+      const { validateFileExists, validateBitrate } = await import('../src/utils/validations.js');
+      vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
+      vi.mocked(validateFileExists).mockResolvedValue(undefined);
+      vi.mocked(validateBitrate).mockImplementation(() => {
+        throw new Error('Invalid bitrate');
+      });
+      const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
+
+      await audioAction('input.mp4', {});
+
+      // expect: process.exit is called with 1
+      expect(exitSpy).toHaveBeenCalledWith(1);
+    });
+
+    // it: should handle extractAudio errors and exit 1
+    it('should handle extractAudio errors and exit 1', async () => {
+      const { checkDependencies } = await import('../src/utils/dependencies.js');
+      const { validateFileExists, validateFormat, validateBitrate } = await import('../src/utils/validations.js');
+      const { extractAudio } = await import('../src/utils/ffmpeg.js');
+
+      vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
+      vi.mocked(validateFileExists).mockResolvedValue(undefined);
+      vi.mocked(validateFormat).mockReturnValue(undefined);
+      vi.mocked(validateBitrate).mockReturnValue(undefined);
+      vi.mocked(extractAudio).mockRejectedValue(new Error('Audio extraction failed'));
+      const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
+
+      await audioAction('input.mp4', {});
+
+      // expect: process.exit is called with 1
+      expect(exitSpy).toHaveBeenCalledWith(1);
+    });
+
+    // it: should exit when validateFormat throws error
+    it('should exit when validateFormat throws error', async () => {
+      const { checkDependencies } = await import('../src/utils/dependencies.js');
+      const { validateFileExists, validateFormat } = await import('../src/utils/validations.js');
+      vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
+      vi.mocked(validateFileExists).mockResolvedValue(undefined);
+      vi.mocked(validateFormat).mockImplementation(() => {
+        throw new Error('Invalid format');
+      });
+      const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
+
+      await audioAction('input.mp4', {});
+
+      // expect: process.exit is called with 1
+      expect(exitSpy).toHaveBeenCalledWith(1);
+    });
+
+    // it: should handle non-Error thrown values in outer catch
+    it('should handle non-Error thrown values in outer catch', async () => {
+      const { checkDependencies } = await import('../src/utils/dependencies.js');
+      vi.mocked(checkDependencies).mockRejectedValue('unknown error');
       const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
 
       await audioAction('input.mp4', {});

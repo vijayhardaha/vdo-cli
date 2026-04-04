@@ -30,6 +30,14 @@ describe('Progress', () => {
       // expect: bar is defined with default message
       expect(bar).toBeDefined();
     });
+
+    // it: should use unit in format when unit is not %
+    it('should use unit in format when unit is not %', () => {
+      const bar = createProgressBar('Downloading', 'MB');
+
+      // expect: bar is defined with custom unit
+      expect(bar).toBeDefined();
+    });
   });
 
   // describe: parseFFmpegProgress
@@ -144,6 +152,59 @@ describe('Progress', () => {
       expect(kbToMB(1024)).toBe(1);
       expect(kbToMB(512)).toBe(0.5);
       expect(kbToMB(2048)).toBe(2);
+    });
+  });
+
+  // describe: formatFileSize
+  describe('formatFileSize', () => {
+    // it: should return bytes when less than 1024
+    it('should return bytes when less than 1024', async () => {
+      const { formatFileSize } = await import('../src/utils/progress.js');
+      const result = formatFileSize(500);
+
+      // expect: result is in bytes
+      expect(result.value).toBe(500);
+      expect(result.unit).toBe('B');
+    });
+
+    // it: should return KB for values < 1MB
+    it('should return KB for values < 1MB', async () => {
+      const { formatFileSize } = await import('../src/utils/progress.js');
+      const result = formatFileSize(1024);
+
+      // expect: result is in KB
+      expect(result.value).toBe(1);
+      expect(result.unit).toBe('KB');
+    });
+
+    // it: should return MB for values < 1GB
+    it('should return MB for values < 1GB', async () => {
+      const { formatFileSize } = await import('../src/utils/progress.js');
+      const result = formatFileSize(1024 * 1024);
+
+      // expect: result is in MB
+      expect(result.value).toBe(1);
+      expect(result.unit).toBe('MB');
+    });
+
+    // it: should return GB for values < 1TB
+    it('should return GB for values < 1TB', async () => {
+      const { formatFileSize } = await import('../src/utils/progress.js');
+      const result = formatFileSize(1024 * 1024 * 1024);
+
+      // expect: result is in GB
+      expect(result.value).toBe(1);
+      expect(result.unit).toBe('GB');
+    });
+
+    // it: should return TB for values >= 1TB
+    it('should return TB for values >= 1TB', async () => {
+      const { formatFileSize } = await import('../src/utils/progress.js');
+      const result = formatFileSize(1024 * 1024 * 1024 * 1024);
+
+      // expect: result is in TB
+      expect(result.value).toBe(1);
+      expect(result.unit).toBe('TB');
     });
   });
 });
