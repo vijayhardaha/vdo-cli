@@ -6,6 +6,7 @@ export interface VideoInfo {
   title: string;
   video_id: string;
   ext: string;
+  filesize?: number;
 }
 
 /**
@@ -24,8 +25,9 @@ export async function getVideoInfo(url: string): Promise<VideoInfo> {
     const title = sanitizeFilename(data.title || 'untitled');
     const video_id = data.display_id || data.id || 'unknown';
     const ext = data.ext || 'mp4';
+    const filesize = data.filesize || data.filesize_approx;
 
-    return { title, video_id, ext };
+    return { title, video_id, ext, filesize };
   } catch {
     throw new Error('Failed to parse video information');
   }
