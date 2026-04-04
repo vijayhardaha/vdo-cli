@@ -46,7 +46,7 @@ Or if you're developing locally:
 
 ```bash
 git clone https://github.com/vijayhardaha/vdo-cli.git
-cd vdo
+cd vdo-cli
 npm install
 npm link
 ```
@@ -336,7 +336,7 @@ For conversion and compression, choose the right preset for your needs:
 Make sure you've installed the package globally and npm's global bin directory is in your PATH:
 
 ```bash
-npm install -g vdo
+npm install -g @vijayhardaha/vdo-cli
 echo $PATH  # Make sure it includes npm's global bin directory
 ```
 
@@ -360,7 +360,7 @@ choco install ffmpeg yt-dlp
 Use sudo (Linux/Mac) or run as Administrator (Windows):
 
 ```bash
-sudo npm install -g vdo
+sudo npm install -g @vijayhardaha/vdo-cli
 ```
 
 Or configure npm to use a different global directory:
