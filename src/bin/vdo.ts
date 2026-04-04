@@ -38,7 +38,7 @@ program.addHelpText(
 
 Examples:
   $ vdo download https://youtube.com/watch?v=example -o myvideo.mp4
-  $ vdo convert input.avi --to mp4 --preset fast
+  $ vdo convert input.avi --format mp4 --preset fast
   $ vdo compress video.mp4 --crf 23 --preset slow
   $ vdo speedup video.mp4 --rate 1.5
   $ vdo audio video.mp4 --format mp3 --bitrate 320k

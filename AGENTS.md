@@ -16,7 +16,7 @@
 | Command            | Alias | Description           | Key Options                   |
 | ------------------ | ----- | --------------------- | ----------------------------- |
 | `download <url>`   | `dl`  | Download from URL     | `-o`, `--format`              |
-| `convert <input>`  | `cv`  | Convert video format  | `--to`, `--preset`, `-o`      |
+| `convert <input>`  | `cv`  | Convert video format  | `--format`, `--preset`, `-o`  |
 | `compress <input>` | `cm`  | Compress with CRF     | `--crf`, `--preset`, `-o`     |
 | `speedup <input>`  | `sp`  | Change playback speed | `--rate`, `-o`                |
 | `audio <input>`    | `au`  | Extract audio         | `--format`, `--bitrate`, `-o` |
@@ -174,6 +174,13 @@ Install: `brew install ffmpeg yt-dlp`
 ## Git Workflow
 
 Pre-commit hooks automatically run type check, lint, and format checks.
+
+**Before preparing git.md (after each task):**
+
+1. Run `bun run tsc` - TypeScript check
+2. Run `bun run format:check` - Format check
+3. Run `bun run lint` - ESLint check
+4. Run `bun run test` - Run tests
 
 **After completing a task:**
 

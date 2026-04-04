@@ -102,20 +102,20 @@ vdo convert <input> [options]
 **Options:**
 
 - `-o, --output <file>` - Output file name
-- `--to <format>` - Target format (mp4, mkv, avi, mov, webm, flv) (default: "mp4")
+- `--format <format>` - Target format (mp4, mkv, avi, mov, webm, flv) (default: "mp4")
 - `--preset <preset>` - Encoding preset (fast, high-quality, custom) (default: "fast")
 
 **Examples:**
 
 ```bash
 # Convert to MP4 with fast preset
-vdo convert input.avi --to mp4
+vdo convert input.avi --format mp4
 
 # Convert to MKV with high-quality preset
-vdo convert video.mov --to mkv --preset high-quality
+vdo convert video.mov --format mkv --preset high-quality
 
 # Specify output file
-vdo convert source.webm --to mp4 -o output.mp4
+vdo convert source.webm --format mp4 -o output.mp4
 ```
 
 **Aliases:** `cv`
@@ -424,7 +424,7 @@ If you encounter any issues or have questions, please file an issue on the GitHu
 vdo dl https://youtu.be/dQw4w9WgXcQ
 
 # Convert AVI to MP4
-vdo cv movie.avi --to mp4
+vdo cv movie.avi --format mp4
 
 # Compress a large video file
 vdo cm vacation.mp4 --crf 23 --preset slow
