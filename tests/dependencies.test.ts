@@ -1,13 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+
 import { checkCommand, checkDependencies, runCommand } from '../src/utils/dependencies.js';
 
 type ExecCallback = (err: Error | null) => void;
 type MockFn = ReturnType<typeof vi.fn>;
 
-vi.mock('child_process', () => ({
-  exec: vi.fn(),
-  spawn: vi.fn(),
-}));
+vi.mock('child_process', () => ({ exec: vi.fn(), spawn: vi.fn() }));
 
 // Test suite for dependency utility functions
 describe('dependencies', () => {
@@ -91,11 +89,7 @@ describe('dependencies', () => {
   // Tests for runCommand function
   describe('runCommand', () => {
     function makeMockProcess() {
-      return {
-        stdout: { on: vi.fn() },
-        stderr: { on: vi.fn() },
-        on: vi.fn(),
-      };
+      return { stdout: { on: vi.fn() }, stderr: { on: vi.fn() }, on: vi.fn() };
     }
 
     // Should resolve with stdout and stderr on exit code 0

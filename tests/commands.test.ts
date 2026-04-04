@@ -1,11 +1,12 @@
-import { describe, it, expect, beforeEach } from 'vitest';
 import { Command } from 'commander';
-import { setupDownload } from '../src/commands/download.js';
-import { setupConvert } from '../src/commands/convert.js';
-import { setupCompress } from '../src/commands/compress.js';
-import { setupSpeedup } from '../src/commands/speedup.js';
+import { describe, it, expect, beforeEach } from 'vitest';
+
 import { setupAudio } from '../src/commands/audio.js';
 import { setupAuto } from '../src/commands/auto.js';
+import { setupCompress } from '../src/commands/compress.js';
+import { setupConvert } from '../src/commands/convert.js';
+import { setupDownload } from '../src/commands/download.js';
+import { setupSpeedup } from '../src/commands/speedup.js';
 
 describe('Commands Setup', () => {
   let program: Command;
@@ -68,7 +69,7 @@ describe('Commands Setup', () => {
     it('should have preset option', () => {
       setupConvert(program);
       const cmd = program.commands[0];
-      const presetOption = cmd?.options.find(opt => opt.long === '--preset');
+      const presetOption = cmd?.options.find((opt) => opt.long === '--preset');
 
       expect(presetOption).toBeDefined();
     });
@@ -90,7 +91,7 @@ describe('Commands Setup', () => {
     it('should have crf option', () => {
       setupCompress(program);
       const cmd = program.commands[0];
-      const crfOption = cmd?.options.find(opt => opt.long === '--crf');
+      const crfOption = cmd?.options.find((opt) => opt.long === '--crf');
 
       expect(crfOption).toBeDefined();
     });
@@ -99,7 +100,7 @@ describe('Commands Setup', () => {
     it('should have preset option', () => {
       setupCompress(program);
       const cmd = program.commands[0];
-      const presetOption = cmd?.options.find(opt => opt.long === '--preset');
+      const presetOption = cmd?.options.find((opt) => opt.long === '--preset');
 
       expect(presetOption).toBeDefined();
     });
@@ -121,7 +122,7 @@ describe('Commands Setup', () => {
     it('should have rate option', () => {
       setupSpeedup(program);
       const cmd = program.commands[0];
-      const rateOption = cmd?.options.find(opt => opt.long === '--rate');
+      const rateOption = cmd?.options.find((opt) => opt.long === '--rate');
 
       expect(rateOption).toBeDefined();
     });
@@ -143,7 +144,7 @@ describe('Commands Setup', () => {
     it('should have format option', () => {
       setupAudio(program);
       const cmd = program.commands[0];
-      const formatOption = cmd?.options.find(opt => opt.long === '--format');
+      const formatOption = cmd?.options.find((opt) => opt.long === '--format');
 
       expect(formatOption).toBeDefined();
     });
@@ -152,7 +153,7 @@ describe('Commands Setup', () => {
     it('should have bitrate option', () => {
       setupAudio(program);
       const cmd = program.commands[0];
-      const bitrateOption = cmd?.options.find(opt => opt.long === '--bitrate');
+      const bitrateOption = cmd?.options.find((opt) => opt.long === '--bitrate');
 
       expect(bitrateOption).toBeDefined();
     });
@@ -174,7 +175,7 @@ describe('Commands Setup', () => {
     it('should have format option', () => {
       setupAuto(program);
       const cmd = program.commands[0];
-      const formatOption = cmd?.options.find(opt => opt.long === '--format');
+      const formatOption = cmd?.options.find((opt) => opt.long === '--format');
 
       expect(formatOption).toBeDefined();
     });

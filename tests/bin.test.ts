@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from 'vitest';
 import { Command } from 'commander';
+import { describe, it, expect, vi } from 'vitest';
 
 vi.mock('../src/commands/download.js', () => ({ setupDownload: vi.fn() }));
 vi.mock('../src/commands/convert.js', () => ({ setupConvert: vi.fn() }));
@@ -7,9 +7,7 @@ vi.mock('../src/commands/compress.js', () => ({ setupCompress: vi.fn() }));
 vi.mock('../src/commands/speedup.js', () => ({ setupSpeedup: vi.fn() }));
 vi.mock('../src/commands/audio.js', () => ({ setupAudio: vi.fn() }));
 vi.mock('../src/commands/auto.js', () => ({ setupAuto: vi.fn() }));
-vi.mock('module', () => ({
-  createRequire: vi.fn(() => () => ({ version: '1.0.0', name: 'vdo' })),
-}));
+vi.mock('module', () => ({ createRequire: vi.fn(() => () => ({ version: '1.0.0', name: 'vdo' })) }));
 
 // Test suite for bin/vdo CLI entry point
 describe('bin/vdo', () => {

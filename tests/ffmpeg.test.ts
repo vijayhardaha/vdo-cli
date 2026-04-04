@@ -1,13 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+
 import { convertVideo, compressVideo, speedUpVideo, extractAudio } from '../src/utils/ffmpeg.js';
 
-vi.mock('../src/utils/dependencies.js', () => ({
-  runCommand: vi.fn(),
-}));
+vi.mock('../src/utils/dependencies.js', () => ({ runCommand: vi.fn() }));
 
-vi.mock('../src/utils/progress.js', () => ({
-  parseFFmpegProgress: vi.fn(),
-}));
+vi.mock('../src/utils/progress.js', () => ({ parseFFmpegProgress: vi.fn() }));
 
 // Test suite for FFmpeg utility functions
 describe('ffmpeg utils', () => {
@@ -78,7 +75,7 @@ describe('ffmpeg utils', () => {
         return { stdout: '120', stderr: '' };
       });
 
-      vi.mocked(parseFFmpegProgress).mockImplementation(line => {
+      vi.mocked(parseFFmpegProgress).mockImplementation((line) => {
         if (line.includes('time=')) return { type: 'time', value: 60 };
         return null;
       });

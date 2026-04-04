@@ -1,13 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+
 import { downloadVideo, getVideoInfo, isSupportedURL } from '../src/utils/ytdlp.js';
 
-vi.mock('../src/utils/dependencies.js', () => ({
-  runCommand: vi.fn(),
-}));
+vi.mock('../src/utils/dependencies.js', () => ({ runCommand: vi.fn() }));
 
-vi.mock('../src/utils/progress.js', () => ({
-  parseYtDlpProgress: vi.fn(),
-}));
+vi.mock('../src/utils/progress.js', () => ({ parseYtDlpProgress: vi.fn() }));
 
 // Test suite for yt-dlp utility functions
 describe('ytdlp utils', () => {
@@ -77,12 +74,7 @@ describe('ytdlp utils', () => {
         return { stdout: '', stderr: '' };
       });
 
-      vi.mocked(parseYtDlpProgress).mockReturnValue({
-        type: 'download',
-        percentage: 50,
-        size: 100,
-        unit: 'MiB',
-      });
+      vi.mocked(parseYtDlpProgress).mockReturnValue({ type: 'download', percentage: 50, size: 100, unit: 'MiB' });
 
       const onProgress = vi.fn();
       await downloadVideo('https://example.com', 'out.mp4', 'mp4', onProgress);
@@ -99,10 +91,7 @@ describe('ytdlp utils', () => {
         return { stdout: '', stderr: '' };
       });
 
-      vi.mocked(parseYtDlpProgress).mockReturnValue({
-        type: 'destination',
-        filename: 'file.mp4',
-      });
+      vi.mocked(parseYtDlpProgress).mockReturnValue({ type: 'destination', filename: 'file.mp4' });
 
       const onProgress = vi.fn();
       await downloadVideo('https://example.com', 'out.mp4', 'mp4', onProgress);
@@ -168,17 +157,10 @@ describe('ytdlp utils', () => {
         return { stdout: '', stderr: '' };
       });
 
-      vi.mocked(parseYtDlpProgress).mockReturnValue({
-        type: 'download',
-        percentage: 50,
-        size: 100,
-        unit: 'MiB',
-      });
+      vi.mocked(parseYtDlpProgress).mockReturnValue({ type: 'download', percentage: 50, size: 100, unit: 'MiB' });
 
       // null onProgress — should not throw
-      await expect(
-        downloadVideo('https://example.com', 'out.mp4', 'mp4', null)
-      ).resolves.toBeUndefined();
+      await expect(downloadVideo('https://example.com', 'out.mp4', 'mp4', null)).resolves.toBeUndefined();
     });
   });
 
@@ -188,10 +170,7 @@ describe('ytdlp utils', () => {
     it('should return parsed JSON from yt-dlp', async () => {
       const { runCommand } = await import('../src/utils/dependencies.js');
       const videoData = { title: 'Test Video', duration: 120 };
-      vi.mocked(runCommand).mockResolvedValue({
-        stdout: JSON.stringify(videoData),
-        stderr: '',
-      });
+      vi.mocked(runCommand).mockResolvedValue({ stdout: JSON.stringify(videoData), stderr: '' });
 
       const result = await getVideoInfo('https://example.com');
       expect(result).toEqual(videoData);
@@ -202,9 +181,7 @@ describe('ytdlp utils', () => {
       const { runCommand } = await import('../src/utils/dependencies.js');
       vi.mocked(runCommand).mockResolvedValue({ stdout: 'invalid json', stderr: '' });
 
-      await expect(getVideoInfo('https://example.com')).rejects.toThrow(
-        'Failed to parse video information'
-      );
+      await expect(getVideoInfo('https://example.com')).rejects.toThrow('Failed to parse video information');
     });
   });
 

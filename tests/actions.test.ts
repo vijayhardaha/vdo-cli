@@ -1,19 +1,16 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { downloadAction } from '../src/commands/download.js';
-import { convertAction } from '../src/commands/convert.js';
-import { compressAction } from '../src/commands/compress.js';
-import { speedupAction } from '../src/commands/speedup.js';
+
 import { audioAction } from '../src/commands/audio.js';
 import { autoAction } from '../src/commands/auto.js';
+import { compressAction } from '../src/commands/compress.js';
+import { convertAction } from '../src/commands/convert.js';
+import { downloadAction } from '../src/commands/download.js';
+import { speedupAction } from '../src/commands/speedup.js';
 
 // Mock all external dependencies
-vi.mock('../src/utils/dependencies.js', () => ({
-  checkDependencies: vi.fn(),
-}));
+vi.mock('../src/utils/dependencies.js', () => ({ checkDependencies: vi.fn() }));
 
-vi.mock('../src/utils/ytdlp.js', () => ({
-  downloadVideo: vi.fn(),
-}));
+vi.mock('../src/utils/ytdlp.js', () => ({ downloadVideo: vi.fn() }));
 
 vi.mock('../src/utils/ffmpeg.js', () => ({
   convertVideo: vi.fn(),
@@ -32,10 +29,7 @@ vi.mock('../src/utils/validations.js', () => ({
   validateFileExists: vi.fn(),
 }));
 
-vi.mock('../src/utils/progress.js', () => ({
-  createProgressBar: vi.fn(),
-  convertToMB: vi.fn(),
-}));
+vi.mock('../src/utils/progress.js', () => ({ createProgressBar: vi.fn(), convertToMB: vi.fn() }));
 
 vi.mock('ora', () => ({
   default: vi.fn(() => ({
@@ -46,15 +40,9 @@ vi.mock('ora', () => ({
   })),
 }));
 
-vi.mock('fs/promises', () => ({
-  access: vi.fn(),
-}));
+vi.mock('fs/promises', () => ({ access: vi.fn() }));
 
-const mockProgressBar = {
-  start: vi.fn(),
-  stop: vi.fn(),
-  update: vi.fn(),
-};
+const mockProgressBar = { start: vi.fn(), stop: vi.fn(), update: vi.fn() };
 
 // Test suite for command action functions
 describe('Command actions', () => {
@@ -311,8 +299,7 @@ describe('Command actions', () => {
     // Should convert video with default options
     it('should convert video with default options', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
-      const { validateFileExists, validateFormat, validatePreset } =
-        await import('../src/utils/validations.js');
+      const { validateFileExists, validateFormat, validatePreset } = await import('../src/utils/validations.js');
       const { convertVideo } = await import('../src/utils/ffmpeg.js');
       const { createProgressBar } = await import('../src/utils/progress.js');
 
@@ -331,8 +318,7 @@ describe('Command actions', () => {
     // Should use provided output option
     it('should use provided output option', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
-      const { validateFileExists, validateFormat, validatePreset } =
-        await import('../src/utils/validations.js');
+      const { validateFileExists, validateFormat, validatePreset } = await import('../src/utils/validations.js');
       const { convertVideo } = await import('../src/utils/ffmpeg.js');
       const { createProgressBar } = await import('../src/utils/progress.js');
 
@@ -352,8 +338,7 @@ describe('Command actions', () => {
     // Should invoke progressCallback
     it('should invoke progressCallback', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
-      const { validateFileExists, validateFormat, validatePreset } =
-        await import('../src/utils/validations.js');
+      const { validateFileExists, validateFormat, validatePreset } = await import('../src/utils/validations.js');
       const { convertVideo } = await import('../src/utils/ffmpeg.js');
       const { createProgressBar } = await import('../src/utils/progress.js');
 
@@ -373,8 +358,7 @@ describe('Command actions', () => {
 
     it('should not update progress bar when percentage is 0', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
-      const { validateFileExists, validateFormat, validatePreset } =
-        await import('../src/utils/validations.js');
+      const { validateFileExists, validateFormat, validatePreset } = await import('../src/utils/validations.js');
       const { convertVideo } = await import('../src/utils/ffmpeg.js');
       const { createProgressBar } = await import('../src/utils/progress.js');
 
@@ -436,8 +420,7 @@ describe('Command actions', () => {
     // Should compress video with default options
     it('should compress video with default options', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
-      const { validateFileExists, validatePreset, validateCRF } =
-        await import('../src/utils/validations.js');
+      const { validateFileExists, validatePreset, validateCRF } = await import('../src/utils/validations.js');
       const { compressVideo } = await import('../src/utils/ffmpeg.js');
       const { createProgressBar } = await import('../src/utils/progress.js');
 
@@ -456,8 +439,7 @@ describe('Command actions', () => {
     // Should use provided output option
     it('should use provided output option', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
-      const { validateFileExists, validatePreset, validateCRF } =
-        await import('../src/utils/validations.js');
+      const { validateFileExists, validatePreset, validateCRF } = await import('../src/utils/validations.js');
       const { compressVideo } = await import('../src/utils/ffmpeg.js');
       const { createProgressBar } = await import('../src/utils/progress.js');
 
@@ -478,8 +460,7 @@ describe('Command actions', () => {
     // Should invoke progressCallback
     it('should invoke progressCallback', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
-      const { validateFileExists, validatePreset, validateCRF } =
-        await import('../src/utils/validations.js');
+      const { validateFileExists, validatePreset, validateCRF } = await import('../src/utils/validations.js');
       const { compressVideo } = await import('../src/utils/ffmpeg.js');
       const { createProgressBar } = await import('../src/utils/progress.js');
 
@@ -499,8 +480,7 @@ describe('Command actions', () => {
 
     it('should not update progress bar when percentage is 0', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
-      const { validateFileExists, validatePreset, validateCRF } =
-        await import('../src/utils/validations.js');
+      const { validateFileExists, validatePreset, validateCRF } = await import('../src/utils/validations.js');
       const { compressVideo } = await import('../src/utils/ffmpeg.js');
       const { createProgressBar } = await import('../src/utils/progress.js');
 
@@ -685,7 +665,7 @@ describe('Command actions', () => {
 
       await speedupAction('input.mp4', { rate: 1 });
 
-      const consoleCalls = vi.mocked(console.log).mock.calls.map(c => c[0]);
+      const consoleCalls = vi.mocked(console.log).mock.calls.map((c) => c[0]);
       expect(consoleCalls.some((m: string) => m?.includes('faster'))).toBe(false);
       expect(consoleCalls.some((m: string) => m?.includes('slower'))).toBe(false);
     });
@@ -735,8 +715,7 @@ describe('Command actions', () => {
     // Should extract audio with defaults
     it('should extract audio with defaults', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
-      const { validateFileExists, validateFormat, validateBitrate } =
-        await import('../src/utils/validations.js');
+      const { validateFileExists, validateFormat, validateBitrate } = await import('../src/utils/validations.js');
       const { extractAudio } = await import('../src/utils/ffmpeg.js');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
@@ -753,8 +732,7 @@ describe('Command actions', () => {
     // Should use provided output, format and bitrate
     it('should use provided output, format and bitrate', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
-      const { validateFileExists, validateFormat, validateBitrate } =
-        await import('../src/utils/validations.js');
+      const { validateFileExists, validateFormat, validateBitrate } = await import('../src/utils/validations.js');
       const { extractAudio } = await import('../src/utils/ffmpeg.js');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });

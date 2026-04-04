@@ -1,4 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
+
 import {
   validateUrl,
   validateFormat,
@@ -11,9 +12,7 @@ import {
   validateFileExists,
 } from '../src/utils/validations.js';
 
-vi.mock('fs/promises', () => ({
-  access: vi.fn(),
-}));
+vi.mock('fs/promises', () => ({ access: vi.fn() }));
 
 // Test suite for validation functions
 describe('Validations', () => {
@@ -32,9 +31,7 @@ describe('Validations', () => {
       const fs = await import('fs/promises');
       vi.mocked(fs.access).mockRejectedValue(new Error('ENOENT'));
       // Expect validation to throw with specific error message
-      await expect(validateFileExists('missing.mp4')).rejects.toThrow(
-        'File not found: missing.mp4'
-      );
+      await expect(validateFileExists('missing.mp4')).rejects.toThrow('File not found: missing.mp4');
     });
   });
 
@@ -86,12 +83,8 @@ describe('Validations', () => {
 
     // Should throw for invalid presets
     it('should throw for invalid presets', () => {
-      expect(() => validatePreset('extreme', ['ultrafast', 'fast', 'medium', 'slow'])).toThrow(
-        'Invalid preset'
-      );
-      expect(() => validatePreset('custom', ['ultrafast', 'fast', 'medium', 'slow'])).toThrow(
-        'Invalid preset'
-      );
+      expect(() => validatePreset('extreme', ['ultrafast', 'fast', 'medium', 'slow'])).toThrow('Invalid preset');
+      expect(() => validatePreset('custom', ['ultrafast', 'fast', 'medium', 'slow'])).toThrow('Invalid preset');
     });
   });
 
@@ -126,9 +119,7 @@ describe('Validations', () => {
     // Should throw for invalid speed rates
     it('should throw for invalid speed rates', () => {
       expect(() => validateSpeedRate(0)).toThrow('Speed rate must be greater than 0');
-      expect(() => validateSpeedRate(17)).toThrow(
-        'Speed rate must be greater than 0 and at most 16'
-      );
+      expect(() => validateSpeedRate(17)).toThrow('Speed rate must be greater than 0 and at most 16');
       expect(() => validateSpeedRate(-1)).toThrow('Speed rate must be greater than 0');
       expect(() => validateSpeedRate('abc')).toThrow('Speed rate must be greater than 0');
     });
