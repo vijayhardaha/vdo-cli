@@ -1,41 +1,40 @@
 import { resolve, dirname, basename, extname, join } from 'path';
 
 import type { Command } from 'commander';
-import ora from 'ora';
 
 import type { SpeedupOptions } from '../types/index.js';
 import { checkDependencies } from '../utils/dependencies.js';
 import { speedUpVideo } from '../utils/ffmpeg.js';
+import { log } from '../utils/log.js';
 import { createProgressBar } from '../utils/progress.js';
 import { validateFileExists, validateSpeedRate } from '../utils/validations.js';
 
-/**
- * Speedup action - speeds up or slows down video playback using ffmpeg
- *
- * @param {string} input - Path to the input video file
- * @param {SpeedupOptions} options - Speed adjustment configuration options including output filename and speed rate
- * @returns {Promise<void>} Promise that resolves when speed adjustment is complete
- * @throws {void} Exits process with code 1 if dependencies missing, file not found, invalid speed rate, or operation fails
- */
 export async function speedupAction(input: string, options: SpeedupOptions): Promise<void> {
   try {
-    // Check dependencies
+    log.spinner('Preparing speed adjustment...');
+
     const deps = await checkDependencies();
     if (!deps.ok) {
-      console.error(`Error: Missing required dependencies: ${deps.missing.join(', ')}`);
-      console.error('Please install them using:');
-      console.error('  brew install ffmpeg yt-dlp');
+      log.fail(`Missing dependencies: ${deps.missing.join(', ')}`);
+      log.warn('Install using: brew install ffmpeg yt-dlp');
       process.exit(1);
     }
 
-    // Validate input file
-    await validateFileExists(input);
+    try {
+      await validateFileExists(input);
+    } catch (error) {
+      log.fail(error instanceof Error ? error.message : String(error));
+      process.exit(1);
+    }
 
-    // Validate speed rate
     const rate = options.rate || 2;
-    validateSpeedRate(rate);
+    try {
+      validateSpeedRate(rate);
+    } catch (error) {
+      log.fail(error instanceof Error ? error.message : String(error));
+      process.exit(1);
+    }
 
-    // Determine output filename
     let outputFile = options.output;
     if (!outputFile) {
       const dir = dirname(input);
@@ -43,9 +42,7 @@ export async function speedupAction(input: string, options: SpeedupOptions): Pro
       outputFile = join(dir, `${name}_${rate}x.mp4`);
     }
 
-    // Show spinner while preparing
-    const spinner = ora('Preparing speed adjustment...').start();
-    spinner.succeed('Speed adjustment started');
+    log.succeed('Speed adjustment started');
 
     const progressBar = createProgressBar('Processing');
 
@@ -57,21 +54,26 @@ export async function speedupAction(input: string, options: SpeedupOptions): Pro
 
     progressBar.start(100, 0);
 
-    // Speed up video
-    await speedUpVideo(input, outputFile, rate, progressCallback);
+    try {
+      await speedUpVideo(input, outputFile, rate, progressCallback);
+    } catch (error) {
+      progressBar.stop();
+      log.fail(`Speed adjustment failed: ${error instanceof Error ? error.message : String(error)}`);
+      process.exit(1);
+    }
 
     progressBar.stop();
-    console.log('\n✓ Speed adjustment completed successfully!');
-    console.log(`  Output file: ${resolve(outputFile)}`);
-    console.log(`  Speed rate: ${rate}x`);
+    log.succeed('Speed adjustment completed successfully!');
+    log.info(`Output: ${resolve(outputFile)}`);
+    log.info(`Speed rate: ${rate}x`);
 
     if (rate > 1) {
-      console.log(`  Result: Video is ${rate}x faster`);
+      log.info(`Result: Video is ${rate}x faster`);
     } else if (rate < 1) {
-      console.log(`  Result: Video is ${(1 / rate).toFixed(2)}x slower`);
+      log.info(`Result: Video is ${(1 / rate).toFixed(2)}x slower`);
     }
   } catch (error) {
-    console.error('\n✗ Error:', error instanceof Error ? error.message : String(error));
+    log.fail(error instanceof Error ? error.message : String(error));
     process.exit(1);
   }
 }
