@@ -6,12 +6,13 @@ import type { ProgressInfo } from '../types/index.js';
  * Create a progress bar instance for displaying CLI progress
  *
  * @param {string} [message='Processing'] - Message to display above the progress bar (default: 'Processing')
+ * @param {string} [unit='MB'] - Unit to display after size values
  * @returns {cliProgress.SingleBar} New cli-progress SingleBar instance configured with classic shades preset
  */
-export function createProgressBar(message = 'Processing'): cliProgress.SingleBar {
+export function createProgressBar(message = 'Processing', unit = 'MB'): cliProgress.SingleBar {
   return new cliProgress.SingleBar(
     {
-      format: `${message} [{bar}] {percentage}% | {value}/{total} MB`,
+      format: `${message} [{bar}] {percentage}% | {value}/{total} ${unit}`,
       barCompleteChar: '█',
       barIncompleteChar: '░',
       hideCursor: true,
@@ -96,15 +97,10 @@ export function kbToMB(kb: number): number {
  * @param {string} unit - Unit of measurement ('KiB', 'MiB', 'GiB', or other)
  * @returns {number} Size converted to megabytes
  */
-export function convertToMB(size: number, unit: string): number {
-  switch (unit) {
-    case 'KiB':
-      return size / 1024;
-    case 'MiB':
-      return size;
-    case 'GiB':
-      return size * 1024;
-    default:
-      return size;
-  }
+export function formatFileSize(bytes: number): { value: number; unit: string } {
+  if (bytes < 1024) return { value: bytes, unit: 'B' };
+  if (bytes < 1024 * 1024) return { value: bytes / 1024, unit: 'KB' };
+  if (bytes < 1024 * 1024 * 1024) return { value: bytes / (1024 * 1024), unit: 'MB' };
+  if (bytes < 1024 * 1024 * 1024 * 1024) return { value: bytes / (1024 * 1024 * 1024), unit: 'GB' };
+  return { value: bytes / (1024 * 1024 * 1024 * 1024), unit: 'TB' };
 }
