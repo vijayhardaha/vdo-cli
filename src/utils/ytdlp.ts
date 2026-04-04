@@ -77,12 +77,10 @@ export async function downloadVideo(
     command = `yt-dlp --output "${outputPath}" --format "${formatSelector}" "${url}"`;
   }
 
-  const outputHandler = (data: string, type: 'stdout' | 'stderr') => {
-    if (type === 'stderr' || type === 'stdout') {
-      const progress = parseYtDlpProgress(data);
-      if (progress && progress.type === 'download' && onProgress) {
-        onProgress(progress.percentage || 0, progress.size || 0, progress.unit || 'MiB');
-      }
+  const outputHandler = (data: string, _type: 'stdout' | 'stderr') => {
+    const progress = parseYtDlpProgress(data);
+    if (progress && progress.type === 'download' && onProgress) {
+      onProgress(progress.percentage || 0, progress.size || 0, progress.unit || 'MiB');
     }
   };
 
