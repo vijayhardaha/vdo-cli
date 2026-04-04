@@ -1,5 +1,47 @@
 import { runCommand } from './dependencies.js';
 import { parseYtDlpProgress } from './progress.js';
+import { sanitizeFilename } from './sanitize.js';
+
+export interface VideoInfo {
+  title: string;
+  video_id: string;
+  ext: string;
+}
+
+/**
+ * Get video information from URL using yt-dlp
+ *
+ * @param {string} url - Video URL to fetch information from
+ * @returns {Promise<VideoInfo>} Promise containing video title, video_id, and extension
+ * @throws {Error} If yt-dlp execution fails or JSON parsing fails
+ */
+export async function getVideoInfo(url: string): Promise<VideoInfo> {
+  const command = `yt-dlp --dump-json --no-download "${url}"`;
+  const result = await runCommand(command);
+
+  try {
+    const data = JSON.parse(result.stdout);
+    const title = sanitizeFilename(data.title || 'untitled');
+    const video_id = data.display_id || data.id || 'unknown';
+    const ext = data.ext || 'mp4';
+
+    return { title, video_id, ext };
+  } catch {
+    throw new Error('Failed to parse video information');
+  }
+}
+
+/**
+ * Generate a proper filename for the downloaded video
+ *
+ * @param {VideoInfo} videoInfo - Video information containing title and video_id
+ * @param {string} format - Desired output format
+ * @returns {string} Generated filename
+ */
+export function generateFilename(videoInfo: VideoInfo, format: string): string {
+  const ext = format === 'mp3' ? 'mp3' : format;
+  return `${videoInfo.title}_${videoInfo.video_id}.${ext}`;
+}
 
 /**
  * Download video from URL using yt-dlp
@@ -18,8 +60,11 @@ export async function downloadVideo(
   onProgress: ((percentage: number, size: number, unit: string) => void) | null = null
 ): Promise<void> {
   const formatMap: Record<string, string> = {
-    mp4: 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
-    mkv: 'bestvideo[ext=mkv]+bestaudio[ext=mka]/best[ext=mkv]/best',
+    mp4: 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/bestvideo[ext=mp4]/best',
+    mkv: 'bestvideo[ext=mkv]+bestaudio[ext=mka]/bestvideo[ext=mkv]/best',
+    webm: 'bestvideo[ext=webm]+bestaudio[ext=webm]/bestvideo[ext=webm]/best',
+    avi: 'bestvideo[ext=avi]+bestaudio[ext=avi]/bestvideo[ext=avi]/best',
+    mov: 'bestvideo[ext=mov]+bestaudio[ext=m4a]/bestvideo[ext=mov]/best',
     mp3: 'bestaudio/best',
   };
 
@@ -27,7 +72,6 @@ export async function downloadVideo(
 
   let command: string;
   if (format === 'mp3') {
-    // Extract audio only
     command = `yt-dlp --extract-audio --audio-format mp3 --output "${outputPath}" --format "${formatSelector}" "${url}"`;
   } else {
     command = `yt-dlp --output "${outputPath}" --format "${formatSelector}" "${url}"`;
@@ -43,41 +87,4 @@ export async function downloadVideo(
   };
 
   await runCommand(command, outputHandler);
-}
-
-/**
- * Get detailed video information from URL using yt-dlp
- *
- * @param {string} url - Video URL to fetch information from
- * @returns {Promise<unknown>} Promise containing video metadata object with title, duration, and other details
- * @throws {Error} If yt-dlp execution fails or JSON parsing fails
- */
-export async function getVideoInfo(url: string): Promise<unknown> {
-  const command = `yt-dlp --dump-json "${url}"`;
-  const result = await runCommand(command);
-
-  try {
-    return JSON.parse(result.stdout);
-  } catch {
-    throw new Error('Failed to parse video information');
-  }
-}
-
-/**
- * Check if a URL is supported by yt-dlp
- *
- * @param {string} url - URL to check for support (must be HTTP or HTTPS)
- * @returns {Promise<boolean>} - True if URL appears to be supported, false otherwise
- * @throws Never throws errors; returns false on any failure
- */
-export async function isSupportedURL(url: string): Promise<boolean> {
-  try {
-    const command = `yt-dlp --list-extractors`;
-    await runCommand(command);
-    // If we can run the command, yt-dlp supports some URLs
-    // A more specific check would require parsing the URL
-    return url.startsWith('http://') || url.startsWith('https://');
-  } catch {
-    return false;
-  }
 }
