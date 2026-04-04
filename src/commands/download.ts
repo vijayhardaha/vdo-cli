@@ -60,11 +60,9 @@ export async function downloadAction(url: string, options: DownloadOptions): Pro
     const progressBar = createProgressBar('Downloading');
 
     const progressCallback = (percentage: number, size: number, unit: string) => {
-      if (progressBar) {
-        const totalMB = convertToMB(size, unit);
-        const currentMB = Math.round((percentage / 100) * totalMB);
-        progressBar.update(currentMB, { total: Math.round(totalMB) });
-      }
+      const totalMB = convertToMB(size, unit);
+      const currentMB = Math.round((percentage / 100) * totalMB);
+      progressBar.update(currentMB, { total: Math.round(totalMB) });
     };
 
     // Create progress bar
