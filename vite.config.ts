@@ -2,7 +2,7 @@
  * ========================================================================
  * Vite Configuration
  * ========================================================================
- * Builds the CLI as a Node.js library (CJS format) for distribution.
+ * Builds the CLI as a Node.js library (ESM format) for distribution.
  * Entry point: src/bin/vdo.ts → dist/vdo.js
  * Docs: https://vitejs.dev/config/
  * ========================================================================
@@ -30,7 +30,7 @@ export default defineConfig({
     ssr: true,
 
     // CLI entry point - produces dist/vdo.js
-    lib: { entry: resolve(__dirname, 'src/bin/vdo.ts'), name: 'vdo', fileName: 'vdo', formats: ['cjs'] },
+    lib: { entry: resolve(__dirname, 'src/bin/vdo.ts'), name: 'vdo', fileName: 'vdo', formats: ['es'] },
 
     rollupOptions: {
       // Mark Node built-ins and runtime deps as external
