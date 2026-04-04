@@ -2,14 +2,14 @@ import { resolve, dirname, basename, extname, join } from 'path';
 
 import type { Command } from 'commander';
 
-import { loading } from '@/utils/icons.js';
+import { loading } from '@/utils/icons';
 
-import type { CompressOptions } from '../types/index.js';
-import { checkDependencies } from '../utils/dependencies.js';
-import { compressVideo } from '../utils/ffmpeg.js';
-import { log } from '../utils/log.js';
-import { createProgressBar } from '../utils/progress.js';
-import { validateFileExists, validatePreset, validateCRF } from '../utils/validations.js';
+import type { CompressOptions } from '../types/index';
+import { checkDependencies } from '../utils/dependencies';
+import { compressVideo } from '../utils/ffmpeg';
+import { log } from '../utils/log';
+import { createProgressBar } from '../utils/progress';
+import { validateFileExists, validatePreset, validateCRF } from '../utils/validations';
 
 /* Allowed encoding presets for compression */
 const ALLOWED_PRESETS = ['ultrafast', 'fast', 'medium', 'slow'];

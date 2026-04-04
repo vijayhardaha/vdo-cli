@@ -1,5 +1,5 @@
-import { runCommand } from './dependencies.js';
-import { parseFFmpegProgress } from './progress.js';
+import { runCommand } from './dependencies';
+import { parseFFmpegProgress } from './progress';
 
 /**
  * Convert video to different format using ffmpeg

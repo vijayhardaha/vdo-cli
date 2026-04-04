@@ -1,4 +1,4 @@
-import { info, success, warning, error, loading } from './icons.js';
+import { info, success, warning, error, loading } from './icons';
 
 /* Log message types for styled console output */
 export type LogType = 'succeed' | 'fail' | 'warn' | 'info' | 'loading';

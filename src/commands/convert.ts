@@ -2,14 +2,14 @@ import { resolve, dirname, basename, extname, join } from 'path';
 
 import type { Command } from 'commander';
 
-import { loading } from '@/utils/icons.js';
+import { loading } from '@/utils/icons';
 
-import type { ConvertOptions } from '../types/index.js';
-import { checkDependencies } from '../utils/dependencies.js';
-import { convertVideo } from '../utils/ffmpeg.js';
-import { log } from '../utils/log.js';
-import { createProgressBar } from '../utils/progress.js';
-import { validateFileExists, validateFormat, validatePreset } from '../utils/validations.js';
+import type { ConvertOptions } from '../types/index';
+import { checkDependencies } from '../utils/dependencies';
+import { convertVideo } from '../utils/ffmpeg';
+import { log } from '../utils/log';
+import { createProgressBar } from '../utils/progress';
+import { validateFileExists, validateFormat, validatePreset } from '../utils/validations';
 
 /* Allowed video formats for conversion */
 const ALLOWED_FORMATS = ['mp4', 'mkv', 'avi', 'mov', 'webm', 'flv'];

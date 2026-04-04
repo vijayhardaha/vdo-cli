@@ -2,14 +2,14 @@ import { resolve, dirname, basename, extname, join } from 'path';
 
 import type { Command } from 'commander';
 
-import { loading } from '@/utils/icons.js';
+import { loading } from '@/utils/icons';
 
-import type { SpeedupOptions } from '../types/index.js';
-import { checkDependencies } from '../utils/dependencies.js';
-import { speedUpVideo } from '../utils/ffmpeg.js';
-import { log } from '../utils/log.js';
-import { createProgressBar } from '../utils/progress.js';
-import { validateFileExists, validateSpeedRate } from '../utils/validations.js';
+import type { SpeedupOptions } from '../types/index';
+import { checkDependencies } from '../utils/dependencies';
+import { speedUpVideo } from '../utils/ffmpeg';
+import { log } from '../utils/log';
+import { createProgressBar } from '../utils/progress';
+import { validateFileExists, validateSpeedRate } from '../utils/validations';
 
 /**
  * Speed up or slow down video playback using ffmpeg

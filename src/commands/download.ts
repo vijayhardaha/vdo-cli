@@ -2,14 +2,14 @@ import { resolve } from 'path';
 
 import type { Command } from 'commander';
 
-import { loading } from '@/utils/icons.js';
+import { loading } from '@/utils/icons';
 
-import type { DownloadOptions } from '../types/index.js';
-import { checkDependencies } from '../utils/dependencies.js';
-import { log } from '../utils/log.js';
-import { createProgressBar, formatFileSize } from '../utils/progress.js';
-import { validateUrl, validateFormat } from '../utils/validations.js';
-import { downloadVideo, getVideoInfo, generateFilename } from '../utils/ytdlp.js';
+import type { DownloadOptions } from '../types/index';
+import { checkDependencies } from '../utils/dependencies';
+import { log } from '../utils/log';
+import { createProgressBar, formatFileSize } from '../utils/progress';
+import { validateUrl, validateFormat } from '../utils/validations';
+import { downloadVideo, getVideoInfo, generateFilename } from '../utils/ytdlp';
 
 /* Allowed video/audio formats for download */
 const ALLOWED_FORMATS = ['mp4', 'mkv', 'webm', 'avi', 'mov', 'mp3'];

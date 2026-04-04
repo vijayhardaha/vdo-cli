@@ -4,11 +4,11 @@ import { createRequire } from 'module';
 
 import { Command } from 'commander';
 
-import { setupAudio } from '../commands/audio.js';
-import { setupCompress } from '../commands/compress.js';
-import { setupConvert } from '../commands/convert.js';
-import { setupDownload } from '../commands/download.js';
-import { setupSpeedup } from '../commands/speedup.js';
+import { setupAudio } from '../commands/audio';
+import { setupCompress } from '../commands/compress';
+import { setupConvert } from '../commands/convert';
+import { setupDownload } from '../commands/download';
+import { setupSpeedup } from '../commands/speedup';
 
 /* Create require function for ESM modules */
 const require = createRequire(import.meta.url);

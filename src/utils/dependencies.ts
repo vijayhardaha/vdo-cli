@@ -1,6 +1,6 @@
 import { exec, spawn } from 'child_process';
 
-import type { DependencyCheck, CommandResult } from '../types/index.js';
+import type { DependencyCheck, CommandResult } from '../types/index';
 
 /**
  * Check if a command exists in the system PATH
