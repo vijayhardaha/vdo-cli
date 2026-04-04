@@ -1,11 +1,13 @@
+import { resolve } from 'path';
+
 import type { Command } from 'commander';
 import ora from 'ora';
-import { resolve } from 'path';
+
+import type { DownloadOptions } from '../types/index.js';
 import { checkDependencies } from '../utils/dependencies.js';
+import { createProgressBar, convertToMB } from '../utils/progress.js';
 import { validateUrl, validateFormat } from '../utils/validations.js';
 import { downloadVideo } from '../utils/ytdlp.js';
-import { createProgressBar, convertToMB } from '../utils/progress.js';
-import type { DownloadOptions } from '../types/index.js';
 
 const ALLOWED_FORMATS = ['mp4', 'mkv', 'mp3'];
 

@@ -1,13 +1,15 @@
+import { access } from 'fs/promises';
+import { resolve, dirname, basename, extname, join } from 'path';
+
 import type { Command } from 'commander';
 import ora from 'ora';
-import { resolve, dirname, basename, extname, join } from 'path';
-import { access } from 'fs/promises';
+
+import type { AutoOptions } from '../types/index.js';
 import { checkDependencies } from '../utils/dependencies.js';
-import { validateUrl } from '../utils/validations.js';
-import { downloadVideo } from '../utils/ytdlp.js';
 import { convertVideo } from '../utils/ffmpeg.js';
 import { createProgressBar } from '../utils/progress.js';
-import type { AutoOptions } from '../types/index.js';
+import { validateUrl } from '../utils/validations.js';
+import { downloadVideo } from '../utils/ytdlp.js';
 
 /**
  * Auto action - automatically detects whether input is a URL or local file and processes accordingly

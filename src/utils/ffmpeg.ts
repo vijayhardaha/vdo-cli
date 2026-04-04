@@ -189,17 +189,9 @@ export async function extractAudio(
   format = 'mp3',
   bitrate = '192k'
 ): Promise<void> {
-  const formatMap: Record<string, string> = {
-    mp3: 'mp3',
-    wav: 'wav',
-    aac: 'adts',
-  };
+  const formatMap: Record<string, string> = { mp3: 'mp3', wav: 'wav', aac: 'adts' };
 
-  const codecMap: Record<string, string> = {
-    mp3: 'libmp3lame',
-    wav: 'pcm_s16le',
-    aac: 'aac',
-  };
+  const codecMap: Record<string, string> = { mp3: 'libmp3lame', wav: 'pcm_s16le', aac: 'aac' };
 
   const ffmpegFormat = formatMap[format.toLowerCase()];
   const ffmpegCodec = codecMap[format.toLowerCase()];

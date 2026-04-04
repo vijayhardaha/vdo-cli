@@ -97,9 +97,7 @@ export function validateSpeedRate(rate: number | string): void {
 export function validateBitrate(bitrate: string): void {
   const bitrateRegex = /^\d+[kKmM]?$/;
   if (!bitrateRegex.test(bitrate)) {
-    throw new Error(
-      'Bitrate must be a number optionally followed by k, K, m, or M (e.g., 192k, 128M)'
-    );
+    throw new Error('Bitrate must be a number optionally followed by k, K, m, or M (e.g., 192k, 128M)');
   }
 }
 

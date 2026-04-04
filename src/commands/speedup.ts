@@ -1,11 +1,13 @@
+import { resolve, dirname, basename, extname, join } from 'path';
+
 import type { Command } from 'commander';
 import ora from 'ora';
-import { resolve, dirname, basename, extname, join } from 'path';
+
+import type { SpeedupOptions } from '../types/index.js';
 import { checkDependencies } from '../utils/dependencies.js';
-import { validateFileExists, validateSpeedRate } from '../utils/validations.js';
 import { speedUpVideo } from '../utils/ffmpeg.js';
 import { createProgressBar } from '../utils/progress.js';
-import type { SpeedupOptions } from '../types/index.js';
+import { validateFileExists, validateSpeedRate } from '../utils/validations.js';
 
 /**
  * Speedup action - speeds up or slows down video playback using ffmpeg

@@ -1,11 +1,13 @@
+import { resolve, dirname, basename, extname, join } from 'path';
+
 import type { Command } from 'commander';
 import ora from 'ora';
-import { resolve, dirname, basename, extname, join } from 'path';
+
+import type { ConvertOptions } from '../types/index.js';
 import { checkDependencies } from '../utils/dependencies.js';
-import { validateFileExists, validateFormat, validatePreset } from '../utils/validations.js';
 import { convertVideo } from '../utils/ffmpeg.js';
 import { createProgressBar } from '../utils/progress.js';
-import type { ConvertOptions } from '../types/index.js';
+import { validateFileExists, validateFormat, validatePreset } from '../utils/validations.js';
 
 const ALLOWED_FORMATS = ['mp4', 'mkv', 'avi', 'mov', 'webm', 'flv'];
 const ALLOWED_PRESETS = ['ultrafast', 'fast', 'medium', 'slow', 'high-quality'];

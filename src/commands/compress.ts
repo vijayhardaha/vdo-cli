@@ -1,11 +1,13 @@
+import { resolve, dirname, basename, extname, join } from 'path';
+
 import type { Command } from 'commander';
 import ora from 'ora';
-import { resolve, dirname, basename, extname, join } from 'path';
+
+import type { CompressOptions } from '../types/index.js';
 import { checkDependencies } from '../utils/dependencies.js';
-import { validateFileExists, validatePreset, validateCRF } from '../utils/validations.js';
 import { compressVideo } from '../utils/ffmpeg.js';
 import { createProgressBar } from '../utils/progress.js';
-import type { CompressOptions } from '../types/index.js';
+import { validateFileExists, validatePreset, validateCRF } from '../utils/validations.js';
 
 const ALLOWED_PRESETS = ['ultrafast', 'fast', 'medium', 'slow'];
 

@@ -1,4 +1,5 @@
 import cliProgress from 'cli-progress';
+
 import type { ProgressInfo } from '../types/index.js';
 
 /**
@@ -66,12 +67,7 @@ export function parseYtDlpProgress(line: string): ProgressInfo | null {
     const percentage = parseFloat(percentMatch[1]);
     const size = parseFloat(percentMatch[2]);
     const unit = percentMatch[3];
-    return {
-      type: 'download',
-      percentage,
-      size,
-      unit,
-    };
+    return { type: 'download', percentage, size, unit };
   }
 
   // Match destination file

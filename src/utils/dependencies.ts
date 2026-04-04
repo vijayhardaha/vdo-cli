@@ -1,4 +1,5 @@
 import { exec, spawn } from 'child_process';
+
 import type { DependencyCheck, CommandResult } from '../types/index.js';
 
 /**
@@ -8,8 +9,8 @@ import type { DependencyCheck, CommandResult } from '../types/index.js';
  * @returns {Promise<boolean>} - True if command exists, false otherwise
  */
 export function checkCommand(command: string): Promise<boolean> {
-  return new Promise(resolve => {
-    exec(`which ${command}`, error => {
+  return new Promise((resolve) => {
+    exec(`which ${command}`, (error) => {
       resolve(!error);
     });
   });
@@ -33,10 +34,7 @@ export async function checkDependencies(): Promise<DependencyCheck> {
     missing.push('yt-dlp');
   }
 
-  return {
-    ok: missing.length === 0,
-    missing,
-  };
+  return { ok: missing.length === 0, missing };
 }
 
 /**

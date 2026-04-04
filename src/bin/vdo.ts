@@ -1,13 +1,15 @@
 #!/usr/bin/env node
 
-import { Command } from 'commander';
 import { createRequire } from 'module';
-import { setupDownload } from '../commands/download.js';
-import { setupConvert } from '../commands/convert.js';
-import { setupCompress } from '../commands/compress.js';
-import { setupSpeedup } from '../commands/speedup.js';
+
+import { Command } from 'commander';
+
 import { setupAudio } from '../commands/audio.js';
 import { setupAuto } from '../commands/auto.js';
+import { setupCompress } from '../commands/compress.js';
+import { setupConvert } from '../commands/convert.js';
+import { setupDownload } from '../commands/download.js';
+import { setupSpeedup } from '../commands/speedup.js';
 
 const require = createRequire(import.meta.url);
 const packageJson = require('../../package.json');

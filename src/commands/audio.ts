@@ -1,10 +1,12 @@
+import { resolve, dirname, basename, extname, join } from 'path';
+
 import type { Command } from 'commander';
 import ora from 'ora';
-import { resolve, dirname, basename, extname, join } from 'path';
-import { checkDependencies } from '../utils/dependencies.js';
-import { validateFileExists, validateFormat, validateBitrate } from '../utils/validations.js';
-import { extractAudio } from '../utils/ffmpeg.js';
+
 import type { AudioOptions } from '../types/index.js';
+import { checkDependencies } from '../utils/dependencies.js';
+import { extractAudio } from '../utils/ffmpeg.js';
+import { validateFileExists, validateFormat, validateBitrate } from '../utils/validations.js';
 
 const ALLOWED_FORMATS = ['mp3', 'wav', 'aac'];
 
