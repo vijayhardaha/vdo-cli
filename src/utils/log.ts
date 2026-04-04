@@ -1,14 +1,13 @@
-import { info, success, warning, error, loading, text } from './icons.js';
+import { info, success, warning, error, loading } from './icons.js';
 
-export type LogType = 'succeed' | 'fail' | 'warn' | 'info' | 'spinner' | 'text';
+export type LogType = 'succeed' | 'fail' | 'warn' | 'info' | 'loading';
 
 export interface LogOutput {
   succeed(message: string): void;
   fail(message: string): void;
   warn(message: string): void;
   info(message: string): void;
-  spinner(message: string): void;
-  text(message: string): void;
+  loading(message: string): void;
 }
 
 export const log = {
@@ -16,6 +15,5 @@ export const log = {
   fail: (message: string) => console.log(`${error} ${message}`),
   warn: (message: string) => console.log(`${warning} ${message}`),
   info: (message: string) => console.log(`${info} ${message}`),
-  spinner: (message: string) => console.log(`${loading} ${message}`),
-  text: (message: string) => console.log(`${text} ${message}`),
+  loading: (message: string) => console.log(`${loading} ${message}`),
 };
