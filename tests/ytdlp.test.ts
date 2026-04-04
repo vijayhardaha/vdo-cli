@@ -76,6 +76,24 @@ describe('ytdlp utils', () => {
       expect(onProgress).toHaveBeenCalledWith(50, 100, 'MiB');
     });
 
+    it('should call onProgress when stderr data contains progress', async () => {
+      const { runCommand } = await import('../src/utils/dependencies.js');
+      const { parseYtDlpProgress } = await import('../src/utils/progress.js');
+
+      vi.mocked(runCommand).mockImplementation(async (_cmd, onOutput) => {
+        if (onOutput) {
+          onOutput('[download] 25.0% of 50.00MiB', 'stderr');
+        }
+        return { stdout: '', stderr: '' };
+      });
+
+      vi.mocked(parseYtDlpProgress).mockReturnValue({ type: 'download', percentage: 25, size: 50, unit: 'MiB' });
+
+      const onProgress = vi.fn();
+      await downloadVideo('https://example.com', 'out.mp4', 'mp4', onProgress);
+      expect(onProgress).toHaveBeenCalledWith(25, 50, 'MiB');
+    });
+
     it('should not call onProgress when progress type is not download', async () => {
       const { runCommand } = await import('../src/utils/dependencies.js');
       const { parseYtDlpProgress } = await import('../src/utils/progress.js');
@@ -179,6 +197,25 @@ describe('ytdlp utils', () => {
 
       const result = await getVideoInfo('https://example.com');
       expect(result.video_id).toBe('id123');
+    });
+
+    it('should use unknown when both display_id and id are missing', async () => {
+      const { runCommand } = await import('../src/utils/dependencies.js');
+      const videoData = { title: 'Test', ext: 'mp4' };
+      vi.mocked(runCommand).mockResolvedValue({ stdout: JSON.stringify(videoData), stderr: '' });
+
+      const result = await getVideoInfo('https://example.com');
+      expect(result.video_id).toBe('unknown');
+    });
+
+    it('should use untitled when title is missing', async () => {
+      const { runCommand } = await import('../src/utils/dependencies.js');
+      const { sanitizeFilename } = await import('../src/utils/sanitize.js');
+      const videoData = { id: 'abc123', ext: 'mp4' };
+      vi.mocked(runCommand).mockResolvedValue({ stdout: JSON.stringify(videoData), stderr: '' });
+
+      await getVideoInfo('https://example.com');
+      expect(sanitizeFilename).toHaveBeenCalledWith('untitled');
     });
 
     it('should default to mp4 when ext not provided', async () => {
