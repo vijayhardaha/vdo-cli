@@ -9,7 +9,6 @@ A powerful Node.js command-line tool for video processing and downloading, built
 - 🗜️ **Compress** videos with customizable quality
 - ⚡ **Speed up** or slow down videos
 - 🎵 **Extract** audio from videos
-- 🤖 **Auto** mode that automatically detects input type
 
 ## Installation
 
@@ -232,37 +231,6 @@ vdo audio video.mp4 -o soundtrack.mp3
 
 ---
 
-#### 6. auto - Automatic detection
-
-Automatically detect whether input is a URL or local file and perform appropriate action.
-
-```bash
-vdo auto <input|url> [options]
-```
-
-**Options:**
-
-- `-o, --output <file>` - Output file name
-- `--format <format>` - Format for downloads (mp4, mkv, mp3) (default: "mp4")
-
-**Examples:**
-
-```bash
-# Auto-download from URL
-vdo auto https://youtube.com/watch?v=example
-
-# Auto-convert local file
-vdo auto ./local-video.avi
-
-# With custom output
-vdo auto https://youtube.com/watch?v=example -o downloaded.mp4
-vdo auto ./video.mov -o converted.mp4
-```
-
-**Aliases:** `a`
-
----
-
 ## Progress Indicators
 
 `vdo` provides real-time progress indicators for all operations:
@@ -404,7 +372,7 @@ vdo/
 │   ├── compress.js         # Compress command
 │   ├── speedup.js          # Speed adjustment command
 │   ├── audio.js            # Audio extraction command
-│   └── auto.js             # Auto-detection command
+
 ├── utils/
 │   ├── dependencies.js     # Dependency checking utilities
 │   ├── validations.js      # Input validation utilities
