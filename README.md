@@ -446,9 +446,6 @@ vdo sp timelapse-source.mp4 --rate 4
 
 # Extract podcast audio
 vdo au interview.mp4 --format mp3 --bitrate 192k
-
-# Let vdo decide what to do
-vdo a https://vimeo.com/12345678
 ```
 
 Happy video processing! 🎬🎵
