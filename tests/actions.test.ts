@@ -6,7 +6,6 @@ import { convertAction } from '../src/commands/convert.js';
 import { downloadAction } from '../src/commands/download.js';
 import { speedupAction } from '../src/commands/speedup.js';
 
-// Mock all external dependencies
 vi.mock('../src/utils/dependencies.js', () => ({ checkDependencies: vi.fn() }));
 
 vi.mock('../src/utils/ytdlp.js', () => ({
@@ -35,15 +34,6 @@ vi.mock('../src/utils/validations.js', () => ({
 vi.mock('../src/utils/progress.js', () => ({
   createProgressBar: vi.fn(),
   formatFileSize: vi.fn(() => ({ value: 100, unit: 'MB' })),
-}));
-
-vi.mock('ora', () => ({
-  default: vi.fn(() => ({
-    start: vi.fn().mockReturnThis(),
-    succeed: vi.fn().mockReturnThis(),
-    fail: vi.fn().mockReturnThis(),
-    text: '',
-  })),
 }));
 
 vi.mock('fs/promises', () => ({ access: vi.fn() }));
@@ -676,7 +666,7 @@ describe('Command actions', () => {
 
       await speedupAction('input.mp4', { rate: 1 });
 
-      const consoleCalls = vi.mocked(console.log).mock.calls.map((c) => c[0]);
+      const consoleCalls = vi.mocked(console.log).mock.calls.map((c: unknown[]) => String(c[0]));
       expect(consoleCalls.some((m: string) => m?.includes('faster'))).toBe(false);
       expect(consoleCalls.some((m: string) => m?.includes('slower'))).toBe(false);
     });
