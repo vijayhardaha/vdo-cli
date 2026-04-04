@@ -1,53 +1,46 @@
 import { resolve } from 'path';
 
 import type { Command } from 'commander';
-import ora from 'ora';
+
+import { loading } from '@/utils/icons.js';
 
 import type { DownloadOptions } from '../types/index.js';
 import { checkDependencies } from '../utils/dependencies.js';
+import { log } from '../utils/log.js';
 import { createProgressBar, formatFileSize } from '../utils/progress.js';
 import { validateUrl, validateFormat } from '../utils/validations.js';
 import { downloadVideo, getVideoInfo, generateFilename } from '../utils/ytdlp.js';
 
 const ALLOWED_FORMATS = ['mp4', 'mkv', 'webm', 'avi', 'mov', 'mp3'];
 
-/**
- * Download action - downloads video from URL using yt-dlp
- *
- * @param {string} url - Video URL to download (must be valid HTTP/HTTPS URL)
- * @param {DownloadOptions} options - Download configuration options including output filename and format
- * @returns {Promise<void>} Promise that resolves when download is complete
- * @throws {void} Exits process with code 1 if dependencies missing, URL invalid, or download fails
- */
 export async function downloadAction(url: string, options: DownloadOptions): Promise<void> {
   try {
-    // Check dependencies
     const deps = await checkDependencies();
     if (!deps.ok) {
-      console.error(`Error: Missing required dependencies: ${deps.missing.join(', ')}`);
-      console.error('Please install them using:');
-      console.error('  brew install ffmpeg yt-dlp');
+      log.fail(`Missing required dependencies: ${deps.missing.join(', ')}`);
+      log.warn('Please install them using:');
+      log.warn('  brew install ffmpeg yt-dlp');
       process.exit(1);
     }
 
-    // Validate URL
     if (!validateUrl(url)) {
-      console.error('Error: Invalid URL format. Please provide a valid HTTP/HTTPS URL.');
+      log.fail('Invalid URL format. Please provide a valid HTTP/HTTPS URL.');
       process.exit(1);
     }
 
-    // Validate format
     const format = options.format || 'mp4';
-    validateFormat(format, ALLOWED_FORMATS);
+    try {
+      validateFormat(format, ALLOWED_FORMATS);
+    } catch (error) {
+      log.fail(error instanceof Error ? error.message : String(error));
+      process.exit(1);
+    }
 
-    // Show spinner while getting video info
-    const spinner = ora('Getting video information...').start();
+    log.spinner('Getting video information...');
 
-    // Get video info to determine filename
     const videoInfo = await getVideoInfo(url);
-    spinner.succeed('Video information retrieved');
+    log.succeed('Video information retrieved');
 
-    // Determine output filename
     let outputFile: string;
     if (options.output) {
       outputFile = options.output.includes('.')
@@ -59,27 +52,30 @@ export async function downloadAction(url: string, options: DownloadOptions): Pro
 
     const { value: total, unit } = formatFileSize(videoInfo.filesize || 0);
     const roundedTotal = Math.round(total);
-    const progressBar = createProgressBar('Downloading', unit);
+    const progressBar = createProgressBar(`${loading} Downloading`, unit);
 
     const progressCallback = (percentage: number, _size: number, _unit: string) => {
       const current = Math.round((percentage / 100) * total);
       progressBar.update(current, { total: roundedTotal });
     };
 
-    // Create progress bar
     progressBar.start(roundedTotal, 0);
 
-    // Download video
-    await downloadVideo(url, outputFile, format, progressCallback);
+    try {
+      await downloadVideo(url, outputFile, format, progressCallback);
+    } catch (error) {
+      progressBar.stop();
+      log.fail(`Download failed: ${error instanceof Error ? error.message : String(error)}`);
+      process.exit(1);
+    }
 
-    // Ensure progress bar shows completion
     progressBar.update(roundedTotal, { total: roundedTotal });
     progressBar.stop();
 
-    console.log('\n✓ Download completed successfully!');
-    console.log(`  Output file: ${resolve(outputFile)}`);
+    log.succeed('Download completed successfully!');
+    log.info(`Output: ${resolve(outputFile)}`);
   } catch (error) {
-    console.error('\n✗ Error:', error instanceof Error ? error.message : String(error));
+    log.fail(error instanceof Error ? error.message : String(error));
     process.exit(1);
   }
 }
