@@ -39,13 +39,13 @@ choco install ffmpeg yt-dlp
 ### Install vdo
 
 ```bash
-npm install -g vdo
+npm install -g @vijayhardaha/vdo-cli
 ```
 
 Or if you're developing locally:
 
 ```bash
-git clone https://github.com/yourusername/vdo.git
+git clone https://github.com/vijayhardaha/vdo-cli.git
 cd vdo
 npm install
 npm link
