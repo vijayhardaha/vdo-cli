@@ -55,6 +55,62 @@ bun run format:check    # Check formatting
 
 ## Coding Conventions
 
+### Comments
+
+#### JSDoc (for exported functions and complex types)
+
+```ts
+/**
+ * {Description of what the function does}
+ * @param {Type} name - {Description of parameter}
+ * @returns {Type} - {Description of return value}
+ * @throws {Type} - {Description of when error is thrown}
+ */
+```
+
+#### Type/Interface Definitions
+
+```ts
+/* {Description of the type} */
+type Foo = string;
+
+/* {Description of the interface} */
+interface Bar {
+  prop: string;
+}
+```
+
+#### Variable Definitions
+
+```ts
+/* {Description of the variable} */
+const myVar = "value";
+```
+
+#### Test Comments (describe, it, expect)
+
+```ts
+// describe: {Test suite name}
+// it: {Expected behavior}
+// expect: {What is being tested}
+describe("foo", () => {
+  // it: should return bar when given valid input
+  it("should return bar", () => {
+    // expect: foo('input') returns 'bar'
+    expect(foo("input")).toBe("bar");
+  });
+});
+```
+
+#### Conditional Check Descriptions
+
+```ts
+// check: if user is authenticated
+if (isAuthenticated) {
+  // do something
+}
+```
+
 ### Naming Conventions
 
 - Components: `PascalCase`
