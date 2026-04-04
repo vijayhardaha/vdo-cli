@@ -11,7 +11,7 @@ import { setupDownload } from '../commands/download.js';
 import { setupSpeedup } from '../commands/speedup.js';
 
 const require = createRequire(import.meta.url);
-const packageJson = require('../../package.json');
+const packageJson = require('../package.json');
 
 // Create the CLI program
 const program = new Command();
