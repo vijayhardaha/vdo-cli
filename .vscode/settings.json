@@ -1,19 +1,26 @@
 {
-  "editor.formatOnSave": true,
+  // ======================================================================
+  // VS Code Workspace Settings
+  // ======================================================================
+  // Purpose: Configure formatter, ESLint, and editor behavior for consistency
+  // Docs: https://code.visualstudio.com/docs/getstarted/settings
+  // ======================================================================
+
+  // ---- Formatting & Saving ----
+  // Use Prettier as the master formatter for this project
   "editor.defaultFormatter": "esbenp.prettier-vscode",
+
+  // We disable `formatOnSave` because ESLint code actions handle formatting
+  "editor.formatOnSave": false,
+
   "editor.codeActionsOnSave": {
+    // Automatically fix lint errors and trigger Prettier on every save
     "source.fixAll.eslint": "explicit"
   },
-  "typescript.preferences.importModuleSpecifier": "relative",
-  "typescript.suggest.autoImports": true,
-  "files.exclude": {
-    "node_modules": true,
-    "dist": true,
-    "coverage": true
-  },
-  "search.exclude": {
-    "node_modules": true,
-    "dist": true,
-    "coverage": true
-  }
+
+  // ---- Linter Integration ----
+  // Allow ESLint to handle formatting (via Prettier plugin)
+  "eslint.enable": true,
+  "eslint.format.enable": true,
+  "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"]
 }

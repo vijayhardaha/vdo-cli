@@ -1,32 +1,30 @@
+// =======================================================================
+// Typescript Configuration
+// =======================================================================
+// Purpose: Static type-checking and module resolution strategy for the
+//          repository, ensuring predictable behavior and strong typing
+//          across code.
+// Docs: https://www.typescriptlang.org/tsconfig
+// =======================================================================
+
 {
-  "compilerOptions": {
-    "target": "ES2022",
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "lib": ["ES2022"],
-    "outDir": "./dist",
-    "rootDir": "./src",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true,
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "allowSyntheticDefaultImports": true
-  },
-  "include": ["src/**/*"],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "tests",
-    "vite.config.ts",
-    "vitest.config.ts",
-    "vitest.setup.ts"
-  ]
+  "extends": "@vijayhardaha/dev-config/tsconfig",
+  "compilerOptions": { "baseUrl": "./", "ignoreDeprecations": "6.0", "paths": { "@/*": ["./src/*"] } },
+
+  // ---- Includes ----
+  // Files to include in the project type-checking scope
+  "include": [
+    "*.config.mjs",
+    "*.config.ts",
+    "*.d.ts",
+    "**/*.js",
+    "**/*.jsx",
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.mjs",
+    "**/*.cjs"
+  ],
+
+  // ---- Excludes ----
+  "exclude": ["node_modules", "coverage", "dist"]
 }
