@@ -92,6 +92,6 @@ export function setupConvert(program: Command): void {
     .description('Convert local video to different format')
     .option('-o, --output <file>', 'Output file name')
     .option('--to <format>', 'Target format (mp4, mkv, avi, mov, webm, flv)', 'mp4')
-    .option('--preset <preset>', 'Encoding preset (fast, high-quality, custom)', 'fast')
+    .option('--preset <preset>', 'Encoding preset (ultrafast, fast, medium, slow, high-quality)', 'fast')
     .action(convertAction);
 }
