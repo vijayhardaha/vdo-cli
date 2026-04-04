@@ -240,6 +240,23 @@ describe('ffmpeg utils', () => {
       vi.mocked(parseFFmpegProgress).mockReturnValue({ type: 'time', value: 90 });
       await compressVideo('input.mp4', 'output.mp4', 28, 'medium', null);
     });
+
+    it('should not call onProgress when output type is stdout', async () => {
+      const { runCommand } = await import('../src/utils/dependencies.js');
+      const { parseFFmpegProgress } = await import('../src/utils/progress.js');
+
+      vi.mocked(runCommand).mockImplementation(async (_cmd, onOutput) => {
+        if (onOutput && _cmd.includes('ffmpeg')) {
+          onOutput('some output', 'stdout');
+        }
+        return { stdout: '180', stderr: '' };
+      });
+
+      vi.mocked(parseFFmpegProgress).mockReturnValue({ type: 'time', value: 90 });
+      const onProgress = vi.fn();
+      await compressVideo('input.mp4', 'output.mp4', 28, 'medium', onProgress);
+      expect(onProgress).not.toHaveBeenCalled();
+    });
   });
 
   // Tests for speedUpVideo function
@@ -435,6 +452,23 @@ describe('ffmpeg utils', () => {
 
       vi.mocked(parseFFmpegProgress).mockReturnValue({ type: 'time', value: 30 });
       await speedUpVideo('input.mp4', 'output.mp4', 2, null);
+    });
+
+    it('should not call onProgress when output type is stdout', async () => {
+      const { runCommand } = await import('../src/utils/dependencies.js');
+      const { parseFFmpegProgress } = await import('../src/utils/progress.js');
+
+      vi.mocked(runCommand).mockImplementation(async (_cmd, onOutput) => {
+        if (onOutput && _cmd.includes('ffmpeg')) {
+          onOutput('some output', 'stdout');
+        }
+        return { stdout: '60', stderr: '' };
+      });
+
+      vi.mocked(parseFFmpegProgress).mockReturnValue({ type: 'time', value: 30 });
+      const onProgress = vi.fn();
+      await speedUpVideo('input.mp4', 'output.mp4', 2, onProgress);
+      expect(onProgress).not.toHaveBeenCalled();
     });
   });
 
