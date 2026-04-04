@@ -1,47 +1,50 @@
 import { resolve, dirname, basename, extname, join } from 'path';
 
 import type { Command } from 'commander';
-import ora from 'ora';
 
 import type { CompressOptions } from '../types/index.js';
 import { checkDependencies } from '../utils/dependencies.js';
 import { compressVideo } from '../utils/ffmpeg.js';
+import { log } from '../utils/log.js';
 import { createProgressBar } from '../utils/progress.js';
 import { validateFileExists, validatePreset, validateCRF } from '../utils/validations.js';
 
 const ALLOWED_PRESETS = ['ultrafast', 'fast', 'medium', 'slow'];
 
-/**
- * Compress action - compresses video to reduce file size using ffmpeg with CRF
- *
- * @param {string} input - Path to the input video file
- * @param {CompressOptions} options - Compression configuration options including output filename, CRF value, and preset
- * @returns {Promise<void>} Promise that resolves when compression is complete
- * @throws {void} Exits process with code 1 if dependencies missing, file not found, or compression fails
- */
 export async function compressAction(input: string, options: CompressOptions): Promise<void> {
   try {
-    // Check dependencies
+    log.spinner('Preparing compression...');
+
     const deps = await checkDependencies();
     if (!deps.ok) {
-      console.error(`Error: Missing required dependencies: ${deps.missing.join(', ')}`);
-      console.error('Please install them using:');
-      console.error('  brew install ffmpeg yt-dlp');
+      log.fail(`Missing dependencies: ${deps.missing.join(', ')}`);
+      log.warn('Install using: brew install ffmpeg yt-dlp');
       process.exit(1);
     }
 
-    // Validate input file
-    await validateFileExists(input);
+    try {
+      await validateFileExists(input);
+    } catch (error) {
+      log.fail(error instanceof Error ? error.message : String(error));
+      process.exit(1);
+    }
 
-    // Validate CRF
     const crf = options.crf || 28;
-    validateCRF(crf);
+    try {
+      validateCRF(crf);
+    } catch (error) {
+      log.fail(error instanceof Error ? error.message : String(error));
+      process.exit(1);
+    }
 
-    // Validate preset
     const preset = options.preset || 'medium';
-    validatePreset(preset, ALLOWED_PRESETS);
+    try {
+      validatePreset(preset, ALLOWED_PRESETS);
+    } catch (error) {
+      log.fail(error instanceof Error ? error.message : String(error));
+      process.exit(1);
+    }
 
-    // Determine output filename
     let outputFile = options.output;
     if (!outputFile) {
       const dir = dirname(input);
@@ -49,9 +52,7 @@ export async function compressAction(input: string, options: CompressOptions): P
       outputFile = join(dir, `${name}_compressed.mp4`);
     }
 
-    // Show spinner while preparing
-    const spinner = ora('Preparing compression...').start();
-    spinner.succeed('Compression started');
+    log.succeed('Compression started');
 
     const progressBar = createProgressBar('Compressing');
 
@@ -63,16 +64,21 @@ export async function compressAction(input: string, options: CompressOptions): P
 
     progressBar.start(100, 0);
 
-    // Compress video
-    await compressVideo(input, outputFile, crf, preset, progressCallback);
+    try {
+      await compressVideo(input, outputFile, crf, preset, progressCallback);
+    } catch (error) {
+      progressBar.stop();
+      log.fail(`Compression failed: ${error instanceof Error ? error.message : String(error)}`);
+      process.exit(1);
+    }
 
     progressBar.stop();
-    console.log('\n✓ Compression completed successfully!');
-    console.log(`  Output file: ${resolve(outputFile)}`);
-    console.log(`  CRF: ${crf}`);
-    console.log(`  Preset: ${preset}`);
+    log.succeed('Compression completed successfully!');
+    log.info(`Output: ${resolve(outputFile)}`);
+    log.info(`CRF: ${crf}`);
+    log.info(`Preset: ${preset}`);
   } catch (error) {
-    console.error('\n✗ Error:', error instanceof Error ? error.message : String(error));
+    log.fail(error instanceof Error ? error.message : String(error));
     process.exit(1);
   }
 }
