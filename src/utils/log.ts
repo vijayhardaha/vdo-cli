@@ -1,7 +1,9 @@
 import { info, success, warning, error, loading } from './icons.js';
 
+/* Log message types for styled console output */
 export type LogType = 'succeed' | 'fail' | 'warn' | 'info' | 'loading';
 
+/* Log output interface with all available logging methods */
 export interface LogOutput {
   succeed(message: string): void;
   fail(message: string): void;
@@ -10,6 +12,7 @@ export interface LogOutput {
   loading(message: string): void;
 }
 
+/* Styled console logging utility using yoctocolors */
 export const log = {
   succeed: (message: string) => console.log(`${success} ${message}`),
   fail: (message: string) => console.log(`${error} ${message}`),

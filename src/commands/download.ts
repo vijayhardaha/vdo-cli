@@ -11,11 +11,21 @@ import { createProgressBar, formatFileSize } from '../utils/progress.js';
 import { validateUrl, validateFormat } from '../utils/validations.js';
 import { downloadVideo, getVideoInfo, generateFilename } from '../utils/ytdlp.js';
 
+/* Allowed video/audio formats for download */
 const ALLOWED_FORMATS = ['mp4', 'mkv', 'webm', 'avi', 'mov', 'mp3'];
 
+/**
+ * Download video from URL using yt-dlp
+ *
+ * @param {string} url - Video URL to download
+ * @param {DownloadOptions} options - Download options including output and format
+ * @returns {Promise<void>}
+ * @throws {void} Exits with code 1 on error
+ */
 export async function downloadAction(url: string, options: DownloadOptions): Promise<void> {
   try {
     const deps = await checkDependencies();
+    // check: if dependencies are missing
     if (!deps.ok) {
       log.fail(`Missing required dependencies: ${deps.missing.join(', ')}`);
       log.warn('Please install them using:');
@@ -23,6 +33,7 @@ export async function downloadAction(url: string, options: DownloadOptions): Pro
       process.exit(1);
     }
 
+    // check: if URL is valid
     if (!validateUrl(url)) {
       log.fail('Invalid URL format. Please provide a valid HTTP/HTTPS URL.');
       process.exit(1);
@@ -42,6 +53,7 @@ export async function downloadAction(url: string, options: DownloadOptions): Pro
     log.succeed('Video information retrieved');
 
     let outputFile: string;
+    // check: if output path is provided
     if (options.output) {
       outputFile = options.output.includes('.')
         ? options.output

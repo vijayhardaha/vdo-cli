@@ -11,11 +11,20 @@ import { log } from '../utils/log.js';
 import { createProgressBar } from '../utils/progress.js';
 import { validateFileExists, validateSpeedRate } from '../utils/validations.js';
 
+/**
+ * Speed up or slow down video playback using ffmpeg
+ *
+ * @param {string} input - Path to input video file
+ * @param {SpeedupOptions} options - Speed adjustment options including output and rate
+ * @returns {Promise<void>}
+ * @throws {void} Exits with code 1 on error
+ */
 export async function speedupAction(input: string, options: SpeedupOptions): Promise<void> {
   try {
     log.loading('Preparing speed adjustment...');
 
     const deps = await checkDependencies();
+    // check: if dependencies are missing
     if (!deps.ok) {
       log.fail(`Missing dependencies: ${deps.missing.join(', ')}`);
       log.warn('Install using: brew install ffmpeg yt-dlp');
@@ -38,6 +47,7 @@ export async function speedupAction(input: string, options: SpeedupOptions): Pro
     }
 
     let outputFile = options.output;
+    // check: if output path not provided, generate default
     if (!outputFile) {
       const dir = dirname(input);
       const name = basename(input, extname(input));
@@ -69,8 +79,10 @@ export async function speedupAction(input: string, options: SpeedupOptions): Pro
     log.info(`Output: ${resolve(outputFile)}`);
     log.info(`Speed rate: ${rate}x`);
 
+    // check: if video should be sped up
     if (rate > 1) {
       log.info(`Result: Video is ${rate}x faster`);
+      // check: if video should be slowed down
     } else if (rate < 1) {
       log.info(`Result: Video is ${(1 / rate).toFixed(2)}x slower`);
     }

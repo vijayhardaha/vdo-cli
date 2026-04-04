@@ -1,7 +1,17 @@
+/* Invalid filename characters for Windows */
 const INVALID_CHARS_WINDOWS = ['<', '>', ':', '"', '/', '\\', '|', '?', '*'];
+/* Invalid filename characters for Unix */
 const INVALID_CHARS_UNIX = [':'];
 
+/**
+ * Sanitize filename by removing invalid characters
+ *
+ * @param {string} name - Original filename
+ * @param {number} [maxLength=200] - Maximum filename length
+ * @returns {string} Sanitized filename
+ */
 export function sanitizeFilename(name: string, maxLength = 200): string {
+  /* check: if Windows platform, use Windows invalid chars */
   const invalidChars = process.platform === 'win32' ? INVALID_CHARS_WINDOWS : INVALID_CHARS_UNIX;
 
   let safe = name.trim();
@@ -14,12 +24,14 @@ export function sanitizeFilename(name: string, maxLength = 200): string {
     .filter((char) => char.charCodeAt(0) >= 32)
     .join('');
 
+  /* check: if Windows, remove trailing dots/spaces */
   if (process.platform === 'win32') {
     safe = safe.replace(/[. ]+$/, '');
   }
 
   safe = safe.replace(/[\s_]+/g, '-');
 
+  /* check: if filename exceeds max length, truncate at punctuation */
   if (safe.length > maxLength) {
     const cutoffSymbols = /[.!?-]/g;
     const matches = [...safe.matchAll(cutoffSymbols)]
@@ -36,6 +48,12 @@ export function sanitizeFilename(name: string, maxLength = 200): string {
   return safe.trim() || 'untitled';
 }
 
+/**
+ * Convert text to URL-friendly slug
+ *
+ * @param {string} text - Text to slugify
+ * @returns {string} Slugified text
+ */
 export function slugify(text: string): string {
   return text
     .toLowerCase()

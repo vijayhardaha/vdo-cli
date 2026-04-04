@@ -8,13 +8,23 @@ import { extractAudio } from '../utils/ffmpeg.js';
 import { log } from '../utils/log.js';
 import { validateFileExists, validateFormat, validateBitrate } from '../utils/validations.js';
 
+/* Allowed audio formats for extraction */
 const ALLOWED_FORMATS = ['mp3', 'wav', 'aac'];
 
+/**
+ * Extract audio track from video using ffmpeg
+ *
+ * @param {string} input - Path to input video file
+ * @param {AudioOptions} options - Audio extraction options including output, format, and bitrate
+ * @returns {Promise<void>}
+ * @throws {void} Exits with code 1 on error
+ */
 export async function audioAction(input: string, options: AudioOptions): Promise<void> {
   try {
     log.loading('Preparing audio extraction...');
 
     const deps = await checkDependencies();
+    // check: if dependencies are missing
     if (!deps.ok) {
       log.fail(`Missing dependencies: ${deps.missing.join(', ')}`);
       log.warn('Install using: brew install ffmpeg yt-dlp');
@@ -45,6 +55,7 @@ export async function audioAction(input: string, options: AudioOptions): Promise
     }
 
     let outputFile = options.output;
+    // check: if output path not provided, generate default
     if (!outputFile) {
       const dir = dirname(input);
       const name = basename(input, extname(input));

@@ -11,14 +11,25 @@ import { log } from '../utils/log.js';
 import { createProgressBar } from '../utils/progress.js';
 import { validateFileExists, validateFormat, validatePreset } from '../utils/validations.js';
 
+/* Allowed video formats for conversion */
 const ALLOWED_FORMATS = ['mp4', 'mkv', 'avi', 'mov', 'webm', 'flv'];
+/* Allowed encoding presets for ffmpeg */
 const ALLOWED_PRESETS = ['ultrafast', 'fast', 'medium', 'slow', 'high-quality'];
 
+/**
+ * Convert video to different format using ffmpeg
+ *
+ * @param {string} input - Path to input video file
+ * @param {ConvertOptions} options - Conversion options including output, format, and preset
+ * @returns {Promise<void>}
+ * @throws {void} Exits with code 1 on error
+ */
 export async function convertAction(input: string, options: ConvertOptions): Promise<void> {
   try {
     log.loading('Preparing conversion...');
 
     const deps = await checkDependencies();
+    // check: if dependencies are missing
     if (!deps.ok) {
       log.fail(`Missing dependencies: ${deps.missing.join(', ')}`);
       log.warn('Install using: brew install ffmpeg yt-dlp');
@@ -49,6 +60,7 @@ export async function convertAction(input: string, options: ConvertOptions): Pro
     }
 
     let outputFile = options.output;
+    // check: if output path not provided, generate default
     if (!outputFile) {
       const dir = dirname(input);
       const name = basename(input, extname(input));

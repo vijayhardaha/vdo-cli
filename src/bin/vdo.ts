@@ -10,32 +10,28 @@ import { setupConvert } from '../commands/convert.js';
 import { setupDownload } from '../commands/download.js';
 import { setupSpeedup } from '../commands/speedup.js';
 
+/* Create require function for ESM modules */
 const require = createRequire(import.meta.url);
+/* Load package.json for version info */
 const packageJson = require('../package.json');
 
-// Create the CLI program
+/* Initialize CLI program */
 const program = new Command();
 
-/**
- * Configure and run the VDO CLI program
- *
- * @returns {void}
- */
-
-// Configure the program
+/* Configure the program */
 program
   .name('vdo')
   .description('A Node.js CLI tool for video utilities using yt-dlp and ffmpeg')
   .version(packageJson.version, '-v, --version');
 
-// Setup all commands
+/* Setup all commands */
 setupDownload(program);
 setupConvert(program);
 setupCompress(program);
 setupSpeedup(program);
 setupAudio(program);
 
-// Add some examples
+/* Add help examples */
 program.addHelpText(
   'after',
   `
@@ -51,10 +47,10 @@ For more information, visit: https://github.com/vijayhardaha/vdo-cli
 `
 );
 
-// Parse command line arguments
+/* Parse command line arguments */
 program.parse(process.argv);
 
-// Show help if no command provided
+/* check: if no command provided, show help */
 if (!process.argv.slice(2).length) {
   program.outputHelp();
 }

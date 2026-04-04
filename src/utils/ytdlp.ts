@@ -2,6 +2,7 @@ import { runCommand } from './dependencies.js';
 import { parseYtDlpProgress } from './progress.js';
 import { sanitizeFilename } from './sanitize.js';
 
+/* Video information returned from yt-dlp */
 export interface VideoInfo {
   title: string;
   video_id: string;
@@ -61,6 +62,7 @@ export async function downloadVideo(
   format: string = 'mp4',
   onProgress: ((percentage: number, size: number, unit: string) => void) | null = null
 ): Promise<void> {
+  /* Format selectors for different output formats */
   const formatMap: Record<string, string> = {
     mp4: 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/bestvideo[ext=mp4]/best',
     mkv: 'bestvideo[ext=mkv]+bestaudio[ext=mka]/bestvideo[ext=mkv]/best',
@@ -73,6 +75,7 @@ export async function downloadVideo(
   const formatSelector = formatMap[format.toLowerCase()] || formatMap.mp4;
 
   let command: string;
+  /* check: if downloading audio only */
   if (format === 'mp3') {
     command = `yt-dlp --extract-audio --audio-format mp3 --output "${outputPath}" --format "${formatSelector}" "${url}"`;
   } else {
@@ -81,6 +84,7 @@ export async function downloadVideo(
 
   const outputHandler = (data: string, _type: 'stdout' | 'stderr') => {
     const progress = parseYtDlpProgress(data);
+    /* check: if progress data is available and callback exists */
     if (progress && progress.type === 'download' && onProgress) {
       onProgress(progress.percentage || 0, progress.size || 0, progress.unit || 'MiB');
     }
