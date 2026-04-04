@@ -26,7 +26,7 @@ const program = new Command();
 program
   .name('vdo')
   .description('A Node.js CLI tool for video utilities using yt-dlp and ffmpeg')
-  .version(packageJson.version);
+  .version(packageJson.version, '-v, --version');
 
 // Setup all commands
 setupDownload(program);
