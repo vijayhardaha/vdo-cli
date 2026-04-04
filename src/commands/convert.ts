@@ -1,48 +1,51 @@
 import { resolve, dirname, basename, extname, join } from 'path';
 
 import type { Command } from 'commander';
-import ora from 'ora';
 
 import type { ConvertOptions } from '../types/index.js';
 import { checkDependencies } from '../utils/dependencies.js';
 import { convertVideo } from '../utils/ffmpeg.js';
+import { log } from '../utils/log.js';
 import { createProgressBar } from '../utils/progress.js';
 import { validateFileExists, validateFormat, validatePreset } from '../utils/validations.js';
 
 const ALLOWED_FORMATS = ['mp4', 'mkv', 'avi', 'mov', 'webm', 'flv'];
 const ALLOWED_PRESETS = ['ultrafast', 'fast', 'medium', 'slow', 'high-quality'];
 
-/**
- * Convert action - converts video to different format using ffmpeg
- *
- * @param {string} input - Path to the input video file
- * @param {ConvertOptions} options - Conversion configuration options including output filename, target format, and preset
- * @returns {Promise<void>} Promise that resolves when conversion is complete
- * @throws {void} Exits process with code 1 if dependencies missing, file not found, or conversion fails
- */
 export async function convertAction(input: string, options: ConvertOptions): Promise<void> {
   try {
-    // Check dependencies
+    log.spinner('Preparing conversion...');
+
     const deps = await checkDependencies();
     if (!deps.ok) {
-      console.error(`Error: Missing required dependencies: ${deps.missing.join(', ')}`);
-      console.error('Please install them using:');
-      console.error('  brew install ffmpeg yt-dlp');
+      log.fail(`Missing dependencies: ${deps.missing.join(', ')}`);
+      log.warn('Install using: brew install ffmpeg yt-dlp');
       process.exit(1);
     }
 
-    // Validate input file
-    await validateFileExists(input);
+    try {
+      await validateFileExists(input);
+    } catch (error) {
+      log.fail(error instanceof Error ? error.message : String(error));
+      process.exit(1);
+    }
 
-    // Validate format
     const format = options.to || 'mp4';
-    validateFormat(format, ALLOWED_FORMATS);
+    try {
+      validateFormat(format, ALLOWED_FORMATS);
+    } catch (error) {
+      log.fail(error instanceof Error ? error.message : String(error));
+      process.exit(1);
+    }
 
-    // Validate preset
     const preset = options.preset || 'fast';
-    validatePreset(preset, ALLOWED_PRESETS);
+    try {
+      validatePreset(preset, ALLOWED_PRESETS);
+    } catch (error) {
+      log.fail(error instanceof Error ? error.message : String(error));
+      process.exit(1);
+    }
 
-    // Determine output filename
     let outputFile = options.output;
     if (!outputFile) {
       const dir = dirname(input);
@@ -50,9 +53,7 @@ export async function convertAction(input: string, options: ConvertOptions): Pro
       outputFile = join(dir, `${name}_converted.${format}`);
     }
 
-    // Show spinner while preparing
-    const spinner = ora('Preparing conversion...').start();
-    spinner.succeed('Conversion started');
+    log.succeed('Conversion started');
 
     const progressBar = createProgressBar('Converting');
 
@@ -64,16 +65,21 @@ export async function convertAction(input: string, options: ConvertOptions): Pro
 
     progressBar.start(100, 0);
 
-    // Convert video
-    await convertVideo(input, outputFile, format, preset, progressCallback);
+    try {
+      await convertVideo(input, outputFile, format, preset, progressCallback);
+    } catch (error) {
+      progressBar.stop();
+      log.fail(`Conversion failed: ${error instanceof Error ? error.message : String(error)}`);
+      process.exit(1);
+    }
 
     progressBar.stop();
-    console.log('\n✓ Conversion completed successfully!');
-    console.log(`  Output file: ${resolve(outputFile)}`);
-    console.log(`  Format: ${format.toUpperCase()}`);
-    console.log(`  Preset: ${preset}`);
+    log.succeed('Conversion completed successfully!');
+    log.info(`Output: ${resolve(outputFile)}`);
+    log.info(`Format: ${format.toUpperCase()}`);
+    log.info(`Preset: ${preset}`);
   } catch (error) {
-    console.error('\n✗ Error:', error instanceof Error ? error.message : String(error));
+    log.fail(error instanceof Error ? error.message : String(error));
     process.exit(1);
   }
 }
