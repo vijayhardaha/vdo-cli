@@ -6,7 +6,7 @@
 
 `vdo` is a Node.js CLI for video utilities wrapping `yt-dlp` (download) and `ffmpeg` (convert/compress/speedup/audio).
 
-- **Runtime:** Node.js ≥ 18, ESM only, pnpm package manager
+- **Runtime:** Node.js ≥ 20, ESM only, bun package manager
 - **Language:** TypeScript 5, strict mode, `moduleResolution: bundler`
 - **Build:** Vite (SSR/Node target) → `dist/bin/vdo.js`
 - **Tests:** Vitest with globals enabled
@@ -42,13 +42,13 @@ src/
 ## Development Commands
 
 ```bash
-pnpm dev -- <command>   # Run CLI in development
-pnpm build              # Build to dist/bin/vdo.js
-pnpm test               # Vitest watch mode
-pnpm test:run           # Vitest single run
-pnpm typecheck          # TypeScript check
-pnpm lint               # ESLint check
-pnpm lint:fix           # ESLint auto-fix
+bun dev -- <command>   # Run CLI in development
+bun run build          # Build to dist/bin/vdo.js
+bun test               # Vitest watch mode
+bun run test:run       # Vitest single run
+bun run tsc            # TypeScript check
+bun run lint           # ESLint check
+bun run lint:fix       # ESLint auto-fix
 ```
 
 ## Coding Conventions
