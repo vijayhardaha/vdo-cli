@@ -8,55 +8,66 @@ vi.mock('../src/utils/progress.js', () => ({ parseYtDlpProgress: vi.fn() }));
 
 vi.mock('../src/utils/sanitize.js', () => ({ sanitizeFilename: vi.fn((name) => name) }));
 
+// describe: ytdlp utilities
 describe('ytdlp utils', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
+  // describe: downloadVideo
   describe('downloadVideo', () => {
+    // it: should build mp4 download command
     it('should build mp4 download command', async () => {
       const { runCommand } = await import('../src/utils/dependencies.js');
       vi.mocked(runCommand).mockResolvedValue({ stdout: '', stderr: '' });
 
       await downloadVideo('https://example.com/video', 'output.mp4', 'mp4');
 
+      // expect: command contains yt-dlp with correct output path
       const cmd = vi.mocked(runCommand).mock.calls[0]?.[0];
       expect(cmd).toContain('yt-dlp');
       expect(cmd).toContain('--output "output.mp4"');
     });
 
+    // it: should build webm download command
     it('should build webm download command', async () => {
       const { runCommand } = await import('../src/utils/dependencies.js');
       vi.mocked(runCommand).mockResolvedValue({ stdout: '', stderr: '' });
 
       await downloadVideo('https://example.com/video', 'output.webm', 'webm');
 
+      // expect: command contains yt-dlp with webm format
       const cmd = vi.mocked(runCommand).mock.calls[0]?.[0];
       expect(cmd).toContain('yt-dlp');
       expect(cmd).toContain('webm');
     });
 
+    // it: should build mp3 extract-audio command
     it('should build mp3 extract-audio command', async () => {
       const { runCommand } = await import('../src/utils/dependencies.js');
       vi.mocked(runCommand).mockResolvedValue({ stdout: '', stderr: '' });
 
       await downloadVideo('https://example.com/video', 'output.mp3', 'mp3');
 
+      // expect: command contains extract-audio flags
       const cmd = vi.mocked(runCommand).mock.calls[0]?.[0];
       expect(cmd).toContain('--extract-audio');
       expect(cmd).toContain('--audio-format mp3');
     });
 
+    // it: should fall back to mp4 for unknown format
     it('should fall back to mp4 for unknown format', async () => {
       const { runCommand } = await import('../src/utils/dependencies.js');
       vi.mocked(runCommand).mockResolvedValue({ stdout: '', stderr: '' });
 
       await downloadVideo('https://example.com/video', 'output.mp4', 'unknown');
 
+      // expect: command uses yt-dlp
       const cmd = vi.mocked(runCommand).mock.calls[0]?.[0];
       expect(cmd).toContain('yt-dlp');
     });
 
+    // it: should call onProgress when download progress parsed
     it('should call onProgress when download progress parsed', async () => {
       const { runCommand } = await import('../src/utils/dependencies.js');
       const { parseYtDlpProgress } = await import('../src/utils/progress.js');
@@ -73,9 +84,12 @@ describe('ytdlp utils', () => {
 
       const onProgress = vi.fn();
       await downloadVideo('https://example.com', 'out.mp4', 'mp4', onProgress);
+
+      // expect: onProgress is called with parsed values
       expect(onProgress).toHaveBeenCalledWith(50, 100, 'MiB');
     });
 
+    // it: should call onProgress when stderr data contains progress
     it('should call onProgress when stderr data contains progress', async () => {
       const { runCommand } = await import('../src/utils/dependencies.js');
       const { parseYtDlpProgress } = await import('../src/utils/progress.js');
@@ -91,9 +105,12 @@ describe('ytdlp utils', () => {
 
       const onProgress = vi.fn();
       await downloadVideo('https://example.com', 'out.mp4', 'mp4', onProgress);
+
+      // expect: onProgress is called with parsed values
       expect(onProgress).toHaveBeenCalledWith(25, 50, 'MiB');
     });
 
+    // it: should not call onProgress when progress type is not download
     it('should not call onProgress when progress type is not download', async () => {
       const { runCommand } = await import('../src/utils/dependencies.js');
       const { parseYtDlpProgress } = await import('../src/utils/progress.js');
@@ -107,9 +124,12 @@ describe('ytdlp utils', () => {
 
       const onProgress = vi.fn();
       await downloadVideo('https://example.com', 'out.mp4', 'mp4', onProgress);
+
+      // expect: onProgress is not called for non-download types
       expect(onProgress).not.toHaveBeenCalled();
     });
 
+    // it: should not call onProgress when parseYtDlpProgress returns null
     it('should not call onProgress when parseYtDlpProgress returns null', async () => {
       const { runCommand } = await import('../src/utils/dependencies.js');
       const { parseYtDlpProgress } = await import('../src/utils/progress.js');
@@ -122,9 +142,12 @@ describe('ytdlp utils', () => {
       vi.mocked(parseYtDlpProgress).mockReturnValue(null);
       const onProgress = vi.fn();
       await downloadVideo('https://example.com', 'out.mp4', 'mp4', onProgress);
+
+      // expect: onProgress is not called when parsing returns null
       expect(onProgress).not.toHaveBeenCalled();
     });
 
+    // it: should use default values for undefined percentage, size, or unit
     it('should use default values for undefined percentage, size, or unit', async () => {
       const { runCommand } = await import('../src/utils/dependencies.js');
       const { parseYtDlpProgress } = await import('../src/utils/progress.js');
@@ -143,19 +166,24 @@ describe('ytdlp utils', () => {
 
       const onProgress = vi.fn();
       await downloadVideo('https://example.com', 'out.mp4', 'mp4', onProgress);
+
+      // expect: onProgress uses default values
       expect(onProgress).toHaveBeenCalledWith(0, 0, 'MiB');
     });
 
+    // it: should use default format mp4 when not specified
     it('should use default format mp4 when not specified', async () => {
       const { runCommand } = await import('../src/utils/dependencies.js');
       vi.mocked(runCommand).mockResolvedValue({ stdout: '', stderr: '' });
 
       await downloadVideo('https://example.com/video', 'output.mp4');
 
+      // expect: command uses yt-dlp
       const cmd = vi.mocked(runCommand).mock.calls[0]?.[0];
       expect(cmd).toContain('yt-dlp');
     });
 
+    // it: should work with null onProgress callback
     it('should work with null onProgress callback', async () => {
       const { runCommand } = await import('../src/utils/dependencies.js');
       const { parseYtDlpProgress } = await import('../src/utils/progress.js');
@@ -167,47 +195,62 @@ describe('ytdlp utils', () => {
 
       vi.mocked(parseYtDlpProgress).mockReturnValue({ type: 'download', percentage: 50, size: 100, unit: 'MiB' });
 
+      // expect: download completes without error with null callback
       await expect(downloadVideo('https://example.com', 'out.mp4', 'mp4', null)).resolves.toBeUndefined();
     });
   });
 
+  // describe: getVideoInfo
   describe('getVideoInfo', () => {
+    // it: should return title, video_id, and ext from yt-dlp
     it('should return title, video_id, and ext from yt-dlp', async () => {
       const { runCommand } = await import('../src/utils/dependencies.js');
       const videoData = { title: 'Test Video', id: 'abc123', display_id: 'abc123', ext: 'mp4' };
       vi.mocked(runCommand).mockResolvedValue({ stdout: JSON.stringify(videoData), stderr: '' });
 
       const result = await getVideoInfo('https://example.com');
+
+      // expect: result contains correct values
       expect(result).toEqual({ title: 'Test Video', video_id: 'abc123', ext: 'mp4' });
     });
 
+    // it: should use display_id when available
     it('should use display_id when available', async () => {
       const { runCommand } = await import('../src/utils/dependencies.js');
       const videoData = { title: 'Test', id: 'id123', display_id: 'display456', ext: 'webm' };
       vi.mocked(runCommand).mockResolvedValue({ stdout: JSON.stringify(videoData), stderr: '' });
 
       const result = await getVideoInfo('https://example.com');
+
+      // expect: video_id uses display_id
       expect(result.video_id).toBe('display456');
     });
 
+    // it: should use id when display_id not available
     it('should use id when display_id not available', async () => {
       const { runCommand } = await import('../src/utils/dependencies.js');
       const videoData = { title: 'Test', id: 'id123', ext: 'mkv' };
       vi.mocked(runCommand).mockResolvedValue({ stdout: JSON.stringify(videoData), stderr: '' });
 
       const result = await getVideoInfo('https://example.com');
+
+      // expect: video_id uses id
       expect(result.video_id).toBe('id123');
     });
 
+    // it: should use unknown when both display_id and id are missing
     it('should use unknown when both display_id and id are missing', async () => {
       const { runCommand } = await import('../src/utils/dependencies.js');
       const videoData = { title: 'Test', ext: 'mp4' };
       vi.mocked(runCommand).mockResolvedValue({ stdout: JSON.stringify(videoData), stderr: '' });
 
       const result = await getVideoInfo('https://example.com');
+
+      // expect: video_id defaults to 'unknown'
       expect(result.video_id).toBe('unknown');
     });
 
+    // it: should use untitled when title is missing
     it('should use untitled when title is missing', async () => {
       const { runCommand } = await import('../src/utils/dependencies.js');
       const { sanitizeFilename } = await import('../src/utils/sanitize.js');
@@ -216,36 +259,50 @@ describe('ytdlp utils', () => {
       vi.mocked(runCommand).mockResolvedValue({ stdout: JSON.stringify(videoData), stderr: '' });
 
       await getVideoInfo('https://example.com');
+
+      // expect: sanitizeFilename is called with 'untitled'
       expect(sanitizeFilename).toHaveBeenCalledWith('untitled');
     });
 
+    // it: should default to mp4 when ext not provided
     it('should default to mp4 when ext not provided', async () => {
       const { runCommand } = await import('../src/utils/dependencies.js');
       const videoData = { title: 'Test', id: 'abc' };
       vi.mocked(runCommand).mockResolvedValue({ stdout: JSON.stringify(videoData), stderr: '' });
 
       const result = await getVideoInfo('https://example.com');
+
+      // expect: ext defaults to mp4
       expect(result.ext).toBe('mp4');
     });
 
+    // it: should throw when JSON parsing fails
     it('should throw when JSON parsing fails', async () => {
       const { runCommand } = await import('../src/utils/dependencies.js');
       vi.mocked(runCommand).mockResolvedValue({ stdout: 'invalid json', stderr: '' });
 
+      // expect: error is thrown for invalid JSON
       await expect(getVideoInfo('https://example.com')).rejects.toThrow('Failed to parse video information');
     });
   });
 
+  // describe: generateFilename
   describe('generateFilename', () => {
+    // it: should generate filename with requested format for video
     it('should generate filename with requested format for video', () => {
       const videoInfo = { title: 'Test Video', video_id: 'abc123', ext: 'webm' };
       const result = generateFilename(videoInfo, 'mp4');
+
+      // expect: filename uses requested format
       expect(result).toBe('Test Video_abc123.mp4');
     });
 
+    // it: should use mp3 extension for audio format
     it('should use mp3 extension for audio format', () => {
       const videoInfo = { title: 'Test Video', video_id: 'abc123', ext: 'webm' };
       const result = generateFilename(videoInfo, 'mp3');
+
+      // expect: filename uses mp3 extension
       expect(result).toBe('Test Video_abc123.mp3');
     });
   });
