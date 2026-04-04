@@ -1,46 +1,49 @@
 import { resolve, dirname, basename, extname, join } from 'path';
 
 import type { Command } from 'commander';
-import ora from 'ora';
 
 import type { AudioOptions } from '../types/index.js';
 import { checkDependencies } from '../utils/dependencies.js';
 import { extractAudio } from '../utils/ffmpeg.js';
+import { log } from '../utils/log.js';
 import { validateFileExists, validateFormat, validateBitrate } from '../utils/validations.js';
 
 const ALLOWED_FORMATS = ['mp3', 'wav', 'aac'];
 
-/**
- * Audio action - extracts audio track from video using ffmpeg
- *
- * @param {string} input - Path to the input video file
- * @param {AudioOptions} options - Audio extraction configuration options including output filename, format, and bitrate
- * @returns {Promise<void>} Promise that resolves when audio extraction is complete
- * @throws {void} Exits process with code 1 if dependencies missing, file not found, invalid format/bitrate, or extraction fails
- */
 export async function audioAction(input: string, options: AudioOptions): Promise<void> {
   try {
-    // Check dependencies
+    log.spinner('Preparing audio extraction...');
+
     const deps = await checkDependencies();
     if (!deps.ok) {
-      console.error(`Error: Missing required dependencies: ${deps.missing.join(', ')}`);
-      console.error('Please install them using:');
-      console.error('  brew install ffmpeg yt-dlp');
+      log.fail(`Missing dependencies: ${deps.missing.join(', ')}`);
+      log.warn('Install using: brew install ffmpeg yt-dlp');
       process.exit(1);
     }
 
-    // Validate input file
-    await validateFileExists(input);
+    try {
+      await validateFileExists(input);
+    } catch (error) {
+      log.fail(error instanceof Error ? error.message : String(error));
+      process.exit(1);
+    }
 
-    // Validate format
     const format = options.format || 'mp3';
-    validateFormat(format, ALLOWED_FORMATS);
+    try {
+      validateFormat(format, ALLOWED_FORMATS);
+    } catch (error) {
+      log.fail(error instanceof Error ? error.message : String(error));
+      process.exit(1);
+    }
 
-    // Validate bitrate
     const bitrate = options.bitrate || '192k';
-    validateBitrate(bitrate);
+    try {
+      validateBitrate(bitrate);
+    } catch (error) {
+      log.fail(error instanceof Error ? error.message : String(error));
+      process.exit(1);
+    }
 
-    // Determine output filename
     let outputFile = options.output;
     if (!outputFile) {
       const dir = dirname(input);
@@ -48,18 +51,21 @@ export async function audioAction(input: string, options: AudioOptions): Promise
       outputFile = join(dir, `${name}.${format}`);
     }
 
-    // Show spinner while processing
-    const spinner = ora('Extracting audio...').start();
+    log.succeed('Audio extraction started');
 
-    // Extract audio
-    await extractAudio(input, outputFile, format, bitrate);
+    try {
+      await extractAudio(input, outputFile, format, bitrate);
+    } catch (error) {
+      log.fail(`Audio extraction failed: ${error instanceof Error ? error.message : String(error)}`);
+      process.exit(1);
+    }
 
-    spinner.succeed('Audio extraction completed!');
-    console.log(`  Output file: ${resolve(outputFile)}`);
-    console.log(`  Format: ${format.toUpperCase()}`);
-    console.log(`  Bitrate: ${bitrate}`);
+    log.succeed('Audio extraction completed!');
+    log.info(`Output: ${resolve(outputFile)}`);
+    log.info(`Format: ${format.toUpperCase()}`);
+    log.info(`Bitrate: ${bitrate}`);
   } catch (error) {
-    console.error('\n✗ Error:', error instanceof Error ? error.message : String(error));
+    log.fail(error instanceof Error ? error.message : String(error));
     process.exit(1);
   }
 }
