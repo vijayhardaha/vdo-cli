@@ -22,8 +22,8 @@
     "lint:fix": "eslint . --ext .ts,.tsx,.js,.mjs --fix",
     "format": "prettier --write \"**/*.{ts,tsx,js,mjs,json,css,md,yml}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,mjs,json,css,md,yml}\"",
-    "test": "vitest",
-    "test:run": "vitest run",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "tsc": "tsc --noEmit",
     "prepare": "husky"
