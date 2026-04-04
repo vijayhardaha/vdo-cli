@@ -6,17 +6,14 @@ import type { ProgressInfo } from '../types/index.js';
  * Create a progress bar instance for displaying CLI progress
  *
  * @param {string} [message='Processing'] - Message to display above the progress bar (default: 'Processing')
- * @param {string} [unit='MB'] - Unit to display after size values
+ * @param {string} [unit='%'] - Unit to display after size values (default: '%' for percentage-based)
  * @returns {cliProgress.SingleBar} New cli-progress SingleBar instance configured with classic shades preset
  */
-export function createProgressBar(message = 'Processing', unit = 'MB'): cliProgress.SingleBar {
+export function createProgressBar(message = 'Processing', unit = '%'): cliProgress.SingleBar {
+  const format =
+    unit === '%' ? `${message} [{bar}] {percentage}%` : `${message} [{bar}] {percentage}% | {value}/{total} ${unit}`;
   return new cliProgress.SingleBar(
-    {
-      format: `${message} [{bar}] {percentage}% | {value}/{total} ${unit}`,
-      barCompleteChar: '█',
-      barIncompleteChar: '░',
-      hideCursor: true,
-    },
+    { format, barCompleteChar: '█', barIncompleteChar: '░', hideCursor: true },
     cliProgress.Presets.shades_classic
   );
 }
