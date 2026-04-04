@@ -1,6 +1,6 @@
 # AGENTS.md
 
-This document is the authoritative reference for AI agents working on the `vdo` codebase.
+> **This file serves as the authoritative reference for AI agents (Cursor, Claude Code, etc.) working on the `vdo` codebase.**
 
 ## Project Overview
 
@@ -13,14 +13,14 @@ This document is the authoritative reference for AI agents working on the `vdo` 
 
 ## Commands
 
-| Command             | Alias | Description             | Key Options                   |
-| ------------------- | ----- | ----------------------- | ----------------------------- |
-| `download <url>`    | `dl`  | Download from URL       | `-o`, `--format`              |
-| `convert <input>`   | `cv`  | Convert video format    | `--to`, `--preset`, `-o`      |
-| `compress <input>`  | `cm`  | Compress with CRF       | `--crf`, `--preset`, `-o`     |
-| `speedup <input>`   | `sp`  | Change playback speed   | `--rate`, `-o`                |
-| `audio <input>`     | `au`  | Extract audio           | `--format`, `--bitrate`, `-o` |
-| `auto <input\|url>` | `a`   | Auto-detect URL vs file | `--format`, `-o`              |
+| Command            | Alias | Description           | Key Options                   |
+| ------------------ | ----- | --------------------- | ----------------------------- | ---------------- |
+| `download <url>`   | `dl`  | Download from URL     | `-o`, `--format`              |
+| `convert <input>`  | `cv`  | Convert video format  | `--to`, `--preset`, `-o`      |
+| `compress <input>` | `cm`  | Compress with CRF     | `--crf`, `--preset`, `-o`     |
+| `speedup <input>`  | `sp`  | Change playback speed | `--rate`, `-o`                |
+| `audio <input>`    | `au`  | Extract audio         | `--format`, `--bitrate`, `-o` |
+| `auto <input       | url>` | `a`                   | Auto-detect URL vs file       | `--format`, `-o` |
 
 ## Architecture
 
@@ -43,22 +43,29 @@ src/
 
 ```bash
 pnpm dev -- <command>   # Run CLI in development
-pnpm build               # Build to dist/bin/vdo.js
-pnpm test                # Vitest watch mode
-pnpm test:run            # Vitest single run
-pnpm typecheck           # TypeScript check
-pnpm lint                # ESLint check
-pnpm lint:fix            # ESLint auto-fix
+pnpm build              # Build to dist/bin/vdo.js
+pnpm test               # Vitest watch mode
+pnpm test:run           # Vitest single run
+pnpm typecheck          # TypeScript check
+pnpm lint               # ESLint check
+pnpm lint:fix           # ESLint auto-fix
 ```
 
 ## Coding Conventions
+
+### Naming Conventions
+
+- Components: `PascalCase`
+- Functions/variables: `camelCase`
+- Files: `kebab-case`
+- Constants: `SCREAMING_SNAKE_CASE`
 
 ### Imports
 
 - **ESM with `.js` extension** (even for `.ts` files):
   ```ts
-  import { runCommand } from './dependencies.js'; // correct
-  import { runCommand } from './dependencies'; // wrong
+  import { runCommand } from "./dependencies.js"; // correct
+  import { runCommand } from "./dependencies"; // wrong
   ```
 
 ### TypeScript
@@ -85,8 +92,6 @@ Every action must:
 
 ## External Dependencies
 
-System (must be installed on host):
-
 - `ffmpeg` - Video processing
 - `yt-dlp` - Video downloading
 
@@ -98,3 +103,35 @@ Install: `brew install ffmpeg yt-dlp`
 2. Add interface to `src/types/index.ts`
 3. Import and call `setup<Name>(program)` in `src/bin/vdo.ts`
 4. Add test file `tests/<name>.test.ts`
+
+## Documentation
+
+- Add JSDoc comments for exported functions and complex types only
+
+## Git Workflow
+
+Pre-commit hooks automatically run type check, lint, and format checks.
+
+**After completing a task:**
+
+1. Check unstaged changes: `git status --porcelain`
+2. Stage files: `git add <files>`
+3. Create `.tmp/git.md` containing the staged files and commit command
+
+Example `.tmp/git.md`:
+
+```bash
+git add src/content/index.tsx
+git commit -m "feat: add version dropdown selector
+
+- fetch versions from npm registry
+- render dropdown with recent versions"
+```
+
+## Commit Conventions
+
+**Format:** `<type>(<scope>): <summary>`
+
+**Types:** `feat`, `fix`, `docs`, `test`, `refactor`, `style`, `build`, `chore`
+
+**Rules:** Subject line ≤50 chars, blank line after subject, body wrapped at 72 chars, lowercase only.
