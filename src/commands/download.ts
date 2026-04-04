@@ -7,9 +7,9 @@ import type { DownloadOptions } from '../types/index.js';
 import { checkDependencies } from '../utils/dependencies.js';
 import { createProgressBar, convertToMB } from '../utils/progress.js';
 import { validateUrl, validateFormat } from '../utils/validations.js';
-import { downloadVideo } from '../utils/ytdlp.js';
+import { downloadVideo, getVideoInfo, generateFilename } from '../utils/ytdlp.js';
 
-const ALLOWED_FORMATS = ['mp4', 'mkv', 'mp3'];
+const ALLOWED_FORMATS = ['mp4', 'mkv', 'webm', 'avi', 'mov', 'mp3'];
 
 /**
  * Download action - downloads video from URL using yt-dlp
@@ -40,17 +40,22 @@ export async function downloadAction(url: string, options: DownloadOptions): Pro
     const format = options.format || 'mp4';
     validateFormat(format, ALLOWED_FORMATS);
 
-    // Determine output filename
-    let outputFile = options.output;
-    if (!outputFile) {
-      const ext = format === 'mp3' ? 'mp3' : format;
-      outputFile = `download.${ext}`;
-    } else if (!outputFile.includes('.')) {
-      outputFile = `${outputFile}.${format}`;
-    }
-
     // Show spinner while getting video info
     const spinner = ora('Getting video information...').start();
+
+    // Get video info to determine filename
+    const videoInfo = await getVideoInfo(url);
+    spinner.succeed('Video information retrieved');
+
+    // Determine output filename
+    let outputFile: string;
+    if (options.output) {
+      outputFile = options.output.includes('.')
+        ? options.output
+        : `${options.output}.${format === 'mp3' ? 'mp3' : videoInfo.ext}`;
+    } else {
+      outputFile = generateFilename(videoInfo, format);
+    }
 
     const progressBar = createProgressBar('Downloading');
 
@@ -62,15 +67,16 @@ export async function downloadAction(url: string, options: DownloadOptions): Pro
       }
     };
 
-    spinner.succeed('Video information retrieved');
-
     // Create progress bar
     progressBar.start(100, 0);
 
     // Download video
     await downloadVideo(url, outputFile, format, progressCallback);
 
+    // Ensure progress bar shows 100%
+    progressBar.update(100, { total: 100 });
     progressBar.stop();
+
     console.log('\n✓ Download completed successfully!');
     console.log(`  Output file: ${resolve(outputFile)}`);
   } catch (error) {
@@ -91,6 +97,6 @@ export function setupDownload(program: Command): void {
     .alias('dl')
     .description('Download video from URL')
     .option('-o, --output <file>', 'Output file name')
-    .option('--format <format>', 'Select format (mp4, mkv, mp3)', 'mp4')
+    .option('--format <format>', 'Select format (mp4, mkv, webm, avi, mov, mp3)', 'mp4')
     .action(downloadAction);
 }
