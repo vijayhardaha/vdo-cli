@@ -211,6 +211,7 @@ describe('ytdlp utils', () => {
     it('should use untitled when title is missing', async () => {
       const { runCommand } = await import('../src/utils/dependencies.js');
       const { sanitizeFilename } = await import('../src/utils/sanitize.js');
+      vi.mocked(sanitizeFilename).mockReturnValue('untitled');
       const videoData = { id: 'abc123', ext: 'mp4' };
       vi.mocked(runCommand).mockResolvedValue({ stdout: JSON.stringify(videoData), stderr: '' });
 

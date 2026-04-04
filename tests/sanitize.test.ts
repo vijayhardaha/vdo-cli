@@ -17,17 +17,17 @@ describe('sanitize utils', () => {
 
     it('should trim whitespace', () => {
       const result = sanitizeFilename('  test video  ');
-      expect(result).toBe('test video');
+      expect(result).toBe('test-video');
     });
 
-    it('should replace multiple spaces with single space', () => {
+    it('should replace spaces with dashes', () => {
       const result = sanitizeFilename('test    video   name');
-      expect(result).toBe('test video name');
+      expect(result).toBe('test-video-name');
     });
 
-    it('should remove colon on unix', () => {
+    it('should remove colon on unix and replace space with dash', () => {
       const result = sanitizeFilename('test: video');
-      expect(result).toBe('test video');
+      expect(result).toBe('test-video');
     });
 
     it('should truncate to max length', () => {
