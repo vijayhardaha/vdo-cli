@@ -18,17 +18,19 @@ export function sanitizeFilename(name: string, maxLength = 200): string {
     safe = safe.replace(/[. ]+$/, '');
   }
 
-  safe = safe.replace(/\s+/g, ' ');
+  safe = safe.replace(/[\s_]+/g, '-');
 
-  safe = safe.slice(0, maxLength);
+  if (safe.length > maxLength) {
+    const cutoffSymbols = /[.!?-]/g;
+    const matches = [...safe.matchAll(cutoffSymbols)]
+      .map((m) => m.index)
+      .filter((idx) => idx !== undefined && idx <= maxLength);
 
-  const cutoffSymbols = /[.!?]/g;
-  const matches = [...safe.matchAll(cutoffSymbols)]
-    .map((m) => m.index)
-    .filter((idx) => idx !== undefined && idx <= maxLength);
-
-  if (matches.length > 0) {
-    safe = safe.slice(0, matches[matches.length - 1]);
+    if (matches.length > 0) {
+      safe = safe.slice(0, matches[matches.length - 1]);
+    } else {
+      safe = safe.slice(0, maxLength);
+    }
   }
 
   return safe.trim() || 'untitled';
