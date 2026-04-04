@@ -5,11 +5,9 @@ import ora from 'ora';
 
 import type { DownloadOptions } from '../types/index.js';
 import { checkDependencies } from '../utils/dependencies.js';
-import { createProgressBar } from '../utils/progress.js';
+import { createProgressBar, formatFileSize } from '../utils/progress.js';
 import { validateUrl, validateFormat } from '../utils/validations.js';
 import { downloadVideo, getVideoInfo, generateFilename } from '../utils/ytdlp.js';
-
-const BYTES_TO_MB = 1024 * 1024;
 
 const ALLOWED_FORMATS = ['mp4', 'mkv', 'webm', 'avi', 'mov', 'mp3'];
 
@@ -59,22 +57,23 @@ export async function downloadAction(url: string, options: DownloadOptions): Pro
       outputFile = generateFilename(videoInfo, format);
     }
 
-    const totalMB = videoInfo.filesize ? Math.round(videoInfo.filesize / BYTES_TO_MB) : 100;
-    const progressBar = createProgressBar('Downloading');
+    const { value: total, unit } = formatFileSize(videoInfo.filesize || 0);
+    const roundedTotal = Math.round(total);
+    const progressBar = createProgressBar('Downloading', unit);
 
     const progressCallback = (percentage: number, _size: number, _unit: string) => {
-      const currentMB = Math.round((percentage / 100) * totalMB);
-      progressBar.update(currentMB, { total: totalMB });
+      const current = Math.round((percentage / 100) * total);
+      progressBar.update(current, { total: roundedTotal });
     };
 
     // Create progress bar
-    progressBar.start(totalMB, 0);
+    progressBar.start(roundedTotal, 0);
 
     // Download video
     await downloadVideo(url, outputFile, format, progressCallback);
 
     // Ensure progress bar shows completion
-    progressBar.update(totalMB, { total: totalMB });
+    progressBar.update(roundedTotal, { total: roundedTotal });
     progressBar.stop();
 
     console.log('\n✓ Download completed successfully!');
