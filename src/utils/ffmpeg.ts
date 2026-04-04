@@ -15,7 +15,7 @@ import { parseFFmpegProgress } from './progress.js';
 export async function convertVideo(
   inputPath: string,
   outputPath: string,
-  format = 'mp4',
+  _format = 'mp4',
   preset = 'fast',
   onProgress: ((percentage: number, currentTime: number, totalTime: number) => void) | null = null
 ): Promise<void> {
@@ -29,7 +29,7 @@ export async function convertVideo(
 
   const ffmpegPreset = presetMap[preset.toLowerCase()] || 'fast';
 
-  const command = `ffmpeg -i "${inputPath}" -c:v libx264 -preset ${ffmpegPreset} -c:a aac -f ${format} "${outputPath}"`;
+  const command = `ffmpeg -i "${inputPath}" -c:v libx264 -preset ${ffmpegPreset} -c:a aac "${outputPath}"`;
 
   let totalTime = 0;
   let currentTime = 0;
