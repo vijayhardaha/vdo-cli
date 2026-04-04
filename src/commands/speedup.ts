@@ -45,6 +45,9 @@ export async function speedupAction(input: string, options: SpeedupOptions): Pro
 
     // Show spinner while preparing
     const spinner = ora('Preparing speed adjustment...').start();
+    spinner.succeed('Speed adjustment started');
+
+    const progressBar = createProgressBar('Processing');
 
     const progressCallback = (percentage: number) => {
       if (progressBar && percentage > 0) {
@@ -52,10 +55,6 @@ export async function speedupAction(input: string, options: SpeedupOptions): Pro
       }
     };
 
-    spinner.succeed('Speed adjustment started');
-
-    // Create progress bar
-    const progressBar = createProgressBar('Processing');
     progressBar.start(100, 0);
 
     // Speed up video

@@ -52,6 +52,9 @@ export async function convertAction(input: string, options: ConvertOptions): Pro
 
     // Show spinner while preparing
     const spinner = ora('Preparing conversion...').start();
+    spinner.succeed('Conversion started');
+
+    const progressBar = createProgressBar('Converting');
 
     const progressCallback = (percentage: number) => {
       if (progressBar && percentage > 0) {
@@ -59,10 +62,6 @@ export async function convertAction(input: string, options: ConvertOptions): Pro
       }
     };
 
-    spinner.succeed('Conversion started');
-
-    // Create progress bar
-    const progressBar = createProgressBar('Converting');
     progressBar.start(100, 0);
 
     // Convert video

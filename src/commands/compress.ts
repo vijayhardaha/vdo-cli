@@ -51,6 +51,9 @@ export async function compressAction(input: string, options: CompressOptions): P
 
     // Show spinner while preparing
     const spinner = ora('Preparing compression...').start();
+    spinner.succeed('Compression started');
+
+    const progressBar = createProgressBar('Compressing');
 
     const progressCallback = (percentage: number) => {
       if (progressBar && percentage > 0) {
@@ -58,10 +61,6 @@ export async function compressAction(input: string, options: CompressOptions): P
       }
     };
 
-    spinner.succeed('Compression started');
-
-    // Create progress bar
-    const progressBar = createProgressBar('Compressing');
     progressBar.start(100, 0);
 
     // Compress video
