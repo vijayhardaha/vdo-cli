@@ -1,7 +1,135 @@
+# =======================================================================
+# Prettier Ignore
+# =======================================================================
+# Purpose: Tell Prettier which files to skip to avoid formatting
+#          generated or binary files (keeps diffs small and fast).
+# Docs:    https://prettier.io/docs/ignore
+# =======================================================================
+
+# ----------------------------------------------------------------------
+# Dependencies
+# ----------------------------------------------------------------------
+# Large binary folders — never format.
+.bun/
+.pnp/
+.pnp.*
+.pnpm-store/
 node_modules/
+vendor/
+
+# ----------------------------------------------------------------------
+# Build & Compilation Output
+# ----------------------------------------------------------------------
+# Next.js / React
+.next/
+out/
+
+# Svelte
+.svelte-kit/
+
+# Bundler output
+build/
 dist/
+
+# ----------------------------------------------------------------------
+# Cache Directories
+# ----------------------------------------------------------------------
+.cache/
+.eslintcache
+.stylelintcache
+.turbo/
+.vite/
+
+# ----------------------------------------------------------------------
+# Testing & Coverage
+# ----------------------------------------------------------------------
+.jest/
+.nyc_output/
+blob-report/
 coverage/
-*.log
-.DS_Store
+playwright-report/
+test-results/
+vitest-results/
+
+# ----------------------------------------------------------------------
+# Configuration & Ide
+# ----------------------------------------------------------------------
+.idea/
+.vscode-insiders/
+
+# ----------------------------------------------------------------------
+# Deployment
+# ----------------------------------------------------------------------
+.netlify/
+.vercel/
+.wrangler/
+
+# ----------------------------------------------------------------------
+# Ai Coding Tools
+# ----------------------------------------------------------------------
+.claude/
+.codex/
+.droid/
+.kilo/
+.opencode/
+.qoder/
+.vibe/
+
+# ----------------------------------------------------------------------
+# Temporary Files
+# ----------------------------------------------------------------------
+.tmp/
+tmp/
+
+# ----------------------------------------------------------------------
+# Package Manager Lockfiles
+# ----------------------------------------------------------------------
+# Formatting these can cause massive, merge-breaking diffs.
+bun.lock
+composer.lock
 package-lock.json
 pnpm-lock.yaml
+yarn.lock
+
+# ----------------------------------------------------------------------
+# Common Auto-Generated YAML
+# ----------------------------------------------------------------------
+# These are typically generated or CI-related - not meant to be formatted.
+.gitlab/
+._circleci/
+*.kubeconfig
+.gitlab-ci.yml
+docker-compose.yml
+azure-pipelines.yml
+docker-compose.yaml
+bitbucket-pipelines.yml
+
+# ----------------------------------------------------------------------
+# Generated & Typings Files
+# ----------------------------------------------------------------------
+*.tsbuildinfo
+next-env.d.ts
+
+# ----------------------------------------------------------------------
+# Minified & Generated Files
+# ----------------------------------------------------------------------
+# Never format minified code; it breaks the "minified" purpose.
+*.min.css
+*.min.js
+*.min.map
+
+# ----------------------------------------------------------------------
+# Environment & Secrets
+# ----------------------------------------------------------------------
+.env
+.env.*
+*.pem
+
+# ----------------------------------------------------------------------
+# Logs
+# ----------------------------------------------------------------------
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
