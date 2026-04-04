@@ -36,7 +36,7 @@ export async function downloadAction(url: string, options: DownloadOptions): Pro
       process.exit(1);
     }
 
-    log.spinner('Getting video information...');
+    log.loading('Getting video information...');
 
     const videoInfo = await getVideoInfo(url);
     log.succeed('Video information retrieved');
