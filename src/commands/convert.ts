@@ -2,6 +2,8 @@ import { resolve, dirname, basename, extname, join } from 'path';
 
 import type { Command } from 'commander';
 
+import { loading } from '@/utils/icons.js';
+
 import type { ConvertOptions } from '../types/index.js';
 import { checkDependencies } from '../utils/dependencies.js';
 import { convertVideo } from '../utils/ffmpeg.js';
@@ -14,7 +16,7 @@ const ALLOWED_PRESETS = ['ultrafast', 'fast', 'medium', 'slow', 'high-quality'];
 
 export async function convertAction(input: string, options: ConvertOptions): Promise<void> {
   try {
-    log.spinner('Preparing conversion...');
+    log.loading('Preparing conversion...');
 
     const deps = await checkDependencies();
     if (!deps.ok) {
@@ -55,7 +57,7 @@ export async function convertAction(input: string, options: ConvertOptions): Pro
 
     log.succeed('Conversion started');
 
-    const progressBar = createProgressBar('Converting');
+    const progressBar = createProgressBar(`${loading} Converting`);
 
     const progressCallback = (percentage: number) => {
       if (progressBar && percentage > 0) {
