@@ -65,9 +65,9 @@ export async function compressAction(input: string, options: CompressOptions): P
       outputFile = join(dir, `${name}_compressed.mp4`);
     }
 
-    log.succeed('Compression started');
+    log.succeed(`Compression started | CRF: ${crf} | Preset: ${preset}`);
 
-    const progressBar = createProgressBar(`${loading} Compressing`);
+    const progressBar = createProgressBar(`${loading} Compressing | CRF: ${crf} | ${preset}`);
 
     const progressCallback = (percentage: number) => {
       if (progressBar && percentage > 0) {
@@ -88,8 +88,6 @@ export async function compressAction(input: string, options: CompressOptions): P
     progressBar.stop();
     log.succeed('Compression completed successfully!');
     log.info(`Output: ${resolve(outputFile)}`);
-    log.info(`CRF: ${crf}`);
-    log.info(`Preset: ${preset}`);
   } catch (error) {
     log.fail(error instanceof Error ? error.message : String(error));
     process.exit(1);

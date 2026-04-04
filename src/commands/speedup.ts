@@ -54,9 +54,9 @@ export async function speedupAction(input: string, options: SpeedupOptions): Pro
       outputFile = join(dir, `${name}_${rate}x.mp4`);
     }
 
-    log.succeed('Speed adjustment started');
+    log.succeed(`Speed adjustment started | Rate: ${rate}x`);
 
-    const progressBar = createProgressBar(`${loading} Processing`);
+    const progressBar = createProgressBar(`${loading} Processing | ${rate}x`);
 
     const progressCallback = (percentage: number) => {
       if (progressBar && percentage > 0) {
@@ -77,15 +77,6 @@ export async function speedupAction(input: string, options: SpeedupOptions): Pro
     progressBar.stop();
     log.succeed('Speed adjustment completed successfully!');
     log.info(`Output: ${resolve(outputFile)}`);
-    log.info(`Speed rate: ${rate}x`);
-
-    // check: if video should be sped up
-    if (rate > 1) {
-      log.info(`Result: Video is ${rate}x faster`);
-      // check: if video should be slowed down
-    } else if (rate < 1) {
-      log.info(`Result: Video is ${(1 / rate).toFixed(2)}x slower`);
-    }
   } catch (error) {
     log.fail(error instanceof Error ? error.message : String(error));
     process.exit(1);

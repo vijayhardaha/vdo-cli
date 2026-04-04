@@ -62,7 +62,7 @@ export async function audioAction(input: string, options: AudioOptions): Promise
       outputFile = join(dir, `${name}.${format}`);
     }
 
-    log.succeed('Audio extraction started');
+    log.succeed(`Audio extraction started | Format: ${format.toUpperCase()} | Bitrate: ${bitrate}`);
 
     try {
       await extractAudio(input, outputFile, format, bitrate);
@@ -73,8 +73,6 @@ export async function audioAction(input: string, options: AudioOptions): Promise
 
     log.succeed('Audio extraction completed!');
     log.info(`Output: ${resolve(outputFile)}`);
-    log.info(`Format: ${format.toUpperCase()}`);
-    log.info(`Bitrate: ${bitrate}`);
   } catch (error) {
     log.fail(error instanceof Error ? error.message : String(error));
     process.exit(1);

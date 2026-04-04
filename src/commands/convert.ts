@@ -67,9 +67,9 @@ export async function convertAction(input: string, options: ConvertOptions): Pro
       outputFile = join(dir, `${name}_converted.${format}`);
     }
 
-    log.succeed('Conversion started');
+    log.succeed(`Conversion started | Format: ${format.toUpperCase()} | Preset: ${preset}`);
 
-    const progressBar = createProgressBar(`${loading} Converting`);
+    const progressBar = createProgressBar(`${loading} Converting | ${format.toUpperCase()} | ${preset}`);
 
     const progressCallback = (percentage: number) => {
       if (progressBar && percentage > 0) {
@@ -90,8 +90,6 @@ export async function convertAction(input: string, options: ConvertOptions): Pro
     progressBar.stop();
     log.succeed('Conversion completed successfully!');
     log.info(`Output: ${resolve(outputFile)}`);
-    log.info(`Format: ${format.toUpperCase()}`);
-    log.info(`Preset: ${preset}`);
   } catch (error) {
     log.fail(error instanceof Error ? error.message : String(error));
     process.exit(1);

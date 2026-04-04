@@ -562,44 +562,6 @@ describe('Command actions', () => {
       expect(speedUpVideo).toHaveBeenCalled();
     });
 
-    // it: should log faster message when rate > 1
-    it('should log faster message when rate > 1', async () => {
-      const { checkDependencies } = await import('../src/utils/dependencies.js');
-      const { validateFileExists, validateSpeedRate } = await import('../src/utils/validations.js');
-      const { speedUpVideo } = await import('../src/utils/ffmpeg.js');
-      const { createProgressBar } = await import('../src/utils/progress.js');
-
-      vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
-      vi.mocked(validateFileExists).mockResolvedValue(undefined);
-      vi.mocked(validateSpeedRate).mockReturnValue(undefined);
-      vi.mocked(speedUpVideo).mockResolvedValue(undefined);
-      vi.mocked(createProgressBar).mockReturnValue(mockProgressBar as never);
-
-      await speedupAction('input.mp4', { rate: 2 });
-
-      // expect: console.log is called with 'faster'
-      expect(vi.mocked(console.log)).toHaveBeenCalledWith(expect.stringContaining('faster'));
-    });
-
-    // it: should log slower message when rate < 1
-    it('should log slower message when rate < 1', async () => {
-      const { checkDependencies } = await import('../src/utils/dependencies.js');
-      const { validateFileExists, validateSpeedRate } = await import('../src/utils/validations.js');
-      const { speedUpVideo } = await import('../src/utils/ffmpeg.js');
-      const { createProgressBar } = await import('../src/utils/progress.js');
-
-      vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
-      vi.mocked(validateFileExists).mockResolvedValue(undefined);
-      vi.mocked(validateSpeedRate).mockReturnValue(undefined);
-      vi.mocked(speedUpVideo).mockResolvedValue(undefined);
-      vi.mocked(createProgressBar).mockReturnValue(mockProgressBar as never);
-
-      await speedupAction('input.mp4', { rate: 0.5 });
-
-      // expect: console.log is called with 'slower'
-      expect(vi.mocked(console.log)).toHaveBeenCalledWith(expect.stringContaining('slower'));
-    });
-
     // it: should use provided output option
     it('should use provided output option', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
