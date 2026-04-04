@@ -14,13 +14,12 @@
 ## Commands
 
 | Command            | Alias | Description           | Key Options                   |
-| ------------------ | ----- | --------------------- | ----------------------------- | ---------------- |
+| ------------------ | ----- | --------------------- | ----------------------------- |
 | `download <url>`   | `dl`  | Download from URL     | `-o`, `--format`              |
 | `convert <input>`  | `cv`  | Convert video format  | `--to`, `--preset`, `-o`      |
 | `compress <input>` | `cm`  | Compress with CRF     | `--crf`, `--preset`, `-o`     |
 | `speedup <input>`  | `sp`  | Change playback speed | `--rate`, `-o`                |
 | `audio <input>`    | `au`  | Extract audio         | `--format`, `--bitrate`, `-o` |
-| `auto <input       | url>` | `a`                   | Auto-detect URL vs file       | `--format`, `-o` |
 
 ## Architecture
 
