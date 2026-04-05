@@ -50,12 +50,11 @@ export async function checkAndPromptOverwrite(outputPaths: string[]): Promise<bo
     return true;
   }
 
-  const fileList =
-    existingFiles.length <= 3
-      ? existingFiles.join(', ')
-      : `${existingFiles.slice(0, 3).join(', ')} and ${existingFiles.length - 3} more`;
+  const fileList = existingFiles.map((f) => `  - ${f}`).join('\n');
 
-  const confirmed = await promptOverwrite(`The following files already exist: ${fileList}. Do you want to overwrite?`);
+  log.info(`The following files already exist:\n${fileList}`);
+
+  const confirmed = await promptOverwrite(`Do you want to overwrite?`);
 
   if (!confirmed) {
     log.info('Operation cancelled.');

@@ -1,6 +1,5 @@
 import { runCommand } from './dependencies';
 import { parseFFmpegProgress } from './progress';
-import { checkAndPromptOverwrite } from './prompt';
 import type { ProgressInfo, SplitPreset } from '../types/index';
 
 /**
@@ -103,8 +102,7 @@ export function getPresetDuration(preset: SplitPreset): number {
  * Split video into multiple parts using re-encoding
  *
  * @param {string} inputPath - Path to input video
- * @param {string} outputDir - Directory for output files
- * @param {string} baseName - Base name for output files
+ * @param {string[]} outputPaths - Pre-built array of output file paths
  * @param {number} partDuration - Max duration per part in seconds
  * @param {number} totalDuration - Total video duration in seconds
  * @param {string} codec - Video codec
@@ -114,8 +112,7 @@ export function getPresetDuration(preset: SplitPreset): number {
  */
 export async function splitVideoReencode(
   inputPath: string,
-  outputDir: string,
-  baseName: string,
+  outputPaths: string[],
   partDuration: number,
   totalDuration: number,
   codec: 'h264' | 'hevc',
@@ -123,19 +120,7 @@ export async function splitVideoReencode(
   onProgress?: (progress: number, part: number, total: number) => void
 ): Promise<string[]> {
   const videoCodec = codec === 'hevc' ? 'libx265' : 'libx264';
-  const numParts = calculateNumParts(totalDuration, partDuration);
-  const outputPaths: string[] = [];
-
-  // Build list of output paths for overwrite check
-  for (let i = 0; i < numParts; i++) {
-    const paddedIndex = String(i + 1).padStart(3, '0');
-    outputPaths.push(`${outputDir}/${baseName}_${paddedIndex}.mp4`);
-  }
-
-  const shouldProceed = await checkAndPromptOverwrite(outputPaths);
-  if (!shouldProceed) {
-    process.exit(0);
-  }
+  const numParts = outputPaths.length;
 
   for (let i = 0; i < numParts; i++) {
     const startSec = i * partDuration;
@@ -144,8 +129,7 @@ export async function splitVideoReencode(
     const startStr = formatSeconds(startSec);
     const endStr = formatSeconds(endSec);
 
-    const paddedIndex = String(i + 1).padStart(3, '0');
-    const outputPath = `${outputDir}/${baseName}_${paddedIndex}.mp4`;
+    const outputPath = outputPaths[i];
 
     const command = `ffmpeg -y -ss "${startStr}" -i "${inputPath}" -to "${endStr}" -c:v ${videoCodec} -crf ${crf} -c:a aac "${outputPath}"`;
 
@@ -167,8 +151,6 @@ export async function splitVideoReencode(
       throw new Error(`Split failed: ${result.stderr}`);
     }
 
-    outputPaths.push(outputPath);
-
     if (onProgress) {
       const partProgress = ((i + 1) / numParts) * 100;
       onProgress(partProgress, i + 1, numParts);
@@ -182,8 +164,7 @@ export async function splitVideoReencode(
  * Split video into multiple parts using stream copy (fast)
  *
  * @param {string} inputPath - Path to input video
- * @param {string} outputDir - Directory for output files
- * @param {string} baseName - Base name for output files
+ * @param {string[]} outputPaths - Pre-built array of output file paths
  * @param {number} partDuration - Max duration per part in seconds
  * @param {number} totalDuration - Total video duration in seconds
  * @param {(progress: number, part: number, total: number) => void} [onProgress] - Progress callback
@@ -191,25 +172,12 @@ export async function splitVideoReencode(
  */
 export async function splitVideoStreamCopy(
   inputPath: string,
-  outputDir: string,
-  baseName: string,
+  outputPaths: string[],
   partDuration: number,
   totalDuration: number,
   onProgress?: (progress: number, part: number, total: number) => void
 ): Promise<string[]> {
-  const numParts = calculateNumParts(totalDuration, partDuration);
-  const outputPaths: string[] = [];
-
-  // Build list of output paths for overwrite check
-  for (let i = 0; i < numParts; i++) {
-    const paddedIndex = String(i + 1).padStart(3, '0');
-    outputPaths.push(`${outputDir}/${baseName}_${paddedIndex}.mp4`);
-  }
-
-  const shouldProceed = await checkAndPromptOverwrite(outputPaths);
-  if (!shouldProceed) {
-    process.exit(0);
-  }
+  const numParts = outputPaths.length;
 
   for (let i = 0; i < numParts; i++) {
     const startSec = i * partDuration;
@@ -218,8 +186,7 @@ export async function splitVideoStreamCopy(
     const startStr = formatSeconds(startSec);
     const endStr = formatSeconds(endSec);
 
-    const paddedIndex = String(i + 1).padStart(3, '0');
-    const outputPath = `${outputDir}/${baseName}_${paddedIndex}.mp4`;
+    const outputPath = outputPaths[i];
 
     const command = `ffmpeg -y -ss "${startStr}" -i "${inputPath}" -to "${endStr}" -c copy "${outputPath}"`;
 

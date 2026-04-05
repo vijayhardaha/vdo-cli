@@ -9,6 +9,7 @@ import { checkDependencies } from '../utils/dependencies';
 import { getVideoDuration } from '../utils/ffmpeg';
 import { log } from '../utils/log';
 import { createProgressBar } from '../utils/progress';
+import { checkAndPromptOverwrite } from '../utils/prompt';
 import {
   splitVideoReencode,
   splitVideoStreamCopy,
@@ -88,24 +89,32 @@ export async function splitAction(input: string, options: SplitOptions): Promise
     const codec = options.codec === 'hevc' ? 'hevc' : 'h264';
     const mode = options.fast ? 'fast' : 'precise';
 
-    log.succeed(`Split started | ${numParts} parts | Max: ${partDuration}s | Mode: ${mode}`);
-
+    // Build list of output paths for overwrite check
     const dir = dirname(input);
     const ext = extname(input);
     const baseName = basename(input, ext);
+    const outputPaths: string[] = [];
+    for (let i = 0; i < numParts; i++) {
+      const paddedIndex = String(i + 1).padStart(3, '0');
+      outputPaths.push(`${dir}/${baseName}_${paddedIndex}.mp4`);
+    }
+
+    const shouldProceed = await checkAndPromptOverwrite(outputPaths);
+    if (!shouldProceed) {
+      process.exit(0);
+    }
+
+    log.succeed(`Split started | ${numParts} parts | Max: ${partDuration}s | Mode: ${mode}`);
 
     const progressBar = createProgressBar(`${loading} Splitting | ${numParts} parts`);
 
     progressBar.start(100, 0);
 
     try {
-      let outputPaths: string[];
-
       if (options.fast) {
-        outputPaths = await splitVideoStreamCopy(
+        await splitVideoStreamCopy(
           input,
-          dir,
-          baseName,
+          outputPaths,
           partDuration,
           totalDuration,
           (progress: number, part: number) => {
@@ -113,10 +122,9 @@ export async function splitAction(input: string, options: SplitOptions): Promise
           }
         );
       } else {
-        outputPaths = await splitVideoReencode(
+        await splitVideoReencode(
           input,
-          dir,
-          baseName,
+          outputPaths,
           partDuration,
           totalDuration,
           codec,

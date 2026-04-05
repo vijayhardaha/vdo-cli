@@ -1,16 +1,24 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 
+import { runCommand } from '../src/utils/dependencies.js';
 import {
   parseDuration,
   calculateNumParts,
   getPresetDuration,
   formatSeconds,
+  splitVideoReencode,
+  splitVideoStreamCopy,
+  parseSplitValue,
   PRESET_DURATIONS,
 } from '../src/utils/split.js';
 
-// describe: split utilities
+vi.mock('../src/utils/dependencies.js', () => ({ runCommand: vi.fn() }));
+
 describe('split utils', () => {
-  // describe: parseDuration
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   describe('parseDuration', () => {
     // it: should parse plain seconds
     it('should parse plain seconds', () => {
@@ -36,7 +44,6 @@ describe('split utils', () => {
     });
   });
 
-  // describe: calculateNumParts
   describe('calculateNumParts', () => {
     // it: should calculate correct number of parts
     it('should calculate correct number of parts', () => {
@@ -57,7 +64,6 @@ describe('split utils', () => {
     });
   });
 
-  // describe: getPresetDuration
   describe('getPresetDuration', () => {
     // it: should return correct duration for presets
     it('should return correct duration for presets', () => {
@@ -70,7 +76,6 @@ describe('split utils', () => {
     });
   });
 
-  // describe: PRESET_DURATIONS
   describe('PRESET_DURATIONS', () => {
     // it: should have all required presets
     it('should have all required presets', () => {
@@ -83,7 +88,6 @@ describe('split utils', () => {
     });
   });
 
-  // describe: formatSeconds
   describe('formatSeconds', () => {
     // it: should format seconds correctly
     it('should format seconds correctly', () => {
@@ -97,6 +101,74 @@ describe('split utils', () => {
     it('should pad single digits', () => {
       expect(formatSeconds(5)).toBe('00:00:05');
       expect(formatSeconds(65)).toBe('00:01:05');
+    });
+  });
+
+  describe('parseSplitValue', () => {
+    // it: should parse preset names
+    it('should parse preset names', () => {
+      expect(parseSplitValue('ig')).toEqual({ type: 'preset', value: 'ig' });
+      expect(parseSplitValue('wa')).toEqual({ type: 'preset', value: 'wa' });
+      expect(parseSplitValue('fb')).toEqual({ type: 'preset', value: 'fb' });
+    });
+
+    // it: should parse numeric duration
+    it('should parse numeric duration', () => {
+      expect(parseSplitValue('60')).toEqual({ type: 'duration', value: 60 });
+      expect(parseSplitValue('90.5')).toEqual({ type: 'duration', value: 90.5 });
+    });
+
+    // it: should throw error for invalid values
+    it('should throw error for invalid values', () => {
+      expect(() => parseSplitValue('abc')).toThrow('Invalid split value');
+      expect(() => parseSplitValue('-10')).toThrow('Invalid split value');
+    });
+  });
+
+  describe('splitVideoReencode', () => {
+    it('should call runCommand with correct ffmpeg arguments', async () => {
+      vi.mocked(runCommand).mockResolvedValue({ stdout: '', stderr: 'frames: 100' });
+
+      const outputPaths = ['/output/video_001.mp4', '/output/video_002.mp4'];
+      const result = await splitVideoReencode('input.mp4', outputPaths, 60, 120, 'h264', 23);
+
+      expect(runCommand).toHaveBeenCalledTimes(2);
+      expect(result.length).toBe(2);
+      expect(result[0]).toBe('/output/video_001.mp4');
+      expect(result[1]).toBe('/output/video_002.mp4');
+    });
+
+    it('should use hevc codec when specified', async () => {
+      vi.mocked(runCommand).mockResolvedValue({ stdout: '', stderr: 'frames: 100' });
+
+      const outputPaths = ['/output/video_001.mp4'];
+      await splitVideoReencode('input.mp4', outputPaths, 60, 120, 'hevc', 20);
+
+      expect(runCommand).toHaveBeenCalledWith(
+        'ffmpeg -y -ss "00:00:00" -i "input.mp4" -to "00:01:00" -c:v libx265 -crf 20 -c:a aac "/output/video_001.mp4"',
+        expect.any(Function)
+      );
+    });
+
+    it('should throw error on failure', async () => {
+      vi.mocked(runCommand).mockResolvedValue({ stdout: '', stderr: 'error occurred' });
+
+      const outputPaths = ['/output/video_001.mp4'];
+      await expect(splitVideoReencode('input.mp4', outputPaths, 60, 120, 'h264', 23)).rejects.toThrow('Split failed');
+    });
+  });
+
+  describe('splitVideoStreamCopy', () => {
+    it('should call runCommand with correct ffmpeg arguments', async () => {
+      vi.mocked(runCommand).mockResolvedValue({ stdout: '', stderr: 'time=00:01:00' });
+
+      const outputPaths = ['/output/video_001.mp4', '/output/video_002.mp4'];
+      const result = await splitVideoStreamCopy('input.mp4', outputPaths, 60, 120);
+
+      expect(runCommand).toHaveBeenCalledTimes(2);
+      expect(result.length).toBe(2);
+      expect(result[0]).toBe('/output/video_001.mp4');
+      expect(result[1]).toBe('/output/video_002.mp4');
     });
   });
 });

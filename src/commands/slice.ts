@@ -8,6 +8,7 @@ import type { SliceOptions, SliceSegment } from '../types/index';
 import { checkDependencies } from '../utils/dependencies';
 import { log } from '../utils/log';
 import { createProgressBar } from '../utils/progress';
+import { checkAndPromptOverwrite } from '../utils/prompt';
 import { sliceVideoStreamCopy, sliceVideoReencode, sliceMultipleSegments, formatTimeForFFmpeg } from '../utils/slice';
 import { validateFileExists } from '../utils/validations';
 
@@ -96,6 +97,19 @@ export async function sliceAction(input: string, options: SliceOptions): Promise
       const dir = dirname(input);
       const mode = options.fast ? 'fast' : 'precise';
 
+      const outputPaths: string[] = [];
+      for (let i = 0; i < options.segments.length; i++) {
+        const segment = options.segments[i];
+        outputPaths.push(
+          `${dir}/segment_${i + 1}_${segment.start.replace(/:/g, '')}_${segment.end.replace(/:/g, '')}.mp4`
+        );
+      }
+
+      const shouldProceed = await checkAndPromptOverwrite(outputPaths);
+      if (!shouldProceed) {
+        process.exit(0);
+      }
+
       log.succeed(`Slicing started | ${options.segments.length} segments | Mode: ${mode}`);
 
       const progressBar = createProgressBar(`${loading} Slicing | ${options.segments.length} segments | ${mode}`);
@@ -103,15 +117,9 @@ export async function sliceAction(input: string, options: SliceOptions): Promise
       progressBar.start(100, 0);
 
       try {
-        const outputPaths = await sliceMultipleSegments(
-          input,
-          dir,
-          options.segments,
-          !!options.fast,
-          (progress, segment) => {
-            progressBar.update(Math.round(progress), { segment });
-          }
-        );
+        await sliceMultipleSegments(input, dir, options.segments, !!options.fast, (progress, segment) => {
+          progressBar.update(Math.round(progress), { segment });
+        });
 
         progressBar.stop();
         log.succeed('Slicing completed successfully!');
@@ -157,6 +165,11 @@ export async function sliceAction(input: string, options: SliceOptions): Promise
       const dir = dirname(input);
       const ext = extname(input);
       outputFile = join(dir, `${basename(input, ext)}_${startDisplay}_${endDisplay}${ext}`);
+    }
+
+    const shouldProceed = await checkAndPromptOverwrite([outputFile]);
+    if (!shouldProceed) {
+      process.exit(0);
     }
 
     log.succeed(`Slicing started | ${startDisplay} to ${endDisplay} | Mode: ${mode}`);
