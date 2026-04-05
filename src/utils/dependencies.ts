@@ -1,5 +1,6 @@
 import { exec, spawn } from 'child_process';
 
+import { log } from './log';
 import type { DependencyCheck, CommandResult } from '../types/index';
 
 /**
@@ -80,4 +81,20 @@ export function runCommand(
       reject(err);
     });
   });
+}
+
+/**
+ * Ensure dependencies are available, exit with error if missing
+ *
+ * @returns {Promise<boolean>} true if all dependencies are available
+ * @throws {void} Exits with code 1 if dependencies are missing
+ */
+export async function ensureDependencies(): Promise<boolean> {
+  const deps = await checkDependencies();
+  if (!deps.ok) {
+    log.fail(`Missing dependencies: ${deps.missing.join(', ')}`);
+    log.warn('Install using: brew install ffmpeg yt-dlp');
+    process.exit(1);
+  }
+  return true;
 }
