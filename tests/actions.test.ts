@@ -45,7 +45,12 @@ vi.mock('../src/utils/progress.js', () => ({
   formatFileSize: vi.fn(() => ({ value: 100, unit: 'MB' })),
 }));
 
-vi.mock('fs/promises', () => ({ access: vi.fn() }));
+vi.mock('fs/promises', () => ({ access: vi.fn().mockRejectedValue(new Error('File not found')) }));
+
+vi.mock('../src/utils/prompt.js', () => ({
+  checkAndPromptOverwrite: vi.fn().mockResolvedValue(true),
+  promptOverwrite: vi.fn().mockResolvedValue(true),
+}));
 
 /* Mock progress bar */
 const mockProgressBar = { start: vi.fn(), stop: vi.fn(), update: vi.fn() };

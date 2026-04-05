@@ -1,5 +1,6 @@
 import { runCommand } from './dependencies';
 import { parseFFmpegProgress } from './progress';
+import { checkAndPromptOverwrite } from './prompt';
 import type { ProgressInfo, SplitPreset } from '../types/index';
 
 /**
@@ -125,6 +126,17 @@ export async function splitVideoReencode(
   const numParts = calculateNumParts(totalDuration, partDuration);
   const outputPaths: string[] = [];
 
+  // Build list of output paths for overwrite check
+  for (let i = 0; i < numParts; i++) {
+    const paddedIndex = String(i + 1).padStart(3, '0');
+    outputPaths.push(`${outputDir}/${baseName}_${paddedIndex}.mp4`);
+  }
+
+  const shouldProceed = await checkAndPromptOverwrite(outputPaths);
+  if (!shouldProceed) {
+    process.exit(0);
+  }
+
   for (let i = 0; i < numParts; i++) {
     const startSec = i * partDuration;
     const endSec = Math.min((i + 1) * partDuration, totalDuration);
@@ -188,6 +200,17 @@ export async function splitVideoStreamCopy(
   const numParts = calculateNumParts(totalDuration, partDuration);
   const outputPaths: string[] = [];
 
+  // Build list of output paths for overwrite check
+  for (let i = 0; i < numParts; i++) {
+    const paddedIndex = String(i + 1).padStart(3, '0');
+    outputPaths.push(`${outputDir}/${baseName}_${paddedIndex}.mp4`);
+  }
+
+  const shouldProceed = await checkAndPromptOverwrite(outputPaths);
+  if (!shouldProceed) {
+    process.exit(0);
+  }
+
   for (let i = 0; i < numParts; i++) {
     const startSec = i * partDuration;
     const endSec = Math.min((i + 1) * partDuration, totalDuration);
@@ -201,8 +224,6 @@ export async function splitVideoStreamCopy(
     const command = `ffmpeg -y -ss "${startStr}" -i "${inputPath}" -to "${endStr}" -c copy "${outputPath}"`;
 
     await runCommand(command);
-
-    outputPaths.push(outputPath);
 
     if (onProgress) {
       const partProgress = ((i + 1) / numParts) * 100;

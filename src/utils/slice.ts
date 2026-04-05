@@ -1,5 +1,6 @@
 import { runCommand } from './dependencies';
 import { parseFFmpegProgress } from './progress';
+import { checkAndPromptOverwrite } from './prompt';
 import type { ProgressInfo, SliceSegment } from '../types/index';
 
 /**
@@ -19,6 +20,11 @@ export async function sliceVideoStreamCopy(
   end: string,
   onProgress?: (progress: number) => void
 ): Promise<void> {
+  const shouldProceed = await checkAndPromptOverwrite([outputPath]);
+  if (!shouldProceed) {
+    process.exit(0);
+  }
+
   const command = `ffmpeg -y -ss "${start}" -i "${inputPath}" -to "${end}" -c copy "${outputPath}"`;
 
   const totalTime = 0;
@@ -64,6 +70,11 @@ export async function sliceVideoReencode(
   crf: number,
   onProgress?: (progress: number) => void
 ): Promise<void> {
+  const shouldProceed = await checkAndPromptOverwrite([outputPath]);
+  if (!shouldProceed) {
+    process.exit(0);
+  }
+
   const videoCodec = codec === 'hevc' ? 'libx265' : 'libx264';
   const command = `ffmpeg -y -ss "${start}" -i "${inputPath}" -to "${end}" -c:v ${videoCodec} -crf ${crf} -c:a aac "${outputPath}"`;
 
@@ -111,6 +122,17 @@ export async function sliceMultipleSegments(
   for (let i = 0; i < segments.length; i++) {
     const segment = segments[i];
     const outputPath = `${outputDir}/segment_${i + 1}_${segment.start.replace(/:/g, '')}_${segment.end.replace(/:/g, '')}.mp4`;
+    outputPaths.push(outputPath);
+  }
+
+  const shouldProceed = await checkAndPromptOverwrite(outputPaths);
+  if (!shouldProceed) {
+    process.exit(0);
+  }
+
+  for (let i = 0; i < segments.length; i++) {
+    const segment = segments[i];
+    const outputPath = outputPaths[i];
 
     if (fast) {
       await sliceVideoStreamCopy(inputPath, outputPath, segment.start, segment.end);
@@ -118,7 +140,6 @@ export async function sliceMultipleSegments(
       await sliceVideoReencode(inputPath, outputPath, segment.start, segment.end, 'h264', 23);
     }
 
-    outputPaths.push(outputPath);
     if (onProgress) {
       onProgress(((i + 1) / segments.length) * 100, i + 1);
     }
