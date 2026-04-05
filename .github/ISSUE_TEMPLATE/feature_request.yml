@@ -1,0 +1,105 @@
+name: Feature Request
+description: Suggest an idea for this project
+title: "[Feature] "
+labels: ["enhancement"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Feature Request
+
+        Thank you for suggesting a feature! Please fill out the form below to help us evaluate your request.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Statement
+      description: |
+        Describe the problem you are trying to solve.
+        What is the pain point or limitation you're experiencing?
+      placeholder: I am trying to do X but...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: |
+        Describe the solution you'd like to see.
+        What would the ideal behavior look like?
+      placeholder: A possible solution would be to...
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: |
+        Describe any alternative solutions or workarounds you've considered.
+        What are the pros and cons of those alternatives?
+      placeholder: I considered doing X but...
+    validations:
+      required: false
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use Case
+      description: |
+        Describe a specific use case where this feature would be valuable.
+        Who would benefit from this feature and how?
+      placeholder: As a user, I want to...
+    validations:
+      required: true
+
+  - type: input
+    id: command
+    attributes:
+      label: Suggested Command (if applicable)
+      description: |
+        If this is a command enhancement, suggest the command syntax.
+        Example: `vdo dl <url> --new-option value`
+      placeholder: vdo dl <url> --new-option value
+    validations:
+      required: false
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How important is this feature to you?
+      options:
+        - Low - Nice to have, but not critical
+        - Medium - Would improve my workflow
+        - High - Critical for my use case
+        - Critical - Blocking me from using the tool
+    validations:
+      required: false
+
+  - type: textarea
+    id: mockup
+    attributes:
+      label: Mockups / Examples
+      description: |
+        Add any mockups, screenshots, or examples that would help explain the feature.
+        (Drag and drop or paste images)
+      placeholder: |
+        Example of expected output:
+        ```
+        $ vdo dl https://example.com --new-option
+        Expected output here...
+        ```
+    validations:
+      required: false
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context
+      description: Add any other context about this feature request here.
+      placeholder: Any other information...
+    validations:
+      required: false
