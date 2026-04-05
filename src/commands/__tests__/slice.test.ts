@@ -9,9 +9,15 @@ vi.mock('../../utils/slice.js', () => ({
   sliceVideoStreamCopy: vi.fn(),
   sliceVideoReencode: vi.fn(),
   sliceMultipleSegments: vi.fn(),
+  formatTimeForFFmpeg: vi.fn((t) => t),
 }));
 
 vi.mock('../../utils/validations.js', () => ({ validateFileExists: vi.fn() }));
+
+vi.mock('../../utils/progress.js', () => ({
+  createProgressBar: vi.fn(),
+  formatFileSize: vi.fn(() => ({ value: 100, unit: 'MB' })),
+}));
 
 vi.mock('fs/promises', () => ({ access: vi.fn().mockRejectedValue(new Error('File not found')) }));
 
@@ -19,6 +25,9 @@ vi.mock('../../utils/prompt.js', () => ({
   checkAndPromptOverwrite: vi.fn().mockResolvedValue(true),
   promptOverwrite: vi.fn().mockResolvedValue(true),
 }));
+
+/* Mock progress bar */
+const mockProgressBar = { start: vi.fn(), stop: vi.fn(), update: vi.fn() };
 
 // Tests for slice command
 describe('slice command', () => {
@@ -117,6 +126,155 @@ describe('slice command', () => {
       const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
 
       await sliceAction('input.mp4', {});
+
+      // Expect process.exit is called with 1
+      expect(exitSpy).toHaveBeenCalledWith(1);
+    });
+
+    // Should should exit when start provided but no end or duration
+    it('should exit when start provided but no end or duration', async () => {
+      const { checkDependencies } = await import('../../utils/dependencies.js');
+      const { validateFileExists } = await import('../../utils/validations.js');
+
+      vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
+      vi.mocked(validateFileExists).mockResolvedValue(undefined);
+
+      const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
+
+      await sliceAction('input.mp4', { start: '10' });
+
+      // Expect process.exit is called with 1
+      expect(exitSpy).toHaveBeenCalledWith(1);
+    });
+
+    // Should should use stream copy in fast mode
+    it('should use stream copy in fast mode', async () => {
+      const { checkDependencies } = await import('../../utils/dependencies.js');
+      const { validateFileExists } = await import('../../utils/validations.js');
+      const { sliceVideoStreamCopy } = await import('../../utils/slice.js');
+      const { createProgressBar } = await import('../../utils/progress.js');
+
+      vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
+      vi.mocked(validateFileExists).mockResolvedValue(undefined);
+      vi.mocked(createProgressBar).mockReturnValue(mockProgressBar as never);
+      vi.mocked(sliceVideoStreamCopy).mockResolvedValue(undefined);
+
+      await sliceAction('input.mp4', { start: '10', end: '30', fast: true });
+
+      // Expect sliceVideoStreamCopy is called
+      expect(sliceVideoStreamCopy).toHaveBeenCalled();
+    });
+
+    // Should should re-encode in precise mode
+    it('should re-encode in precise mode', async () => {
+      const { checkDependencies } = await import('../../utils/dependencies.js');
+      const { validateFileExists } = await import('../../utils/validations.js');
+      const { sliceVideoReencode } = await import('../../utils/slice.js');
+      const { createProgressBar } = await import('../../utils/progress.js');
+
+      vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
+      vi.mocked(validateFileExists).mockResolvedValue(undefined);
+      vi.mocked(createProgressBar).mockReturnValue(mockProgressBar as never);
+      vi.mocked(sliceVideoReencode).mockResolvedValue(undefined);
+
+      await sliceAction('input.mp4', { start: '10', end: '30', precise: true });
+
+      // Expect sliceVideoReencode is called
+      expect(sliceVideoReencode).toHaveBeenCalled();
+    });
+
+    // Should should use auto mode (stream copy) by default
+    it('should use auto mode (stream copy) by default', async () => {
+      const { checkDependencies } = await import('../../utils/dependencies.js');
+      const { validateFileExists } = await import('../../utils/validations.js');
+      const { sliceVideoStreamCopy } = await import('../../utils/slice.js');
+      const { createProgressBar } = await import('../../utils/progress.js');
+
+      vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
+      vi.mocked(validateFileExists).mockResolvedValue(undefined);
+      vi.mocked(createProgressBar).mockReturnValue(mockProgressBar as never);
+      vi.mocked(sliceVideoStreamCopy).mockResolvedValue(undefined);
+
+      await sliceAction('input.mp4', { start: '10', end: '30' });
+
+      // Expect sliceVideoStreamCopy is called (auto default)
+      expect(sliceVideoStreamCopy).toHaveBeenCalled();
+    });
+
+    // Should should use duration instead of end time
+    it('should use duration instead of end time', async () => {
+      const { checkDependencies } = await import('../../utils/dependencies.js');
+      const { validateFileExists } = await import('../../utils/validations.js');
+      const { sliceVideoStreamCopy } = await import('../../utils/slice.js');
+      const { createProgressBar } = await import('../../utils/progress.js');
+
+      vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
+      vi.mocked(validateFileExists).mockResolvedValue(undefined);
+      vi.mocked(createProgressBar).mockReturnValue(mockProgressBar as never);
+      vi.mocked(sliceVideoStreamCopy).mockResolvedValue(undefined);
+
+      await sliceAction('input.mp4', { start: '10', duration: '20' });
+
+      // Expect sliceVideoStreamCopy is called with duration-based end time
+      expect(sliceVideoStreamCopy).toHaveBeenCalled();
+    });
+
+    // Should should handle segments path
+    it('should handle segments path', async () => {
+      const { checkDependencies } = await import('../../utils/dependencies.js');
+      const { validateFileExists } = await import('../../utils/validations.js');
+      const { sliceMultipleSegments } = await import('../../utils/slice.js');
+      const { createProgressBar } = await import('../../utils/progress.js');
+
+      vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
+      vi.mocked(validateFileExists).mockResolvedValue(undefined);
+      vi.mocked(createProgressBar).mockReturnValue(mockProgressBar as never);
+      vi.mocked(sliceMultipleSegments).mockResolvedValue([]);
+
+      await sliceAction('/path/to/video.mp4', {
+        segments: [
+          { start: '0', end: '10' },
+          { start: '30', end: '45' },
+        ],
+      });
+
+      // Expect sliceMultipleSegments is called
+      expect(sliceMultipleSegments).toHaveBeenCalled();
+    });
+
+    // Should should exit when user declines overwrite
+    it('should exit when user declines overwrite', async () => {
+      const { checkDependencies } = await import('../../utils/dependencies.js');
+      const { validateFileExists } = await import('../../utils/validations.js');
+      const { checkAndPromptOverwrite } = await import('../../utils/prompt.js');
+
+      vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
+      vi.mocked(validateFileExists).mockResolvedValue(undefined);
+      vi.mocked(checkAndPromptOverwrite).mockResolvedValue(false);
+
+      const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
+
+      await sliceAction('input.mp4', { start: '10', end: '30' });
+
+      // Expect process.exit is called with 0
+      expect(exitSpy).toHaveBeenCalledWith(0);
+    });
+
+    // Should should handle thrown errors in slice functions
+    it('should handle thrown errors in slice functions', async () => {
+      const { checkDependencies } = await import('../../utils/dependencies.js');
+      const { validateFileExists } = await import('../../utils/validations.js');
+      const { sliceVideoStreamCopy } = await import('../../utils/slice.js');
+      const { createProgressBar } = await import('../../utils/progress.js');
+
+      vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
+      vi.mocked(validateFileExists).mockResolvedValue(undefined);
+      vi.mocked(createProgressBar).mockReturnValue(mockProgressBar as never);
+      vi.mocked(sliceVideoStreamCopy).mockRejectedValue(new Error('slice error'));
+
+      const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
+
+      await sliceAction('input.mp4', { start: '10', end: '30' });
 
       // Expect process.exit is called with 1
       expect(exitSpy).toHaveBeenCalledWith(1);

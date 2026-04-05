@@ -23,7 +23,17 @@ vi.mock('../../utils/prompt.js', () => ({
   promptOverwrite: vi.fn().mockResolvedValue(true),
 }));
 
-vi.mock('fs/promises', () => ({ access: vi.fn().mockRejectedValue(new Error('File not found')) }));
+vi.mock('../../utils/ffmpeg.js', () => ({ convertVideo: vi.fn() }));
+
+vi.mock('../../utils/split.js', () => ({ parseSplitValue: vi.fn() }));
+
+vi.mock('../split.js', () => ({ splitAction: vi.fn(), parseSplitValue: vi.fn() }));
+
+vi.mock('fs/promises', () => ({
+  access: vi.fn().mockRejectedValue(new Error('File not found')),
+  rename: vi.fn(),
+  unlink: vi.fn(),
+}));
 
 /* Mock progress bar */
 const mockProgressBar = { start: vi.fn(), stop: vi.fn(), update: vi.fn() };
@@ -263,6 +273,76 @@ describe('download command', () => {
 
       // Expect process.exit is called with 1
       expect(exitSpy).toHaveBeenCalledWith(1);
+    });
+
+    // Should should exit when user declines overwrite
+    it('should exit when user declines overwrite', async () => {
+      const { checkDependencies } = await import('../../utils/dependencies.js');
+      const { validateUrl, validateFormat } = await import('../../utils/validations.js');
+      const { getVideoInfo } = await import('../../utils/ytdlp.js');
+      const { checkAndPromptOverwrite } = await import('../../utils/prompt.js');
+
+      vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
+      vi.mocked(validateUrl).mockReturnValue(true);
+      vi.mocked(validateFormat).mockReturnValue(undefined);
+      vi.mocked(getVideoInfo).mockResolvedValue({ title: 'Test', video_id: '123', ext: 'mp4' });
+      vi.mocked(checkAndPromptOverwrite).mockResolvedValue(false);
+
+      const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
+
+      await downloadAction('https://example.com', {});
+
+      // Expect process.exit is called with 0
+      expect(exitSpy).toHaveBeenCalledWith(0);
+    });
+
+    // Should should convert downloaded file when convert option is set
+    it('should convert downloaded file when convert option is set', async () => {
+      const { checkDependencies } = await import('../../utils/dependencies.js');
+      const { validateUrl, validateFormat } = await import('../../utils/validations.js');
+      const { getVideoInfo } = await import('../../utils/ytdlp.js');
+      const { downloadVideo } = await import('../../utils/ytdlp.js');
+      const { convertVideo } = await import('../../utils/ffmpeg.js');
+      const { createProgressBar } = await import('../../utils/progress.js');
+      const { unlink } = await import('fs/promises');
+
+      vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
+      vi.mocked(validateUrl).mockReturnValue(true);
+      vi.mocked(validateFormat).mockReturnValue(undefined);
+      vi.mocked(getVideoInfo).mockResolvedValue({ title: 'Test', video_id: '123', ext: 'webm' });
+      vi.mocked(downloadVideo).mockResolvedValue(undefined);
+      vi.mocked(createProgressBar).mockReturnValue(mockProgressBar as never);
+      vi.mocked(convertVideo).mockResolvedValue(undefined);
+      vi.mocked(unlink).mockResolvedValue(undefined);
+
+      await downloadAction('https://example.com', { convert: true, format: 'mp4' });
+
+      // Expect convertVideo is called
+      expect(convertVideo).toHaveBeenCalled();
+    });
+
+    // Should should call splitAction when split option is set
+    it('should call splitAction when split option is set', async () => {
+      const { checkDependencies } = await import('../../utils/dependencies.js');
+      const { validateUrl, validateFormat } = await import('../../utils/validations.js');
+      const { getVideoInfo } = await import('../../utils/ytdlp.js');
+      const { downloadVideo } = await import('../../utils/ytdlp.js');
+      const { createProgressBar } = await import('../../utils/progress.js');
+      const { parseSplitValue } = await import('../../utils/split.js');
+      const { splitAction } = await import('../split.js');
+
+      vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
+      vi.mocked(validateUrl).mockReturnValue(true);
+      vi.mocked(validateFormat).mockReturnValue(undefined);
+      vi.mocked(getVideoInfo).mockResolvedValue({ title: 'Test', video_id: '123', ext: 'mp4' });
+      vi.mocked(downloadVideo).mockResolvedValue(undefined);
+      vi.mocked(createProgressBar).mockReturnValue(mockProgressBar as never);
+      vi.mocked(parseSplitValue).mockReturnValue({ type: 'preset', value: 'instagram' });
+
+      await downloadAction('https://example.com', { split: 'instagram' });
+
+      // Expect splitAction is called
+      expect(vi.mocked(splitAction)).toHaveBeenCalled();
     });
 
     // Should should handle non-Error thrown values in outer catch
