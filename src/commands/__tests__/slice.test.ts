@@ -1,27 +1,37 @@
 import { Command } from 'commander';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-import { setupSlice, sliceAction } from '../slice.js';
+import { setupSlice, sliceAction } from '../slice';
 
-vi.mock('../../utils/dependencies.js', () => ({ checkDependencies: vi.fn(), runCommand: vi.fn() }));
+vi.mock('../../utils/dependencies', () => {
+  const mockCheckDependencies = vi.fn();
+  const mockEnsureDependencies = vi.fn(async () => {
+    const deps = await mockCheckDependencies();
+    if (!deps.ok) {
+      process.exit(1);
+    }
+    return true;
+  });
+  return { checkDependencies: mockCheckDependencies, ensureDependencies: mockEnsureDependencies, runCommand: vi.fn() };
+});
 
-vi.mock('../../utils/slice.js', () => ({
+vi.mock('../../utils/slice', () => ({
   sliceVideoStreamCopy: vi.fn(),
   sliceVideoReencode: vi.fn(),
   sliceMultipleSegments: vi.fn(),
   formatTimeForFFmpeg: vi.fn((t) => t),
 }));
 
-vi.mock('../../utils/validations.js', () => ({ validateFileExists: vi.fn() }));
+vi.mock('../../utils/validations', () => ({ validateFileExists: vi.fn() }));
 
-vi.mock('../../utils/progress.js', () => ({
+vi.mock('../../utils/progress', () => ({
   createProgressBar: vi.fn(),
   formatFileSize: vi.fn(() => ({ value: 100, unit: 'MB' })),
 }));
 
 vi.mock('fs/promises', () => ({ access: vi.fn().mockRejectedValue(new Error('File not found')) }));
 
-vi.mock('../../utils/prompt.js', () => ({
+vi.mock('../../utils/prompt', () => ({
   checkAndPromptOverwrite: vi.fn().mockResolvedValue(true),
   promptOverwrite: vi.fn().mockResolvedValue(true),
 }));
@@ -103,7 +113,7 @@ describe('slice command', () => {
   describe('sliceAction', () => {
     // Should should exit when dependencies missing
     it('should exit when dependencies missing', async () => {
-      const { checkDependencies } = await import('../../utils/dependencies.js');
+      const { checkDependencies } = await import('../../utils/dependencies');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: false, missing: ['ffmpeg'] });
 
@@ -117,8 +127,8 @@ describe('slice command', () => {
 
     // Should should exit when start/end not provided
     it('should exit when start/end not provided', async () => {
-      const { checkDependencies } = await import('../../utils/dependencies.js');
-      const { validateFileExists } = await import('../../utils/validations.js');
+      const { checkDependencies } = await import('../../utils/dependencies');
+      const { validateFileExists } = await import('../../utils/validations');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateFileExists).mockResolvedValue(undefined);
@@ -133,8 +143,8 @@ describe('slice command', () => {
 
     // Should should exit when start provided but no end or duration
     it('should exit when start provided but no end or duration', async () => {
-      const { checkDependencies } = await import('../../utils/dependencies.js');
-      const { validateFileExists } = await import('../../utils/validations.js');
+      const { checkDependencies } = await import('../../utils/dependencies');
+      const { validateFileExists } = await import('../../utils/validations');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateFileExists).mockResolvedValue(undefined);
@@ -149,10 +159,10 @@ describe('slice command', () => {
 
     // Should should use stream copy in fast mode
     it('should use stream copy in fast mode', async () => {
-      const { checkDependencies } = await import('../../utils/dependencies.js');
-      const { validateFileExists } = await import('../../utils/validations.js');
-      const { sliceVideoStreamCopy } = await import('../../utils/slice.js');
-      const { createProgressBar } = await import('../../utils/progress.js');
+      const { checkDependencies } = await import('../../utils/dependencies');
+      const { validateFileExists } = await import('../../utils/validations');
+      const { sliceVideoStreamCopy } = await import('../../utils/slice');
+      const { createProgressBar } = await import('../../utils/progress');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateFileExists).mockResolvedValue(undefined);
@@ -167,10 +177,10 @@ describe('slice command', () => {
 
     // Should should re-encode in precise mode
     it('should re-encode in precise mode', async () => {
-      const { checkDependencies } = await import('../../utils/dependencies.js');
-      const { validateFileExists } = await import('../../utils/validations.js');
-      const { sliceVideoReencode } = await import('../../utils/slice.js');
-      const { createProgressBar } = await import('../../utils/progress.js');
+      const { checkDependencies } = await import('../../utils/dependencies');
+      const { validateFileExists } = await import('../../utils/validations');
+      const { sliceVideoReencode } = await import('../../utils/slice');
+      const { createProgressBar } = await import('../../utils/progress');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateFileExists).mockResolvedValue(undefined);
@@ -185,10 +195,10 @@ describe('slice command', () => {
 
     // Should should use auto mode (stream copy) by default
     it('should use auto mode (stream copy) by default', async () => {
-      const { checkDependencies } = await import('../../utils/dependencies.js');
-      const { validateFileExists } = await import('../../utils/validations.js');
-      const { sliceVideoStreamCopy } = await import('../../utils/slice.js');
-      const { createProgressBar } = await import('../../utils/progress.js');
+      const { checkDependencies } = await import('../../utils/dependencies');
+      const { validateFileExists } = await import('../../utils/validations');
+      const { sliceVideoStreamCopy } = await import('../../utils/slice');
+      const { createProgressBar } = await import('../../utils/progress');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateFileExists).mockResolvedValue(undefined);
@@ -203,10 +213,10 @@ describe('slice command', () => {
 
     // Should should use duration instead of end time
     it('should use duration instead of end time', async () => {
-      const { checkDependencies } = await import('../../utils/dependencies.js');
-      const { validateFileExists } = await import('../../utils/validations.js');
-      const { sliceVideoStreamCopy } = await import('../../utils/slice.js');
-      const { createProgressBar } = await import('../../utils/progress.js');
+      const { checkDependencies } = await import('../../utils/dependencies');
+      const { validateFileExists } = await import('../../utils/validations');
+      const { sliceVideoStreamCopy } = await import('../../utils/slice');
+      const { createProgressBar } = await import('../../utils/progress');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateFileExists).mockResolvedValue(undefined);
@@ -221,10 +231,10 @@ describe('slice command', () => {
 
     // Should should handle segments path
     it('should handle segments path', async () => {
-      const { checkDependencies } = await import('../../utils/dependencies.js');
-      const { validateFileExists } = await import('../../utils/validations.js');
-      const { sliceMultipleSegments } = await import('../../utils/slice.js');
-      const { createProgressBar } = await import('../../utils/progress.js');
+      const { checkDependencies } = await import('../../utils/dependencies');
+      const { validateFileExists } = await import('../../utils/validations');
+      const { sliceMultipleSegments } = await import('../../utils/slice');
+      const { createProgressBar } = await import('../../utils/progress');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateFileExists).mockResolvedValue(undefined);
@@ -244,9 +254,9 @@ describe('slice command', () => {
 
     // Should should exit when user declines overwrite
     it('should exit when user declines overwrite', async () => {
-      const { checkDependencies } = await import('../../utils/dependencies.js');
-      const { validateFileExists } = await import('../../utils/validations.js');
-      const { checkAndPromptOverwrite } = await import('../../utils/prompt.js');
+      const { checkDependencies } = await import('../../utils/dependencies');
+      const { validateFileExists } = await import('../../utils/validations');
+      const { checkAndPromptOverwrite } = await import('../../utils/prompt');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateFileExists).mockResolvedValue(undefined);
@@ -262,10 +272,10 @@ describe('slice command', () => {
 
     // Should should handle thrown errors in slice functions
     it('should handle thrown errors in slice functions', async () => {
-      const { checkDependencies } = await import('../../utils/dependencies.js');
-      const { validateFileExists } = await import('../../utils/validations.js');
-      const { sliceVideoStreamCopy } = await import('../../utils/slice.js');
-      const { createProgressBar } = await import('../../utils/progress.js');
+      const { checkDependencies } = await import('../../utils/dependencies');
+      const { validateFileExists } = await import('../../utils/validations');
+      const { sliceVideoStreamCopy } = await import('../../utils/slice');
+      const { createProgressBar } = await import('../../utils/progress');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateFileExists).mockResolvedValue(undefined);
@@ -282,7 +292,7 @@ describe('slice command', () => {
 
     // Should should handle non-Error thrown values in outer catch
     it('should handle non-Error thrown values in outer catch', async () => {
-      const { checkDependencies } = await import('../../utils/dependencies.js');
+      const { checkDependencies } = await import('../../utils/dependencies');
 
       vi.mocked(checkDependencies).mockRejectedValue('unknown error');
 

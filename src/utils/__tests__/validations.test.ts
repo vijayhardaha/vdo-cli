@@ -10,7 +10,7 @@ import {
   getFileExtension,
   generateOutputFilename,
   validateFileExists,
-} from '../validations.js';
+} from '../validations';
 
 vi.mock('fs/promises', () => ({ access: vi.fn() }));
 

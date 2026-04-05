@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-import { checkCommand, checkDependencies, runCommand } from '../dependencies.js';
+import { checkCommand, checkDependencies, runCommand } from '../dependencies';
 
 type ExecCallback = (err: Error | null) => void;
 type MockFn = ReturnType<typeof vi.fn>;

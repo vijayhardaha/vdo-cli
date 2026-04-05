@@ -1,11 +1,21 @@
 import { Command } from 'commander';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-import { setupSplit, splitAction } from '../split.js';
+import { setupSplit, splitAction } from '../split';
 
-vi.mock('../../utils/dependencies.js', () => ({ checkDependencies: vi.fn(), runCommand: vi.fn() }));
+vi.mock('../../utils/dependencies', () => {
+  const mockCheckDependencies = vi.fn();
+  const mockEnsureDependencies = vi.fn(async () => {
+    const deps = await mockCheckDependencies();
+    if (!deps.ok) {
+      process.exit(1);
+    }
+    return true;
+  });
+  return { checkDependencies: mockCheckDependencies, ensureDependencies: mockEnsureDependencies, runCommand: vi.fn() };
+});
 
-vi.mock('../../utils/split.js', () => ({
+vi.mock('../../utils/split', () => ({
   splitVideoReencode: vi.fn(() => Promise.resolve(['output_001.mp4', 'output_002.mp4'])),
   splitVideoStreamCopy: vi.fn(() => Promise.resolve(['output_001.mp4', 'output_002.mp4'])),
   parseDuration: vi.fn(),
@@ -13,18 +23,18 @@ vi.mock('../../utils/split.js', () => ({
   calculateNumParts: vi.fn(),
 }));
 
-vi.mock('../../utils/validations.js', () => ({ validateFileExists: vi.fn() }));
+vi.mock('../../utils/validations', () => ({ validateFileExists: vi.fn() }));
 
-vi.mock('../../utils/ffmpeg.js', () => ({ getVideoDuration: vi.fn() }));
+vi.mock('../../utils/ffmpeg', () => ({ getVideoDuration: vi.fn() }));
 
-vi.mock('../../utils/progress.js', () => ({
+vi.mock('../../utils/progress', () => ({
   createProgressBar: vi.fn(),
   formatFileSize: vi.fn(() => ({ value: 100, unit: 'MB' })),
 }));
 
 vi.mock('fs/promises', () => ({ access: vi.fn().mockRejectedValue(new Error('File not found')) }));
 
-vi.mock('../../utils/prompt.js', () => ({
+vi.mock('../../utils/prompt', () => ({
   checkAndPromptOverwrite: vi.fn().mockResolvedValue(true),
   promptOverwrite: vi.fn().mockResolvedValue(true),
 }));
@@ -106,7 +116,7 @@ describe('split command', () => {
   describe('splitAction', () => {
     // Should should exit when dependencies missing
     it('should exit when dependencies missing', async () => {
-      const { checkDependencies } = await import('../../utils/dependencies.js');
+      const { checkDependencies } = await import('../../utils/dependencies');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: false, missing: ['ffmpeg'] });
 
@@ -120,8 +130,8 @@ describe('split command', () => {
 
     // Should should exit when neither preset nor duration provided
     it('should exit when neither preset nor duration provided', async () => {
-      const { checkDependencies } = await import('../../utils/dependencies.js');
-      const { validateFileExists } = await import('../../utils/validations.js');
+      const { checkDependencies } = await import('../../utils/dependencies');
+      const { validateFileExists } = await import('../../utils/validations');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateFileExists).mockResolvedValue(undefined);
@@ -136,8 +146,8 @@ describe('split command', () => {
 
     // Should should exit when both preset and duration provided
     it('should exit when both preset and duration provided', async () => {
-      const { checkDependencies } = await import('../../utils/dependencies.js');
-      const { validateFileExists } = await import('../../utils/validations.js');
+      const { checkDependencies } = await import('../../utils/dependencies');
+      const { validateFileExists } = await import('../../utils/validations');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateFileExists).mockResolvedValue(undefined);
@@ -152,9 +162,9 @@ describe('split command', () => {
 
     // Should should exit when duration is zero or negative
     it('should exit when duration is zero or negative', async () => {
-      const { checkDependencies } = await import('../../utils/dependencies.js');
-      const { validateFileExists } = await import('../../utils/validations.js');
-      const { parseDuration } = await import('../../utils/split.js');
+      const { checkDependencies } = await import('../../utils/dependencies');
+      const { validateFileExists } = await import('../../utils/validations');
+      const { parseDuration } = await import('../../utils/split');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateFileExists).mockResolvedValue(undefined);
@@ -170,10 +180,10 @@ describe('split command', () => {
 
     // Should should return early when video is short (no split needed)
     it('should return early when video is short', async () => {
-      const { checkDependencies } = await import('../../utils/dependencies.js');
-      const { validateFileExists } = await import('../../utils/validations.js');
-      const { getVideoDuration } = await import('../../utils/ffmpeg.js');
-      const { parseDuration, calculateNumParts } = await import('../../utils/split.js');
+      const { checkDependencies } = await import('../../utils/dependencies');
+      const { validateFileExists } = await import('../../utils/validations');
+      const { getVideoDuration } = await import('../../utils/ffmpeg');
+      const { parseDuration, calculateNumParts } = await import('../../utils/split');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateFileExists).mockResolvedValue(undefined);
@@ -189,11 +199,11 @@ describe('split command', () => {
 
     // Should should use stream copy in fast mode
     it('should use stream copy in fast mode', async () => {
-      const { checkDependencies } = await import('../../utils/dependencies.js');
-      const { validateFileExists } = await import('../../utils/validations.js');
-      const { getVideoDuration } = await import('../../utils/ffmpeg.js');
-      const { calculateNumParts, splitVideoStreamCopy } = await import('../../utils/split.js');
-      const { createProgressBar } = await import('../../utils/progress.js');
+      const { checkDependencies } = await import('../../utils/dependencies');
+      const { validateFileExists } = await import('../../utils/validations');
+      const { getVideoDuration } = await import('../../utils/ffmpeg');
+      const { calculateNumParts, splitVideoStreamCopy } = await import('../../utils/split');
+      const { createProgressBar } = await import('../../utils/progress');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateFileExists).mockResolvedValue(undefined);
@@ -210,11 +220,11 @@ describe('split command', () => {
 
     // Should should use re-encode in precise mode (default)
     it('should use re-encode in precise mode (default)', async () => {
-      const { checkDependencies } = await import('../../utils/dependencies.js');
-      const { validateFileExists } = await import('../../utils/validations.js');
-      const { getVideoDuration } = await import('../../utils/ffmpeg.js');
-      const { calculateNumParts, splitVideoReencode } = await import('../../utils/split.js');
-      const { createProgressBar } = await import('../../utils/progress.js');
+      const { checkDependencies } = await import('../../utils/dependencies');
+      const { validateFileExists } = await import('../../utils/validations');
+      const { getVideoDuration } = await import('../../utils/ffmpeg');
+      const { calculateNumParts, splitVideoReencode } = await import('../../utils/split');
+      const { createProgressBar } = await import('../../utils/progress');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateFileExists).mockResolvedValue(undefined);
@@ -231,11 +241,11 @@ describe('split command', () => {
 
     // Should should use preset duration
     it('should use preset duration', async () => {
-      const { checkDependencies } = await import('../../utils/dependencies.js');
-      const { validateFileExists } = await import('../../utils/validations.js');
-      const { getVideoDuration } = await import('../../utils/ffmpeg.js');
-      const { getPresetDuration, calculateNumParts, splitVideoReencode } = await import('../../utils/split.js');
-      const { createProgressBar } = await import('../../utils/progress.js');
+      const { checkDependencies } = await import('../../utils/dependencies');
+      const { validateFileExists } = await import('../../utils/validations');
+      const { getVideoDuration } = await import('../../utils/ffmpeg');
+      const { getPresetDuration, calculateNumParts, splitVideoReencode } = await import('../../utils/split');
+      const { createProgressBar } = await import('../../utils/progress');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateFileExists).mockResolvedValue(undefined);
@@ -253,11 +263,11 @@ describe('split command', () => {
 
     // Should should exit when user declines overwrite
     it('should exit when user declines overwrite', async () => {
-      const { checkDependencies } = await import('../../utils/dependencies.js');
-      const { validateFileExists } = await import('../../utils/validations.js');
-      const { getVideoDuration } = await import('../../utils/ffmpeg.js');
-      const { calculateNumParts } = await import('../../utils/split.js');
-      const { checkAndPromptOverwrite } = await import('../../utils/prompt.js');
+      const { checkDependencies } = await import('../../utils/dependencies');
+      const { validateFileExists } = await import('../../utils/validations');
+      const { getVideoDuration } = await import('../../utils/ffmpeg');
+      const { calculateNumParts } = await import('../../utils/split');
+      const { checkAndPromptOverwrite } = await import('../../utils/prompt');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateFileExists).mockResolvedValue(undefined);
@@ -275,11 +285,11 @@ describe('split command', () => {
 
     // Should should handle split errors
     it('should handle split errors', async () => {
-      const { checkDependencies } = await import('../../utils/dependencies.js');
-      const { validateFileExists } = await import('../../utils/validations.js');
-      const { getVideoDuration } = await import('../../utils/ffmpeg.js');
-      const { calculateNumParts, splitVideoReencode } = await import('../../utils/split.js');
-      const { createProgressBar } = await import('../../utils/progress.js');
+      const { checkDependencies } = await import('../../utils/dependencies');
+      const { validateFileExists } = await import('../../utils/validations');
+      const { getVideoDuration } = await import('../../utils/ffmpeg');
+      const { calculateNumParts, splitVideoReencode } = await import('../../utils/split');
+      const { createProgressBar } = await import('../../utils/progress');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateFileExists).mockResolvedValue(undefined);
@@ -298,7 +308,7 @@ describe('split command', () => {
 
     // Should should handle non-Error thrown values in outer catch
     it('should handle non-Error thrown values in outer catch', async () => {
-      const { checkDependencies } = await import('../../utils/dependencies.js');
+      const { checkDependencies } = await import('../../utils/dependencies');
 
       vi.mocked(checkDependencies).mockRejectedValue('unknown error');
 

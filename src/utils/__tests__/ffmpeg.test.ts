@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-import { convertVideo, compressVideo, speedUpVideo, extractAudio } from '../ffmpeg.js';
+import { convertVideo, compressVideo, speedUpVideo, extractAudio } from '../ffmpeg';
 
-vi.mock('../dependencies.js', () => ({ runCommand: vi.fn() }));
+vi.mock('../dependencies', () => ({ runCommand: vi.fn() }));
 
-vi.mock('../progress.js', () => ({ parseFFmpegProgress: vi.fn() }));
+vi.mock('../progress', () => ({ parseFFmpegProgress: vi.fn() }));
 
 // Tests for ffmpeg utilities
 describe('ffmpeg utils', () => {
@@ -16,9 +16,9 @@ describe('ffmpeg utils', () => {
   describe('convertVideo', () => {
     // Should call ffprobe then ffmpeg with correct commands
     it('should call ffprobe then ffmpeg with correct commands', async () => {
-      const { runCommand } = await import('../dependencies.js');
+      const { runCommand } = await import('../dependencies');
 
-      const { parseFFmpegProgress } = await import('../progress.js');
+      const { parseFFmpegProgress } = await import('../progress');
 
       vi.mocked(runCommand).mockResolvedValue({ stdout: '120.5', stderr: '' });
 
@@ -42,7 +42,7 @@ describe('ffmpeg utils', () => {
 
     // Should use provided preset
     it('should use provided preset', async () => {
-      const { runCommand } = await import('../dependencies.js');
+      const { runCommand } = await import('../dependencies');
 
       vi.mocked(runCommand).mockResolvedValue({ stdout: '60', stderr: '' });
 
@@ -56,7 +56,7 @@ describe('ffmpeg utils', () => {
 
     // Should map high-quality preset to slow
     it('should map high quality preset to slow', async () => {
-      const { runCommand } = await import('../dependencies.js');
+      const { runCommand } = await import('../dependencies');
 
       vi.mocked(runCommand).mockResolvedValue({ stdout: '60', stderr: '' });
 
@@ -70,7 +70,7 @@ describe('ffmpeg utils', () => {
 
     // Should fall back to fast preset for unknown preset
     it('should fall back to fast preset for unknown preset', async () => {
-      const { runCommand } = await import('../dependencies.js');
+      const { runCommand } = await import('../dependencies');
 
       vi.mocked(runCommand).mockResolvedValue({ stdout: '60', stderr: '' });
 
@@ -84,9 +84,9 @@ describe('ffmpeg utils', () => {
 
     // Should call onProgress when time progress is reported
     it('should call onProgress when time progress is reported', async () => {
-      const { runCommand } = await import('../dependencies.js');
+      const { runCommand } = await import('../dependencies');
 
-      const { parseFFmpegProgress } = await import('../progress.js');
+      const { parseFFmpegProgress } = await import('../progress');
 
       vi.mocked(runCommand).mockImplementation(async (_cmd, onOutput) => {
         if (onOutput && _cmd.includes('ffmpeg')) {
@@ -112,9 +112,9 @@ describe('ffmpeg utils', () => {
 
     // Should not call onProgress when stdout data arrives
     it('should not call onProgress when stdout data arrives', async () => {
-      const { runCommand } = await import('../dependencies.js');
+      const { runCommand } = await import('../dependencies');
 
-      const { parseFFmpegProgress } = await import('../progress.js');
+      const { parseFFmpegProgress } = await import('../progress');
 
       vi.mocked(runCommand).mockImplementation(async (_cmd, onOutput) => {
         if (onOutput && _cmd.includes('ffmpeg')) {
@@ -136,9 +136,9 @@ describe('ffmpeg utils', () => {
 
     // Should not call onProgress when progress has no value
     it('should not call onProgress when progress has no value', async () => {
-      const { runCommand } = await import('../dependencies.js');
+      const { runCommand } = await import('../dependencies');
 
-      const { parseFFmpegProgress } = await import('../progress.js');
+      const { parseFFmpegProgress } = await import('../progress');
 
       vi.mocked(runCommand).mockImplementation(async (_cmd, onOutput) => {
         if (onOutput && _cmd.includes('ffmpeg')) {
@@ -160,9 +160,9 @@ describe('ffmpeg utils', () => {
 
     // Should not call onProgress when onProgress is null
     it('should not call onProgress when onProgress is null', async () => {
-      const { runCommand } = await import('../dependencies.js');
+      const { runCommand } = await import('../dependencies');
 
-      const { parseFFmpegProgress } = await import('../progress.js');
+      const { parseFFmpegProgress } = await import('../progress');
 
       vi.mocked(runCommand).mockImplementation(async (_cmd, onOutput) => {
         if (onOutput && _cmd.includes('ffmpeg')) {
@@ -183,7 +183,7 @@ describe('ffmpeg utils', () => {
   describe('compressVideo', () => {
     // Should call ffprobe then ffmpeg with crf value
     it('should call ffprobe then ffmpeg with crf value', async () => {
-      const { runCommand } = await import('../dependencies.js');
+      const { runCommand } = await import('../dependencies');
 
       vi.mocked(runCommand).mockResolvedValue({ stdout: '90', stderr: '' });
 
@@ -203,9 +203,9 @@ describe('ffmpeg utils', () => {
 
     // Should call onProgress with correct percentage
     it('should call onProgress with correct percentage', async () => {
-      const { runCommand } = await import('../dependencies.js');
+      const { runCommand } = await import('../dependencies');
 
-      const { parseFFmpegProgress } = await import('../progress.js');
+      const { parseFFmpegProgress } = await import('../progress');
 
       vi.mocked(runCommand).mockImplementation(async (_cmd, onOutput) => {
         if (onOutput && _cmd.includes('ffmpeg')) {
@@ -227,9 +227,9 @@ describe('ffmpeg utils', () => {
 
     // Should not call onProgress when progress type is not time
     it('should not call onProgress when progress type is not time', async () => {
-      const { runCommand } = await import('../dependencies.js');
+      const { runCommand } = await import('../dependencies');
 
-      const { parseFFmpegProgress } = await import('../progress.js');
+      const { parseFFmpegProgress } = await import('../progress');
 
       vi.mocked(runCommand).mockImplementation(async (_cmd, onOutput) => {
         if (onOutput && _cmd.includes('ffmpeg')) {
@@ -251,9 +251,9 @@ describe('ffmpeg utils', () => {
 
     // Should not call onProgress when progress has no value
     it('should not call onProgress when progress has no value', async () => {
-      const { runCommand } = await import('../dependencies.js');
+      const { runCommand } = await import('../dependencies');
 
-      const { parseFFmpegProgress } = await import('../progress.js');
+      const { parseFFmpegProgress } = await import('../progress');
 
       vi.mocked(runCommand).mockImplementation(async (_cmd, onOutput) => {
         if (onOutput && _cmd.includes('ffmpeg')) {
@@ -275,9 +275,9 @@ describe('ffmpeg utils', () => {
 
     // Should not call onProgress when totalTime is 0
     it('should not call onProgress when totalTime is 0', async () => {
-      const { runCommand } = await import('../dependencies.js');
+      const { runCommand } = await import('../dependencies');
 
-      const { parseFFmpegProgress } = await import('../progress.js');
+      const { parseFFmpegProgress } = await import('../progress');
 
       vi.mocked(runCommand).mockImplementation(async (_cmd, onOutput) => {
         if (onOutput && _cmd.includes('ffmpeg')) {
@@ -299,9 +299,9 @@ describe('ffmpeg utils', () => {
 
     // Should not call onProgress when onProgress is null
     it('should not call onProgress when onProgress is null', async () => {
-      const { runCommand } = await import('../dependencies.js');
+      const { runCommand } = await import('../dependencies');
 
-      const { parseFFmpegProgress } = await import('../progress.js');
+      const { parseFFmpegProgress } = await import('../progress');
 
       vi.mocked(runCommand).mockImplementation(async (_cmd, onOutput) => {
         if (onOutput && _cmd.includes('ffmpeg')) {
@@ -319,9 +319,9 @@ describe('ffmpeg utils', () => {
 
     // Should not call onProgress when output type is stdout
     it('should not call onProgress when output type is stdout', async () => {
-      const { runCommand } = await import('../dependencies.js');
+      const { runCommand } = await import('../dependencies');
 
-      const { parseFFmpegProgress } = await import('../progress.js');
+      const { parseFFmpegProgress } = await import('../progress');
 
       vi.mocked(runCommand).mockImplementation(async (_cmd, onOutput) => {
         if (onOutput && _cmd.includes('ffmpeg')) {
@@ -346,7 +346,7 @@ describe('ffmpeg utils', () => {
   describe('speedUpVideo', () => {
     // Should use atempo filter for rate in 0.5-2.0 range
     it('should use atempo filter for rate in 0.5-2.0 range', async () => {
-      const { runCommand } = await import('../dependencies.js');
+      const { runCommand } = await import('../dependencies');
 
       vi.mocked(runCommand).mockResolvedValue({ stdout: '60', stderr: '' });
 
@@ -360,7 +360,7 @@ describe('ffmpeg utils', () => {
 
     // Should chain atempo filters for rate > 2
     it('should chain atempo filters for rate > 2', async () => {
-      const { runCommand } = await import('../dependencies.js');
+      const { runCommand } = await import('../dependencies');
 
       vi.mocked(runCommand).mockResolvedValue({ stdout: '60', stderr: '' });
 
@@ -374,7 +374,7 @@ describe('ffmpeg utils', () => {
 
     // Should chain atempo filters for rate > 2 with exact factors
     it('should chain atempo filters for rate > 2 with exact factors', async () => {
-      const { runCommand } = await import('../dependencies.js');
+      const { runCommand } = await import('../dependencies');
 
       vi.mocked(runCommand).mockResolvedValue({ stdout: '60', stderr: '' });
 
@@ -390,7 +390,7 @@ describe('ffmpeg utils', () => {
 
     // Should chain atempo filters for rate < 0.5
     it('should chain atempo filters for rate < 0.5', async () => {
-      const { runCommand } = await import('../dependencies.js');
+      const { runCommand } = await import('../dependencies');
 
       vi.mocked(runCommand).mockResolvedValue({ stdout: '60', stderr: '' });
 
@@ -404,7 +404,7 @@ describe('ffmpeg utils', () => {
 
     // Should chain atempo filters for rate < 0.5 with exact factors
     it('should chain atempo filters for rate < 0.5 with exact factors', async () => {
-      const { runCommand } = await import('../dependencies.js');
+      const { runCommand } = await import('../dependencies');
 
       vi.mocked(runCommand).mockResolvedValue({ stdout: '60', stderr: '' });
 
@@ -420,9 +420,9 @@ describe('ffmpeg utils', () => {
 
     // Should call onProgress when rate < 0.5 and time progress reported
     it('should call onProgress when rate < 0.5 and time progress reported', async () => {
-      const { runCommand } = await import('../dependencies.js');
+      const { runCommand } = await import('../dependencies');
 
-      const { parseFFmpegProgress } = await import('../progress.js');
+      const { parseFFmpegProgress } = await import('../progress');
 
       vi.mocked(runCommand).mockImplementation(async (_cmd, onOutput) => {
         if (onOutput && _cmd.includes('ffmpeg')) {
@@ -444,9 +444,9 @@ describe('ffmpeg utils', () => {
 
     // Should call onProgress when rate > 2 and time progress reported
     it('should call onProgress when rate > 2 and time progress reported', async () => {
-      const { runCommand } = await import('../dependencies.js');
+      const { runCommand } = await import('../dependencies');
 
-      const { parseFFmpegProgress } = await import('../progress.js');
+      const { parseFFmpegProgress } = await import('../progress');
 
       vi.mocked(runCommand).mockImplementation(async (_cmd, onOutput) => {
         if (onOutput && _cmd.includes('ffmpeg')) {
@@ -468,7 +468,7 @@ describe('ffmpeg utils', () => {
 
     // Should use setpts filter for video speed
     it('should use setpts filter for video speed', async () => {
-      const { runCommand } = await import('../dependencies.js');
+      const { runCommand } = await import('../dependencies');
 
       vi.mocked(runCommand).mockResolvedValue({ stdout: '60', stderr: '' });
 
@@ -482,9 +482,9 @@ describe('ffmpeg utils', () => {
 
     // Should call onProgress with correct percentage
     it('should call onProgress with correct percentage', async () => {
-      const { runCommand } = await import('../dependencies.js');
+      const { runCommand } = await import('../dependencies');
 
-      const { parseFFmpegProgress } = await import('../progress.js');
+      const { parseFFmpegProgress } = await import('../progress');
 
       vi.mocked(runCommand).mockImplementation(async (_cmd, onOutput) => {
         if (onOutput && _cmd.includes('ffmpeg')) {
@@ -506,9 +506,9 @@ describe('ffmpeg utils', () => {
 
     // Should not call onProgress when progress type is not time
     it('should not call onProgress when progress type is not time', async () => {
-      const { runCommand } = await import('../dependencies.js');
+      const { runCommand } = await import('../dependencies');
 
-      const { parseFFmpegProgress } = await import('../progress.js');
+      const { parseFFmpegProgress } = await import('../progress');
 
       vi.mocked(runCommand).mockImplementation(async (_cmd, onOutput) => {
         if (onOutput && _cmd.includes('ffmpeg')) {
@@ -530,9 +530,9 @@ describe('ffmpeg utils', () => {
 
     // Should not call onProgress when progress has no value
     it('should not call onProgress when progress has no value', async () => {
-      const { runCommand } = await import('../dependencies.js');
+      const { runCommand } = await import('../dependencies');
 
-      const { parseFFmpegProgress } = await import('../progress.js');
+      const { parseFFmpegProgress } = await import('../progress');
 
       vi.mocked(runCommand).mockImplementation(async (_cmd, onOutput) => {
         if (onOutput && _cmd.includes('ffmpeg')) {
@@ -554,9 +554,9 @@ describe('ffmpeg utils', () => {
 
     // Should not call onProgress when totalTime is 0
     it('should not call onProgress when totalTime is 0', async () => {
-      const { runCommand } = await import('../dependencies.js');
+      const { runCommand } = await import('../dependencies');
 
-      const { parseFFmpegProgress } = await import('../progress.js');
+      const { parseFFmpegProgress } = await import('../progress');
 
       vi.mocked(runCommand).mockImplementation(async (_cmd, onOutput) => {
         if (onOutput && _cmd.includes('ffmpeg')) {
@@ -578,9 +578,9 @@ describe('ffmpeg utils', () => {
 
     // Should not call onProgress when onProgress is null
     it('should not call onProgress when onProgress is null', async () => {
-      const { runCommand } = await import('../dependencies.js');
+      const { runCommand } = await import('../dependencies');
 
-      const { parseFFmpegProgress } = await import('../progress.js');
+      const { parseFFmpegProgress } = await import('../progress');
 
       vi.mocked(runCommand).mockImplementation(async (_cmd, onOutput) => {
         if (onOutput && _cmd.includes('ffmpeg')) {
@@ -598,9 +598,9 @@ describe('ffmpeg utils', () => {
 
     // Should not call onProgress when output type is stdout
     it('should not call onProgress when output type is stdout', async () => {
-      const { runCommand } = await import('../dependencies.js');
+      const { runCommand } = await import('../dependencies');
 
-      const { parseFFmpegProgress } = await import('../progress.js');
+      const { parseFFmpegProgress } = await import('../progress');
 
       vi.mocked(runCommand).mockImplementation(async (_cmd, onOutput) => {
         if (onOutput && _cmd.includes('ffmpeg')) {
@@ -625,7 +625,7 @@ describe('ffmpeg utils', () => {
   describe('extractAudio', () => {
     // Should extract mp3 with libmp3lame codec
     it('should extract mp3 with libmp3lame codec', async () => {
-      const { runCommand } = await import('../dependencies.js');
+      const { runCommand } = await import('../dependencies');
 
       vi.mocked(runCommand).mockResolvedValue({ stdout: '120', stderr: '' });
 
@@ -645,7 +645,7 @@ describe('ffmpeg utils', () => {
 
     // Should extract wav with pcm_s16le codec
     it('should extract wav with pcm_s16le codec', async () => {
-      const { runCommand } = await import('../dependencies.js');
+      const { runCommand } = await import('../dependencies');
 
       vi.mocked(runCommand).mockResolvedValue({ stdout: '120', stderr: '' });
 
@@ -662,7 +662,7 @@ describe('ffmpeg utils', () => {
 
     // Should extract aac with adts format
     it('should extract aac with adts format', async () => {
-      const { runCommand } = await import('../dependencies.js');
+      const { runCommand } = await import('../dependencies');
 
       vi.mocked(runCommand).mockResolvedValue({ stdout: '120', stderr: '' });
 
@@ -679,7 +679,7 @@ describe('ffmpeg utils', () => {
 
     // Should use default format mp3 and bitrate 192k
     it('should use default format mp3 and bitrate 192k', async () => {
-      const { runCommand } = await import('../dependencies.js');
+      const { runCommand } = await import('../dependencies');
 
       vi.mocked(runCommand).mockResolvedValue({ stdout: '120', stderr: '' });
 

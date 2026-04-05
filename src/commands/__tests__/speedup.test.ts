@@ -1,22 +1,32 @@
 import { Command } from 'commander';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-import { setupSpeedup, speedupAction } from '../speedup.js';
+import { setupSpeedup, speedupAction } from '../speedup';
 
-vi.mock('../../utils/dependencies.js', () => ({ checkDependencies: vi.fn(), runCommand: vi.fn() }));
+vi.mock('../../utils/dependencies', () => {
+  const mockCheckDependencies = vi.fn();
+  const mockEnsureDependencies = vi.fn(async () => {
+    const deps = await mockCheckDependencies();
+    if (!deps.ok) {
+      process.exit(1);
+    }
+    return true;
+  });
+  return { checkDependencies: mockCheckDependencies, ensureDependencies: mockEnsureDependencies, runCommand: vi.fn() };
+});
 
-vi.mock('../../utils/ffmpeg.js', () => ({ speedUpVideo: vi.fn(), getVideoDuration: vi.fn(() => Promise.resolve(60)) }));
+vi.mock('../../utils/ffmpeg', () => ({ speedUpVideo: vi.fn(), getVideoDuration: vi.fn(() => Promise.resolve(60)) }));
 
-vi.mock('../../utils/validations.js', () => ({ validateFileExists: vi.fn(), validateSpeedRate: vi.fn() }));
+vi.mock('../../utils/validations', () => ({ validateFileExists: vi.fn(), validateSpeedRate: vi.fn() }));
 
-vi.mock('../../utils/progress.js', () => ({
+vi.mock('../../utils/progress', () => ({
   createProgressBar: vi.fn(),
   formatFileSize: vi.fn(() => ({ value: 100, unit: 'MB' })),
 }));
 
 vi.mock('fs/promises', () => ({ access: vi.fn().mockRejectedValue(new Error('File not found')) }));
 
-vi.mock('../../utils/prompt.js', () => ({
+vi.mock('../../utils/prompt', () => ({
   checkAndPromptOverwrite: vi.fn().mockResolvedValue(true),
   promptOverwrite: vi.fn().mockResolvedValue(true),
 }));
@@ -62,7 +72,7 @@ describe('speedup command', () => {
   describe('speedupAction', () => {
     // Should should exit when dependencies missing
     it('should exit when dependencies missing', async () => {
-      const { checkDependencies } = await import('../../utils/dependencies.js');
+      const { checkDependencies } = await import('../../utils/dependencies');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: false, missing: ['ffmpeg'] });
 
@@ -76,10 +86,10 @@ describe('speedup command', () => {
 
     // Should should speed up video with default rate
     it('should speed up video with default rate', async () => {
-      const { checkDependencies } = await import('../../utils/dependencies.js');
-      const { validateFileExists, validateSpeedRate } = await import('../../utils/validations.js');
-      const { speedUpVideo } = await import('../../utils/ffmpeg.js');
-      const { createProgressBar } = await import('../../utils/progress.js');
+      const { checkDependencies } = await import('../../utils/dependencies');
+      const { validateFileExists, validateSpeedRate } = await import('../../utils/validations');
+      const { speedUpVideo } = await import('../../utils/ffmpeg');
+      const { createProgressBar } = await import('../../utils/progress');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateFileExists).mockResolvedValue(undefined);
@@ -95,10 +105,10 @@ describe('speedup command', () => {
 
     // Should should use provided output option
     it('should use provided output option', async () => {
-      const { checkDependencies } = await import('../../utils/dependencies.js');
-      const { validateFileExists, validateSpeedRate } = await import('../../utils/validations.js');
-      const { speedUpVideo } = await import('../../utils/ffmpeg.js');
-      const { createProgressBar } = await import('../../utils/progress.js');
+      const { checkDependencies } = await import('../../utils/dependencies');
+      const { validateFileExists, validateSpeedRate } = await import('../../utils/validations');
+      const { speedUpVideo } = await import('../../utils/ffmpeg');
+      const { createProgressBar } = await import('../../utils/progress');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateFileExists).mockResolvedValue(undefined);
@@ -115,10 +125,10 @@ describe('speedup command', () => {
 
     // Should should invoke progressCallback
     it('should invoke progressCallback', async () => {
-      const { checkDependencies } = await import('../../utils/dependencies.js');
-      const { validateFileExists, validateSpeedRate } = await import('../../utils/validations.js');
-      const { speedUpVideo } = await import('../../utils/ffmpeg.js');
-      const { createProgressBar } = await import('../../utils/progress.js');
+      const { checkDependencies } = await import('../../utils/dependencies');
+      const { validateFileExists, validateSpeedRate } = await import('../../utils/validations');
+      const { speedUpVideo } = await import('../../utils/ffmpeg');
+      const { createProgressBar } = await import('../../utils/progress');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateFileExists).mockResolvedValue(undefined);
@@ -136,10 +146,10 @@ describe('speedup command', () => {
 
     // Should should not update progress bar when percentage is 0
     it('should not update progress bar when percentage is 0', async () => {
-      const { checkDependencies } = await import('../../utils/dependencies.js');
-      const { validateFileExists, validateSpeedRate } = await import('../../utils/validations.js');
-      const { speedUpVideo } = await import('../../utils/ffmpeg.js');
-      const { createProgressBar } = await import('../../utils/progress.js');
+      const { checkDependencies } = await import('../../utils/dependencies');
+      const { validateFileExists, validateSpeedRate } = await import('../../utils/validations');
+      const { speedUpVideo } = await import('../../utils/ffmpeg');
+      const { createProgressBar } = await import('../../utils/progress');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateFileExists).mockResolvedValue(undefined);
@@ -157,10 +167,10 @@ describe('speedup command', () => {
 
     // Should should not log faster or slower when rate is 1
     it('should not log faster or slower when rate is 1', async () => {
-      const { checkDependencies } = await import('../../utils/dependencies.js');
-      const { validateFileExists, validateSpeedRate } = await import('../../utils/validations.js');
-      const { speedUpVideo } = await import('../../utils/ffmpeg.js');
-      const { createProgressBar } = await import('../../utils/progress.js');
+      const { checkDependencies } = await import('../../utils/dependencies');
+      const { validateFileExists, validateSpeedRate } = await import('../../utils/validations');
+      const { speedUpVideo } = await import('../../utils/ffmpeg');
+      const { createProgressBar } = await import('../../utils/progress');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateFileExists).mockResolvedValue(undefined);
@@ -179,8 +189,8 @@ describe('speedup command', () => {
 
     // Should should handle errors and exit 1
     it('should handle errors and exit 1', async () => {
-      const { checkDependencies } = await import('../../utils/dependencies.js');
-      const { validateFileExists } = await import('../../utils/validations.js');
+      const { checkDependencies } = await import('../../utils/dependencies');
+      const { validateFileExists } = await import('../../utils/validations');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateFileExists).mockRejectedValue(new Error('File not found'));
@@ -195,8 +205,8 @@ describe('speedup command', () => {
 
     // Should should handle non-Error thrown values
     it('should handle non-Error thrown values', async () => {
-      const { checkDependencies } = await import('../../utils/dependencies.js');
-      const { validateFileExists } = await import('../../utils/validations.js');
+      const { checkDependencies } = await import('../../utils/dependencies');
+      const { validateFileExists } = await import('../../utils/validations');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateFileExists).mockRejectedValue('string error');
@@ -211,8 +221,8 @@ describe('speedup command', () => {
 
     // Should should exit when validateSpeedRate throws error
     it('should exit when validateSpeedRate throws error', async () => {
-      const { checkDependencies } = await import('../../utils/dependencies.js');
-      const { validateFileExists, validateSpeedRate } = await import('../../utils/validations.js');
+      const { checkDependencies } = await import('../../utils/dependencies');
+      const { validateFileExists, validateSpeedRate } = await import('../../utils/validations');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateFileExists).mockResolvedValue(undefined);
@@ -230,10 +240,10 @@ describe('speedup command', () => {
 
     // Should should handle speedUpVideo errors and exit 1
     it('should handle speedUpVideo errors and exit 1', async () => {
-      const { checkDependencies } = await import('../../utils/dependencies.js');
-      const { validateFileExists, validateSpeedRate } = await import('../../utils/validations.js');
-      const { speedUpVideo } = await import('../../utils/ffmpeg.js');
-      const { createProgressBar } = await import('../../utils/progress.js');
+      const { checkDependencies } = await import('../../utils/dependencies');
+      const { validateFileExists, validateSpeedRate } = await import('../../utils/validations');
+      const { speedUpVideo } = await import('../../utils/ffmpeg');
+      const { createProgressBar } = await import('../../utils/progress');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateFileExists).mockResolvedValue(undefined);
@@ -252,7 +262,7 @@ describe('speedup command', () => {
 
     // Should should handle non-Error thrown values in outer catch
     it('should handle non-Error thrown values in outer catch', async () => {
-      const { checkDependencies } = await import('../../utils/dependencies.js');
+      const { checkDependencies } = await import('../../utils/dependencies');
 
       vi.mocked(checkDependencies).mockRejectedValue('unknown error');
 

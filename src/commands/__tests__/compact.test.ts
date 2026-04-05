@@ -1,31 +1,41 @@
 import { Command } from 'commander';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-import { compactVideo, compactVideoCRF } from '../../utils/compact.js';
-import { checkDependencies } from '../../utils/dependencies.js';
-import { getVideoDuration } from '../../utils/ffmpeg.js';
-import { createProgressBar } from '../../utils/progress.js';
-import { checkAndPromptOverwrite } from '../../utils/prompt.js';
-import { validateFileExists } from '../../utils/validations.js';
-import { setupCompact, compactAction } from '../compact.js';
+import { compactVideo, compactVideoCRF } from '../../utils/compact';
+import { checkDependencies } from '../../utils/dependencies';
+import { getVideoDuration } from '../../utils/ffmpeg';
+import { createProgressBar } from '../../utils/progress';
+import { checkAndPromptOverwrite } from '../../utils/prompt';
+import { validateFileExists } from '../../utils/validations';
+import { setupCompact, compactAction } from '../compact';
 
-vi.mock('../../utils/dependencies.js', () => ({ checkDependencies: vi.fn(), runCommand: vi.fn() }));
+vi.mock('../../utils/dependencies', () => {
+  const mockCheckDependencies = vi.fn();
+  const mockEnsureDependencies = vi.fn(async () => {
+    const deps = await mockCheckDependencies();
+    if (!deps.ok) {
+      process.exit(1);
+    }
+    return true;
+  });
+  return { checkDependencies: mockCheckDependencies, ensureDependencies: mockEnsureDependencies, runCommand: vi.fn() };
+});
 
-vi.mock('../../utils/prompt.js', () => ({
+vi.mock('../../utils/prompt', () => ({
   checkAndPromptOverwrite: vi.fn().mockResolvedValue(true),
   promptOverwrite: vi.fn().mockResolvedValue(true),
 }));
 
-vi.mock('../../utils/progress.js', () => ({
+vi.mock('../../utils/progress', () => ({
   createProgressBar: vi.fn(),
   formatFileSize: vi.fn(() => ({ value: 100, unit: 'MB' })),
 }));
 
-vi.mock('../../utils/validations.js', () => ({ validateFileExists: vi.fn() }));
+vi.mock('../../utils/validations', () => ({ validateFileExists: vi.fn() }));
 
-vi.mock('../../utils/ffmpeg.js', () => ({ getVideoDuration: vi.fn() }));
+vi.mock('../../utils/ffmpeg', () => ({ getVideoDuration: vi.fn() }));
 
-vi.mock('../../utils/compact.js', () => ({
+vi.mock('../../utils/compact', () => ({
   compactVideo: vi.fn(),
   compactVideoCRF: vi.fn(),
   getCRFForQuality: vi.fn((q: string) => ({ low: 28, medium: 23, high: 18, lossless: 0 })[q] ?? 23),

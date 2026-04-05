@@ -1,13 +1,23 @@
 import { Command } from 'commander';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-import { setupAudio, audioAction } from '../audio.js';
+import { setupAudio, audioAction } from '../audio';
 
-vi.mock('../../utils/dependencies.js', () => ({ checkDependencies: vi.fn(), runCommand: vi.fn() }));
+vi.mock('../../utils/dependencies', () => {
+  const mockCheckDependencies = vi.fn();
+  const mockEnsureDependencies = vi.fn(async () => {
+    const deps = await mockCheckDependencies();
+    if (!deps.ok) {
+      process.exit(1);
+    }
+    return true;
+  });
+  return { checkDependencies: mockCheckDependencies, ensureDependencies: mockEnsureDependencies, runCommand: vi.fn() };
+});
 
-vi.mock('../../utils/ffmpeg.js', () => ({ extractAudio: vi.fn() }));
+vi.mock('../../utils/ffmpeg', () => ({ extractAudio: vi.fn() }));
 
-vi.mock('../../utils/validations.js', () => ({
+vi.mock('../../utils/validations', () => ({
   validateFileExists: vi.fn(),
   validateFormat: vi.fn(),
   validateBitrate: vi.fn(),
@@ -15,7 +25,7 @@ vi.mock('../../utils/validations.js', () => ({
 
 vi.mock('fs/promises', () => ({ access: vi.fn().mockRejectedValue(new Error('File not found')) }));
 
-vi.mock('../../utils/prompt.js', () => ({
+vi.mock('../../utils/prompt', () => ({
   checkAndPromptOverwrite: vi.fn().mockResolvedValue(true),
   promptOverwrite: vi.fn().mockResolvedValue(true),
 }));
@@ -67,7 +77,7 @@ describe('audio command', () => {
   describe('audioAction', () => {
     // Should should exit when dependencies missing
     it('should exit when dependencies missing', async () => {
-      const { checkDependencies } = await import('../../utils/dependencies.js');
+      const { checkDependencies } = await import('../../utils/dependencies');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: false, missing: ['ffmpeg'] });
 
@@ -81,9 +91,9 @@ describe('audio command', () => {
 
     // Should should extract audio with defaults
     it('should extract audio with defaults', async () => {
-      const { checkDependencies } = await import('../../utils/dependencies.js');
-      const { validateFileExists, validateFormat, validateBitrate } = await import('../../utils/validations.js');
-      const { extractAudio } = await import('../../utils/ffmpeg.js');
+      const { checkDependencies } = await import('../../utils/dependencies');
+      const { validateFileExists, validateFormat, validateBitrate } = await import('../../utils/validations');
+      const { extractAudio } = await import('../../utils/ffmpeg');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateFileExists).mockResolvedValue(undefined);
@@ -99,9 +109,9 @@ describe('audio command', () => {
 
     // Should should use provided output, format and bitrate
     it('should use provided output, format and bitrate', async () => {
-      const { checkDependencies } = await import('../../utils/dependencies.js');
-      const { validateFileExists, validateFormat, validateBitrate } = await import('../../utils/validations.js');
-      const { extractAudio } = await import('../../utils/ffmpeg.js');
+      const { checkDependencies } = await import('../../utils/dependencies');
+      const { validateFileExists, validateFormat, validateBitrate } = await import('../../utils/validations');
+      const { extractAudio } = await import('../../utils/ffmpeg');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateFileExists).mockResolvedValue(undefined);
@@ -120,8 +130,8 @@ describe('audio command', () => {
 
     // Should should handle errors and exit 1
     it('should handle errors and exit 1', async () => {
-      const { checkDependencies } = await import('../../utils/dependencies.js');
-      const { validateFileExists } = await import('../../utils/validations.js');
+      const { checkDependencies } = await import('../../utils/dependencies');
+      const { validateFileExists } = await import('../../utils/validations');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateFileExists).mockRejectedValue(new Error('File not found'));
@@ -136,8 +146,8 @@ describe('audio command', () => {
 
     // Should should handle non-Error thrown values
     it('should handle non-Error thrown values', async () => {
-      const { checkDependencies } = await import('../../utils/dependencies.js');
-      const { validateFileExists } = await import('../../utils/validations.js');
+      const { checkDependencies } = await import('../../utils/dependencies');
+      const { validateFileExists } = await import('../../utils/validations');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateFileExists).mockRejectedValue('string error');
@@ -152,8 +162,8 @@ describe('audio command', () => {
 
     // Should should exit when validateBitrate throws error
     it('should exit when validateBitrate throws error', async () => {
-      const { checkDependencies } = await import('../../utils/dependencies.js');
-      const { validateFileExists, validateBitrate } = await import('../../utils/validations.js');
+      const { checkDependencies } = await import('../../utils/dependencies');
+      const { validateFileExists, validateBitrate } = await import('../../utils/validations');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateFileExists).mockResolvedValue(undefined);
@@ -171,9 +181,9 @@ describe('audio command', () => {
 
     // Should should handle extractAudio errors and exit 1
     it('should handle extractAudio errors and exit 1', async () => {
-      const { checkDependencies } = await import('../../utils/dependencies.js');
-      const { validateFileExists, validateFormat, validateBitrate } = await import('../../utils/validations.js');
-      const { extractAudio } = await import('../../utils/ffmpeg.js');
+      const { checkDependencies } = await import('../../utils/dependencies');
+      const { validateFileExists, validateFormat, validateBitrate } = await import('../../utils/validations');
+      const { extractAudio } = await import('../../utils/ffmpeg');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateFileExists).mockResolvedValue(undefined);
@@ -191,8 +201,8 @@ describe('audio command', () => {
 
     // Should should exit when validateFormat throws error
     it('should exit when validateFormat throws error', async () => {
-      const { checkDependencies } = await import('../../utils/dependencies.js');
-      const { validateFileExists, validateFormat } = await import('../../utils/validations.js');
+      const { checkDependencies } = await import('../../utils/dependencies');
+      const { validateFileExists, validateFormat } = await import('../../utils/validations');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateFileExists).mockResolvedValue(undefined);
@@ -210,7 +220,7 @@ describe('audio command', () => {
 
     // Should should handle non-Error thrown values in outer catch
     it('should handle non-Error thrown values in outer catch', async () => {
-      const { checkDependencies } = await import('../../utils/dependencies.js');
+      const { checkDependencies } = await import('../../utils/dependencies');
 
       vi.mocked(checkDependencies).mockRejectedValue('unknown error');
 

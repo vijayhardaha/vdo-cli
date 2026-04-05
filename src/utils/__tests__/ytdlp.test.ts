@@ -1,12 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-import { downloadVideo, getVideoInfo, generateFilename } from '../ytdlp.js';
+import { downloadVideo, getVideoInfo, generateFilename } from '../ytdlp';
 
-vi.mock('../dependencies.js', () => ({ runCommand: vi.fn() }));
+vi.mock('../dependencies', () => ({ runCommand: vi.fn() }));
 
-vi.mock('../progress.js', () => ({ parseYtDlpProgress: vi.fn() }));
+vi.mock('../progress', () => ({ parseYtDlpProgress: vi.fn() }));
 
-vi.mock('../sanitize.js', () => ({ sanitizeFilename: vi.fn((name) => name) }));
+vi.mock('../sanitize', () => ({ sanitizeFilename: vi.fn((name) => name) }));
 
 // Tests for ytdlp utilities
 describe('ytdlp utils', () => {
@@ -18,7 +18,7 @@ describe('ytdlp utils', () => {
   describe('downloadVideo', () => {
     // Should build mp4 download command
     it('should build mp4 download command', async () => {
-      const { runCommand } = await import('../dependencies.js');
+      const { runCommand } = await import('../dependencies');
 
       vi.mocked(runCommand).mockResolvedValue({ stdout: '', stderr: '' });
 
@@ -35,7 +35,7 @@ describe('ytdlp utils', () => {
 
     // Should build webm download command
     it('should build webm download command', async () => {
-      const { runCommand } = await import('../dependencies.js');
+      const { runCommand } = await import('../dependencies');
 
       vi.mocked(runCommand).mockResolvedValue({ stdout: '', stderr: '' });
 
@@ -52,7 +52,7 @@ describe('ytdlp utils', () => {
 
     // Should build mp3 extract-audio command
     it('should build mp3 extract-audio command', async () => {
-      const { runCommand } = await import('../dependencies.js');
+      const { runCommand } = await import('../dependencies');
 
       vi.mocked(runCommand).mockResolvedValue({ stdout: '', stderr: '' });
 
@@ -69,7 +69,7 @@ describe('ytdlp utils', () => {
 
     // Should fall back to mp4 for unknown format
     it('should fall back to mp4 for unknown format', async () => {
-      const { runCommand } = await import('../dependencies.js');
+      const { runCommand } = await import('../dependencies');
 
       vi.mocked(runCommand).mockResolvedValue({ stdout: '', stderr: '' });
 
@@ -83,9 +83,9 @@ describe('ytdlp utils', () => {
 
     // Should call onProgress when download progress parsed
     it('should call onProgress when download progress parsed', async () => {
-      const { runCommand } = await import('../dependencies.js');
+      const { runCommand } = await import('../dependencies');
 
-      const { parseYtDlpProgress } = await import('../progress.js');
+      const { parseYtDlpProgress } = await import('../progress');
 
       vi.mocked(runCommand).mockImplementation(async (_cmd, onOutput) => {
         if (onOutput) {
@@ -109,9 +109,9 @@ describe('ytdlp utils', () => {
 
     // Should call onProgress when stderr data contains progress
     it('should call onProgress when stderr data contains progress', async () => {
-      const { runCommand } = await import('../dependencies.js');
+      const { runCommand } = await import('../dependencies');
 
-      const { parseYtDlpProgress } = await import('../progress.js');
+      const { parseYtDlpProgress } = await import('../progress');
 
       vi.mocked(runCommand).mockImplementation(async (_cmd, onOutput) => {
         if (onOutput) {
@@ -133,9 +133,9 @@ describe('ytdlp utils', () => {
 
     // Should not call onProgress when progress type is not download
     it('should not call onProgress when progress type is not download', async () => {
-      const { runCommand } = await import('../dependencies.js');
+      const { runCommand } = await import('../dependencies');
 
-      const { parseYtDlpProgress } = await import('../progress.js');
+      const { parseYtDlpProgress } = await import('../progress');
 
       vi.mocked(runCommand).mockImplementation(async (_cmd, onOutput) => {
         if (onOutput) onOutput('[download] Destination: file.mp4', 'stdout');
@@ -155,9 +155,9 @@ describe('ytdlp utils', () => {
 
     // Should not call onProgress when parseYtDlpProgress returns null
     it('should not call onProgress when parseYtDlpProgress returns null', async () => {
-      const { runCommand } = await import('../dependencies.js');
+      const { runCommand } = await import('../dependencies');
 
-      const { parseYtDlpProgress } = await import('../progress.js');
+      const { parseYtDlpProgress } = await import('../progress');
 
       vi.mocked(runCommand).mockImplementation(async (_cmd, onOutput) => {
         if (onOutput) onOutput('some other line', 'stdout');
@@ -177,9 +177,9 @@ describe('ytdlp utils', () => {
 
     // Should use default values for undefined percentage, size, or unit
     it('should use default values for undefined percentage, size, or unit', async () => {
-      const { runCommand } = await import('../dependencies.js');
+      const { runCommand } = await import('../dependencies');
 
-      const { parseYtDlpProgress } = await import('../progress.js');
+      const { parseYtDlpProgress } = await import('../progress');
 
       vi.mocked(runCommand).mockImplementation(async (_cmd, onOutput) => {
         if (onOutput) onOutput('[download] data', 'stdout');
@@ -204,7 +204,7 @@ describe('ytdlp utils', () => {
 
     // Should use default format mp4 when not specified
     it('should use default format mp4 when not specified', async () => {
-      const { runCommand } = await import('../dependencies.js');
+      const { runCommand } = await import('../dependencies');
 
       vi.mocked(runCommand).mockResolvedValue({ stdout: '', stderr: '' });
 
@@ -218,9 +218,9 @@ describe('ytdlp utils', () => {
 
     // Should work with null onProgress callback
     it('should work with null onProgress callback', async () => {
-      const { runCommand } = await import('../dependencies.js');
+      const { runCommand } = await import('../dependencies');
 
-      const { parseYtDlpProgress } = await import('../progress.js');
+      const { parseYtDlpProgress } = await import('../progress');
 
       vi.mocked(runCommand).mockImplementation(async (_cmd, onOutput) => {
         if (onOutput) onOutput('[download] 50.0% of 100MiB', 'stdout');
@@ -239,7 +239,7 @@ describe('ytdlp utils', () => {
   describe('getVideoInfo', () => {
     // Should return title, video_id, and ext from yt-dlp
     it('should return title, video_id, and ext from yt-dlp', async () => {
-      const { runCommand } = await import('../dependencies.js');
+      const { runCommand } = await import('../dependencies');
 
       const videoData = { title: 'Test Video', id: 'abc123', display_id: 'abc123', ext: 'mp4' };
 
@@ -253,7 +253,7 @@ describe('ytdlp utils', () => {
 
     // Should use display_id when available
     it('should use display_id when available', async () => {
-      const { runCommand } = await import('../dependencies.js');
+      const { runCommand } = await import('../dependencies');
 
       const videoData = { title: 'Test', id: 'id123', display_id: 'display456', ext: 'webm' };
 
@@ -267,7 +267,7 @@ describe('ytdlp utils', () => {
 
     // Should use id when display_id not available
     it('should use id when display_id not available', async () => {
-      const { runCommand } = await import('../dependencies.js');
+      const { runCommand } = await import('../dependencies');
 
       const videoData = { title: 'Test', id: 'id123', ext: 'mkv' };
 
@@ -281,7 +281,7 @@ describe('ytdlp utils', () => {
 
     // Should use unknown when both display_id and id are missing
     it('should use unknown when both display_id and id are missing', async () => {
-      const { runCommand } = await import('../dependencies.js');
+      const { runCommand } = await import('../dependencies');
 
       const videoData = { title: 'Test', ext: 'mp4' };
 
@@ -295,9 +295,9 @@ describe('ytdlp utils', () => {
 
     // Should use untitled when title is missing
     it('should use untitled when title is missing', async () => {
-      const { runCommand } = await import('../dependencies.js');
+      const { runCommand } = await import('../dependencies');
 
-      const { sanitizeFilename } = await import('../sanitize.js');
+      const { sanitizeFilename } = await import('../sanitize');
 
       vi.mocked(sanitizeFilename).mockReturnValue('untitled');
 
@@ -313,7 +313,7 @@ describe('ytdlp utils', () => {
 
     // Should default to mp4 when ext not provided
     it('should default to mp4 when ext not provided', async () => {
-      const { runCommand } = await import('../dependencies.js');
+      const { runCommand } = await import('../dependencies');
 
       const videoData = { title: 'Test', id: 'abc' };
 
@@ -327,7 +327,7 @@ describe('ytdlp utils', () => {
 
     // Should throw when JSON parsing fails
     it('should throw when JSON parsing fails', async () => {
-      const { runCommand } = await import('../dependencies.js');
+      const { runCommand } = await import('../dependencies');
 
       vi.mocked(runCommand).mockResolvedValue({ stdout: 'invalid json', stderr: '' });
 

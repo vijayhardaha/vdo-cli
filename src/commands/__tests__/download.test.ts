@@ -1,33 +1,43 @@
 import { Command } from 'commander';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-import { setupDownload, downloadAction } from '../download.js';
+import { setupDownload, downloadAction } from '../download';
 
-vi.mock('../../utils/dependencies.js', () => ({ checkDependencies: vi.fn(), runCommand: vi.fn() }));
+vi.mock('../../utils/dependencies', () => {
+  const mockCheckDependencies = vi.fn();
+  const mockEnsureDependencies = vi.fn(async () => {
+    const deps = await mockCheckDependencies();
+    if (!deps.ok) {
+      process.exit(1);
+    }
+    return true;
+  });
+  return { checkDependencies: mockCheckDependencies, ensureDependencies: mockEnsureDependencies, runCommand: vi.fn() };
+});
 
-vi.mock('../../utils/ytdlp.js', () => ({
+vi.mock('../../utils/ytdlp', () => ({
   downloadVideo: vi.fn(),
   getVideoInfo: vi.fn(),
   generateFilename: vi.fn((info, format) => `${info.title}_${info.video_id}.${format}`),
 }));
 
-vi.mock('../../utils/progress.js', () => ({
+vi.mock('../../utils/progress', () => ({
   createProgressBar: vi.fn(),
   formatFileSize: vi.fn(() => ({ value: 100, unit: 'MB' })),
 }));
 
-vi.mock('../../utils/validations.js', () => ({ validateUrl: vi.fn(), validateFormat: vi.fn() }));
+vi.mock('../../utils/validations', () => ({ validateUrl: vi.fn(), validateFormat: vi.fn() }));
 
-vi.mock('../../utils/prompt.js', () => ({
+vi.mock('../../utils/prompt', () => ({
   checkAndPromptOverwrite: vi.fn().mockResolvedValue(true),
   promptOverwrite: vi.fn().mockResolvedValue(true),
 }));
 
-vi.mock('../../utils/ffmpeg.js', () => ({ convertVideo: vi.fn() }));
+vi.mock('../../utils/ffmpeg', () => ({ convertVideo: vi.fn() }));
 
-vi.mock('../../utils/split.js', () => ({ parseSplitValue: vi.fn() }));
+vi.mock('../../utils/split', () => ({ parseSplitValue: vi.fn() }));
 
-vi.mock('../split.js', () => ({ splitAction: vi.fn(), parseSplitValue: vi.fn() }));
+vi.mock('../split', () => ({ splitAction: vi.fn(), parseSplitValue: vi.fn() }));
 
 vi.mock('fs/promises', () => ({
   access: vi.fn().mockRejectedValue(new Error('File not found')),
@@ -104,7 +114,7 @@ describe('download command', () => {
   describe('downloadAction', () => {
     // Should should exit with error when dependencies missing
     it('should exit with error when dependencies missing', async () => {
-      const { checkDependencies } = await import('../../utils/dependencies.js');
+      const { checkDependencies } = await import('../../utils/dependencies');
       vi.mocked(checkDependencies).mockResolvedValue({ ok: false, missing: ['ffmpeg'] });
       const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
 
@@ -116,8 +126,8 @@ describe('download command', () => {
 
     // Should should exit with error when URL is invalid
     it('should exit with error when URL is invalid', async () => {
-      const { checkDependencies } = await import('../../utils/dependencies.js');
-      const { validateUrl } = await import('../../utils/validations.js');
+      const { checkDependencies } = await import('../../utils/dependencies');
+      const { validateUrl } = await import('../../utils/validations');
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateUrl).mockReturnValue(false);
       const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
@@ -130,10 +140,10 @@ describe('download command', () => {
 
     // Should should download video with default options
     it('should download video with default options', async () => {
-      const { checkDependencies } = await import('../../utils/dependencies.js');
-      const { validateUrl, validateFormat } = await import('../../utils/validations.js');
-      const { downloadVideo, getVideoInfo } = await import('../../utils/ytdlp.js');
-      const { createProgressBar } = await import('../../utils/progress.js');
+      const { checkDependencies } = await import('../../utils/dependencies');
+      const { validateUrl, validateFormat } = await import('../../utils/validations');
+      const { downloadVideo, getVideoInfo } = await import('../../utils/ytdlp');
+      const { createProgressBar } = await import('../../utils/progress');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateUrl).mockReturnValue(true);
@@ -150,10 +160,10 @@ describe('download command', () => {
 
     // Should should use provided output and format options
     it('should use provided output and format options', async () => {
-      const { checkDependencies } = await import('../../utils/dependencies.js');
-      const { validateUrl, validateFormat } = await import('../../utils/validations.js');
-      const { downloadVideo, getVideoInfo } = await import('../../utils/ytdlp.js');
-      const { createProgressBar } = await import('../../utils/progress.js');
+      const { checkDependencies } = await import('../../utils/dependencies');
+      const { validateUrl, validateFormat } = await import('../../utils/validations');
+      const { downloadVideo, getVideoInfo } = await import('../../utils/ytdlp');
+      const { createProgressBar } = await import('../../utils/progress');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateUrl).mockReturnValue(true);
@@ -172,10 +182,10 @@ describe('download command', () => {
 
     // Should should append extension when output has no dot
     it('should append extension when output has no dot', async () => {
-      const { checkDependencies } = await import('../../utils/dependencies.js');
-      const { validateUrl, validateFormat } = await import('../../utils/validations.js');
-      const { downloadVideo, getVideoInfo } = await import('../../utils/ytdlp.js');
-      const { createProgressBar } = await import('../../utils/progress.js');
+      const { checkDependencies } = await import('../../utils/dependencies');
+      const { validateUrl, validateFormat } = await import('../../utils/validations');
+      const { downloadVideo, getVideoInfo } = await import('../../utils/ytdlp');
+      const { createProgressBar } = await import('../../utils/progress');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateUrl).mockReturnValue(true);
@@ -194,10 +204,10 @@ describe('download command', () => {
 
     // Should should call progressCallback and update progress bar
     it('should call progressCallback and update progress bar', async () => {
-      const { checkDependencies } = await import('../../utils/dependencies.js');
-      const { validateUrl, validateFormat } = await import('../../utils/validations.js');
-      const { downloadVideo, getVideoInfo } = await import('../../utils/ytdlp.js');
-      const { createProgressBar } = await import('../../utils/progress.js');
+      const { checkDependencies } = await import('../../utils/dependencies');
+      const { validateUrl, validateFormat } = await import('../../utils/validations');
+      const { downloadVideo, getVideoInfo } = await import('../../utils/ytdlp');
+      const { createProgressBar } = await import('../../utils/progress');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateUrl).mockReturnValue(true);
@@ -217,10 +227,10 @@ describe('download command', () => {
 
     // Should should handle thrown errors and exit 1
     it('should handle thrown errors and exit 1', async () => {
-      const { checkDependencies } = await import('../../utils/dependencies.js');
-      const { validateUrl, validateFormat } = await import('../../utils/validations.js');
-      const { downloadVideo, getVideoInfo } = await import('../../utils/ytdlp.js');
-      const { createProgressBar } = await import('../../utils/progress.js');
+      const { checkDependencies } = await import('../../utils/dependencies');
+      const { validateUrl, validateFormat } = await import('../../utils/validations');
+      const { downloadVideo, getVideoInfo } = await import('../../utils/ytdlp');
+      const { createProgressBar } = await import('../../utils/progress');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateUrl).mockReturnValue(true);
@@ -238,10 +248,10 @@ describe('download command', () => {
 
     // Should should handle non-Error thrown values
     it('should handle non-Error thrown values', async () => {
-      const { checkDependencies } = await import('../../utils/dependencies.js');
-      const { validateUrl, validateFormat } = await import('../../utils/validations.js');
-      const { downloadVideo, getVideoInfo } = await import('../../utils/ytdlp.js');
-      const { createProgressBar } = await import('../../utils/progress.js');
+      const { checkDependencies } = await import('../../utils/dependencies');
+      const { validateUrl, validateFormat } = await import('../../utils/validations');
+      const { downloadVideo, getVideoInfo } = await import('../../utils/ytdlp');
+      const { createProgressBar } = await import('../../utils/progress');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateUrl).mockReturnValue(true);
@@ -259,8 +269,8 @@ describe('download command', () => {
 
     // Should should exit when validateFormat throws error
     it('should exit when validateFormat throws error', async () => {
-      const { checkDependencies } = await import('../../utils/dependencies.js');
-      const { validateUrl, validateFormat } = await import('../../utils/validations.js');
+      const { checkDependencies } = await import('../../utils/dependencies');
+      const { validateUrl, validateFormat } = await import('../../utils/validations');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateUrl).mockReturnValue(true);
@@ -277,10 +287,10 @@ describe('download command', () => {
 
     // Should should exit when user declines overwrite
     it('should exit when user declines overwrite', async () => {
-      const { checkDependencies } = await import('../../utils/dependencies.js');
-      const { validateUrl, validateFormat } = await import('../../utils/validations.js');
-      const { getVideoInfo } = await import('../../utils/ytdlp.js');
-      const { checkAndPromptOverwrite } = await import('../../utils/prompt.js');
+      const { checkDependencies } = await import('../../utils/dependencies');
+      const { validateUrl, validateFormat } = await import('../../utils/validations');
+      const { getVideoInfo } = await import('../../utils/ytdlp');
+      const { checkAndPromptOverwrite } = await import('../../utils/prompt');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateUrl).mockReturnValue(true);
@@ -298,12 +308,12 @@ describe('download command', () => {
 
     // Should should convert downloaded file when convert option is set
     it('should convert downloaded file when convert option is set', async () => {
-      const { checkDependencies } = await import('../../utils/dependencies.js');
-      const { validateUrl, validateFormat } = await import('../../utils/validations.js');
-      const { getVideoInfo } = await import('../../utils/ytdlp.js');
-      const { downloadVideo } = await import('../../utils/ytdlp.js');
-      const { convertVideo } = await import('../../utils/ffmpeg.js');
-      const { createProgressBar } = await import('../../utils/progress.js');
+      const { checkDependencies } = await import('../../utils/dependencies');
+      const { validateUrl, validateFormat } = await import('../../utils/validations');
+      const { getVideoInfo } = await import('../../utils/ytdlp');
+      const { downloadVideo } = await import('../../utils/ytdlp');
+      const { convertVideo } = await import('../../utils/ffmpeg');
+      const { createProgressBar } = await import('../../utils/progress');
       const { unlink } = await import('fs/promises');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
@@ -323,13 +333,13 @@ describe('download command', () => {
 
     // Should should call splitAction when split option is set
     it('should call splitAction when split option is set', async () => {
-      const { checkDependencies } = await import('../../utils/dependencies.js');
-      const { validateUrl, validateFormat } = await import('../../utils/validations.js');
-      const { getVideoInfo } = await import('../../utils/ytdlp.js');
-      const { downloadVideo } = await import('../../utils/ytdlp.js');
-      const { createProgressBar } = await import('../../utils/progress.js');
-      const { parseSplitValue } = await import('../../utils/split.js');
-      const { splitAction } = await import('../split.js');
+      const { checkDependencies } = await import('../../utils/dependencies');
+      const { validateUrl, validateFormat } = await import('../../utils/validations');
+      const { getVideoInfo } = await import('../../utils/ytdlp');
+      const { downloadVideo } = await import('../../utils/ytdlp');
+      const { createProgressBar } = await import('../../utils/progress');
+      const { parseSplitValue } = await import('../../utils/split');
+      const { splitAction } = await import('../split');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateUrl).mockReturnValue(true);
@@ -347,8 +357,8 @@ describe('download command', () => {
 
     // Should should handle non-Error thrown values in outer catch
     it('should handle non-Error thrown values in outer catch', async () => {
-      const { checkDependencies } = await import('../../utils/dependencies.js');
-      const { validateUrl } = await import('../../utils/validations.js');
+      const { checkDependencies } = await import('../../utils/dependencies');
+      const { validateUrl } = await import('../../utils/validations');
 
       vi.mocked(checkDependencies).mockRejectedValue('unknown error');
       vi.mocked(validateUrl).mockReturnValue(true);

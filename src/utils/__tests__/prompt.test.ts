@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-import { promptOverwrite, checkAndPromptOverwrite } from '../prompt.js';
+import { promptOverwrite, checkAndPromptOverwrite } from '../prompt';
 
-vi.mock('../log.js', () => ({ log: { info: vi.fn() } }));
+vi.mock('../log', () => ({ log: { info: vi.fn() } }));
 
 vi.mock('fs/promises', () => ({ access: vi.fn() }));
 

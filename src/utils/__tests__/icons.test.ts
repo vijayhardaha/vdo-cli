@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 
-import { info, success, warning, error, loading } from '../icons.js';
+import { info, success, warning, error, loading } from '../icons';
 
 // Tests for icons utilities
 describe('icons', () => {
