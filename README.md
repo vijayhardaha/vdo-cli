@@ -1,5 +1,9 @@
 # vdo - Video Utilities CLI
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![npm version](https://img.shields.io/npm/v/%40vijayhardaha%2Fvdo-cli)](https://www.npmjs.com/package/@vijayhardaha/vdo-cli)
+[![Downloads](https://img.shields.io/npm/dm/%40vijayhardaha%2Fvdo-cli)](https://www.npmjs.com/package/@vijayhardaha/vdo-cli)
+
 > **Video downloader, converter, compressor, and editor** — all in one CLI tool.
 
 A powerful, all-in-one **video processing CLI** built on top of **yt-dlp** and **ffmpeg**. Download videos from YouTube, Instagram, Facebook, and all sites supported by yt-dlp, convert formats, compress files, trim video segments, split for social media, reduce video size, adjust playback speed, or extract audio — all with a single command.
