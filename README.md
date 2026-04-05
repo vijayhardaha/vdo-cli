@@ -576,19 +576,20 @@ vdo/
 └── README.md
 ```
 
+## Documentation
+
+- [Contributing Guide](docs/CONTRIBUTING.md) - How to contribute to vdo
+- [Code of Conduct](docs/CODE_OF_CONDUCT.md) - Community guidelines
+- [Testing Guide](docs/CLI_TEST_GUIDE.md) - How to test the CLI with real URLs
+- [Changelog](CHANGELOG.md) - Version history and release notes
+
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+Contributions are welcome! Please read our [Contributing Guide](docs/CONTRIBUTING.md) before submitting a Pull Request.
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Acknowledgments
 
