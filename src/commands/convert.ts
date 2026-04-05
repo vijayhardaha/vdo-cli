@@ -1,4 +1,4 @@
-import { resolve, dirname, basename, extname, join } from 'path';
+import { resolve } from 'path';
 
 import type { Command } from 'commander';
 
@@ -7,6 +7,7 @@ import { ensureDependencies } from '@/utils/dependencies';
 import { convertVideo } from '@/utils/ffmpeg';
 import { loading } from '@/utils/icons';
 import { log } from '@/utils/log';
+import { resolveOutputFile } from '@/utils/output';
 import { createProgressBar } from '@/utils/progress';
 import { validateFileExists, validateFormat, validatePreset } from '@/utils/validations';
 
@@ -52,13 +53,7 @@ export async function convertAction(input: string, options: ConvertOptions): Pro
       process.exit(1);
     }
 
-    let outputFile = options.output;
-    // check: if output path not provided, generate default
-    if (!outputFile) {
-      const dir = dirname(input);
-      const name = basename(input, extname(input));
-      outputFile = join(dir, `${name}_converted.${format}`);
-    }
+    const outputFile = resolveOutputFile({ input, output: options.output, format, suffix: '_converted' });
 
     log.succeed(`Conversion started | Format: ${format.toUpperCase()} | Preset: ${preset}`);
 

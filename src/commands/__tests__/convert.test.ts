@@ -135,6 +135,72 @@ describe('convert command', () => {
       expect(callArgs?.[1]).toBe('custom_out.mp4');
     });
 
+    // Should append format extension when output extension differs from format
+    it('should append format extension when output extension differs from format', async () => {
+      const { checkDependencies } = await import('../../utils/dependencies');
+      const { validateFileExists, validateFormat, validatePreset } = await import('../../utils/validations');
+      const { convertVideo } = await import('../../utils/ffmpeg');
+      const { createProgressBar } = await import('../../utils/progress');
+
+      vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
+      vi.mocked(validateFileExists).mockResolvedValue(undefined);
+      vi.mocked(validateFormat).mockReturnValue(undefined);
+      vi.mocked(validatePreset).mockReturnValue(undefined);
+      vi.mocked(convertVideo).mockResolvedValue(undefined);
+      vi.mocked(createProgressBar).mockReturnValue(mockProgressBar as never);
+
+      await convertAction('input.mp4', { output: 'video.avi', format: 'mov' });
+
+      const callArgs = vi.mocked(convertVideo).mock.calls[0];
+
+      // Expect output has format appended: video.avi.mov
+      expect(callArgs?.[1]).toBe('video.avi.mov');
+    });
+
+    // Should not append format extension when output extension matches format
+    it('should not append format extension when output extension matches format', async () => {
+      const { checkDependencies } = await import('../../utils/dependencies');
+      const { validateFileExists, validateFormat, validatePreset } = await import('../../utils/validations');
+      const { convertVideo } = await import('../../utils/ffmpeg');
+      const { createProgressBar } = await import('../../utils/progress');
+
+      vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
+      vi.mocked(validateFileExists).mockResolvedValue(undefined);
+      vi.mocked(validateFormat).mockReturnValue(undefined);
+      vi.mocked(validatePreset).mockReturnValue(undefined);
+      vi.mocked(convertVideo).mockResolvedValue(undefined);
+      vi.mocked(createProgressBar).mockReturnValue(mockProgressBar as never);
+
+      await convertAction('input.mp4', { output: 'video.avi', format: 'avi' });
+
+      const callArgs = vi.mocked(convertVideo).mock.calls[0];
+
+      // Expect output remains unchanged: video.avi
+      expect(callArgs?.[1]).toBe('video.avi');
+    });
+
+    // Should append format extension when output has no extension
+    it('should append format extension when output has no extension', async () => {
+      const { checkDependencies } = await import('../../utils/dependencies');
+      const { validateFileExists, validateFormat, validatePreset } = await import('../../utils/validations');
+      const { convertVideo } = await import('../../utils/ffmpeg');
+      const { createProgressBar } = await import('../../utils/progress');
+
+      vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
+      vi.mocked(validateFileExists).mockResolvedValue(undefined);
+      vi.mocked(validateFormat).mockReturnValue(undefined);
+      vi.mocked(validatePreset).mockReturnValue(undefined);
+      vi.mocked(convertVideo).mockResolvedValue(undefined);
+      vi.mocked(createProgressBar).mockReturnValue(mockProgressBar as never);
+
+      await convertAction('input.mp4', { output: 'output', format: 'mov' });
+
+      const callArgs = vi.mocked(convertVideo).mock.calls[0];
+
+      // Expect output has format appended: output.mov
+      expect(callArgs?.[1]).toBe('output.mov');
+    });
+
     // Should should invoke progressCallback
     it('should invoke progressCallback', async () => {
       const { checkDependencies } = await import('../../utils/dependencies');
