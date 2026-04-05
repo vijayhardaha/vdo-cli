@@ -220,7 +220,7 @@ function parseSegments(segmentsStr: string): SliceSegment[] {
 export function setupSlice(program: Command): void {
   program
     .command('slice <input>')
-    .alias('sl')
+    .alias('slc')
     .description('Slice/trim video segment')
     .option('-o, --output <file>', 'Output file name')
     .option('-s, --start <time>', 'Start time (e.g., 0, 10, 1:30, 00:01:30)')

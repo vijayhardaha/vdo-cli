@@ -92,7 +92,7 @@ export async function speedupAction(input: string, options: SpeedupOptions): Pro
 export function setupSpeedup(program: Command): void {
   program
     .command('speedup <input>')
-    .alias('sp')
+    .alias('sup')
     .description('Speed up or slow down video')
     .option('-o, --output <file>', 'Output file name')
     .option('--rate <value>', 'Speed rate (e.g., 2 for 2x faster, 0.5 for 2x slower)', '2')

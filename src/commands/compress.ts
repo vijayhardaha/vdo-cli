@@ -103,7 +103,7 @@ export async function compressAction(input: string, options: CompressOptions): P
 export function setupCompress(program: Command): void {
   program
     .command('compress <input>')
-    .alias('cm')
+    .alias('cps')
     .description('Compress video to reduce file size')
     .option('-o, --output <file>', 'Output file name')
     .option('--crf <value>', 'Constant Rate Factor (0-51, lower = better quality)', '28')

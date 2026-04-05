@@ -235,7 +235,7 @@ export async function compactAction(input: string, options: CompactOptions): Pro
 export function setupCompact(program: Command): void {
   program
     .command('compact <input>')
-    .alias('cp')
+    .alias('cpt')
     .description('Compact video to target size using two-pass encoding')
     .option('-o, --output <file>', 'Output file name')
     .option('--target <size>', 'Target size (e.g., 25MB, 100MB)')

@@ -105,7 +105,7 @@ export async function convertAction(input: string, options: ConvertOptions): Pro
 export function setupConvert(program: Command): void {
   program
     .command('convert <input>')
-    .alias('cv')
+    .alias('cvt')
     .description('Convert local video to different format')
     .option('-o, --output <file>', 'Output file name')
     .option('-f, --format <format>', 'Target format (mp4, mkv, avi, mov, webm, flv)', 'mp4')

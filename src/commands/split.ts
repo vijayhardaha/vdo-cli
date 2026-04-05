@@ -150,6 +150,7 @@ export async function splitAction(input: string, options: SplitOptions): Promise
 export function setupSplit(program: Command): void {
   program
     .command('split <input>')
+    .alias('spl')
     .description('Split video into multiple parts')
     .option('-o, --output <file>', 'Output directory or base name')
     .option('-p, --preset <platform>', 'Platform preset: instagram/ig (60s), whatsapp/wa (90s), facebook/fb (120s)')
