@@ -1,3 +1,5 @@
+import * as readline from 'node:readline';
+
 import { log } from './log';
 
 /**
@@ -7,22 +9,18 @@ import { log } from './log';
  * @returns {Promise<boolean>} - true if user confirms (Y), false if user declines (n)
  */
 export async function promptOverwrite(message: string): Promise<boolean> {
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+
   const response = await new Promise<string>((resolve) => {
-    process.stdout.write(`${message} (Y/n) `);
-
-    const handler = (data: Buffer) => {
-      process.stdin.removeListener('data', handler);
-      resolve(data.toString().trim().toLowerCase());
-    };
-
-    process.stdin.on('data', handler);
+    rl.question(`${message} (Y/n) `, (answer) => {
+      resolve(answer);
+    });
   });
 
-  if (response === '' || response === 'y' || response === 'yes') {
-    return true;
-  }
+  rl.close();
 
-  return false;
+  const normalized = response.trim().toLowerCase();
+  return normalized === '' || normalized === 'y' || normalized === 'yes';
 }
 
 /**
