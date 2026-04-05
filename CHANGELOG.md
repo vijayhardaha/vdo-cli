@@ -5,6 +5,58 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2026-04-05
+
+### Added
+
+- **Overwrite Prompts**: Added file overwrite confirmation prompts to all commands
+  - Prompts user before overwriting existing files
+  - Applied to slice and split commands
+
+- **Progress Bars**: Added progress indicators for better UX
+  - Audio extraction progress bar
+  - Slice and split progress bars
+
+- **Dynamic Install Commands**: Show OS-specific install instructions for missing dependencies
+  - macOS: `brew install`
+  - Linux: `sudo apt install`
+  - Windows: `winget install`
+  - Fallback: manual install message
+
+### Changed
+
+- **Dependency Management**: Added `ensureDependencies()` utility for centralized dependency checks
+  - Used across all command actions
+  - Improved error messaging
+
+- **Import Paths**: Migrated all internal imports to use `@` alias
+  - Cleaner, more maintainable imports
+  - Removed `.js` extensions from imports
+
+- **Overwrite Handling**: Moved overwrite check to command level for slice and split
+
+### Fixed
+
+- **Piped Input**: Fixed handling of piped input in `promptOverwrite`
+- **FFmpeg Overwrite**: Added `-y` flag to ffmpeg commands for automatic file overwrite
+- **Progress Bars**: Fixed missing progress bar start calls in slice and split commands
+
+### Documentation
+
+- Updated project structure documentation
+- Fixed test command in documentation
+- Updated `ensureDependencies()` documentation
+
+### Testing
+
+- Improved test coverage for slice, compact, split, download commands
+- Refactored tests to follow AGENTS.md conventions
+- Split command tests into separate files per command
+- Moved tests to proper locations:
+  - `bin/` tests to `src/bin/__tests__/`
+  - `utils/` tests to `src/utils/__tests__/`
+- Fixed test expectations and comments
+
 ## [1.0.0] - 2026-04-05
 
 ### Added
