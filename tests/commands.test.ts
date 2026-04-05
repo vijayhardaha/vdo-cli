@@ -27,7 +27,7 @@ describe('Commands Setup', () => {
       expect(commands).toHaveLength(1);
       expect(commands[0]?.name()).toBe('download');
       expect(commands[0]?.aliases()).toContain('dl');
-      expect(commands[0]?.options).toHaveLength(2);
+      expect(commands[0]?.options).toHaveLength(4);
     });
 
     // Should have output option
@@ -43,8 +43,27 @@ describe('Commands Setup', () => {
     it('should have format option', () => {
       setupDownload(program);
       const cmd = program.commands[0];
-      // Check that the command has options defined
-      expect(cmd?.options).toHaveLength(2);
+      const formatOption = cmd?.options.find((opt) => opt.long === '--format');
+
+      expect(formatOption).toBeDefined();
+    });
+
+    // Should have convert option
+    it('should have convert option', () => {
+      setupDownload(program);
+      const cmd = program.commands[0];
+      const convertOption = cmd?.options.find((opt) => opt.long === '--convert');
+
+      expect(convertOption).toBeDefined();
+    });
+
+    // Should have split option
+    it('should have split option', () => {
+      setupDownload(program);
+      const cmd = program.commands[0];
+      const splitOption = cmd?.options.find((opt) => opt.long === '--split');
+
+      expect(splitOption).toBeDefined();
     });
   });
 
