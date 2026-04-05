@@ -120,9 +120,9 @@ describe('Command actions', () => {
 
       await downloadAction('https://example.com', { output: 'myvideo', format: 'mkv' });
 
-      // expect: output uses videoInfo.ext not requested format
+      // expect: output uses requested format instead of videoInfo.ext
       const callArgs = vi.mocked(downloadVideo).mock.calls[0];
-      expect(callArgs?.[1]).toBe('myvideo.mp4');
+      expect(callArgs?.[1]).toBe('myvideo.mkv');
       expect(callArgs?.[2]).toBe('mkv');
     });
 

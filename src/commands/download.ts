@@ -63,7 +63,7 @@ export async function downloadAction(url: string, options: DownloadOptions): Pro
     if (options.output) {
       outputFile = options.output.includes('.')
         ? options.output
-        : `${options.output}.${format === 'mp3' ? 'mp3' : videoInfo.ext}`;
+        : `${options.output}.${format === 'mp3' ? 'mp3' : format}`;
     } else {
       outputFile = generateFilename(videoInfo, format);
     }
