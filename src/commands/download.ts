@@ -7,7 +7,7 @@ import { loading } from '@/utils/icons';
 
 import { splitAction } from './split';
 import type { DownloadOptions, SplitOptions } from '../types/index';
-import { checkDependencies } from '../utils/dependencies';
+import { ensureDependencies } from '../utils/dependencies';
 import { convertVideo } from '../utils/ffmpeg';
 import { log } from '../utils/log';
 import { createProgressBar, formatFileSize } from '../utils/progress';
@@ -31,14 +31,7 @@ const DEFAULT_CONVERT_PRESET = 'fast';
  */
 export async function downloadAction(url: string, options: DownloadOptions): Promise<void> {
   try {
-    const deps = await checkDependencies();
-    // check: if dependencies are missing
-    if (!deps.ok) {
-      log.fail(`Missing required dependencies: ${deps.missing.join(', ')}`);
-      log.warn('Please install them using:');
-      log.warn('  brew install ffmpeg yt-dlp');
-      process.exit(1);
-    }
+    await ensureDependencies();
 
     // check: if URL is valid
     if (!validateUrl(url)) {

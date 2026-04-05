@@ -5,7 +5,7 @@ import type { Command } from 'commander';
 import { loading } from '@/utils/icons';
 
 import type { SliceOptions, SliceSegment } from '../types/index';
-import { checkDependencies } from '../utils/dependencies';
+import { ensureDependencies } from '../utils/dependencies';
 import { log } from '../utils/log';
 import { createProgressBar } from '../utils/progress';
 import { checkAndPromptOverwrite } from '../utils/prompt';
@@ -77,13 +77,7 @@ export async function sliceAction(input: string, options: SliceOptions): Promise
   try {
     log.loading('Preparing slice operation...');
 
-    const deps = await checkDependencies();
-    // check: if dependencies are missing
-    if (!deps.ok) {
-      log.fail(`Missing dependencies: ${deps.missing.join(', ')}`);
-      log.warn('Install using: brew install ffmpeg yt-dlp');
-      process.exit(1);
-    }
+    await ensureDependencies();
 
     try {
       await validateFileExists(input);

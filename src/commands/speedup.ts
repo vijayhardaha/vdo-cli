@@ -5,7 +5,7 @@ import type { Command } from 'commander';
 import { loading } from '@/utils/icons';
 
 import type { SpeedupOptions } from '../types/index';
-import { checkDependencies } from '../utils/dependencies';
+import { ensureDependencies } from '../utils/dependencies';
 import { speedUpVideo } from '../utils/ffmpeg';
 import { log } from '../utils/log';
 import { createProgressBar } from '../utils/progress';
@@ -23,13 +23,7 @@ export async function speedupAction(input: string, options: SpeedupOptions): Pro
   try {
     log.loading('Preparing speed adjustment...');
 
-    const deps = await checkDependencies();
-    // check: if dependencies are missing
-    if (!deps.ok) {
-      log.fail(`Missing dependencies: ${deps.missing.join(', ')}`);
-      log.warn('Install using: brew install ffmpeg yt-dlp');
-      process.exit(1);
-    }
+    await ensureDependencies();
 
     try {
       await validateFileExists(input);
