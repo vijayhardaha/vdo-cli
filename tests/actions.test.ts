@@ -55,15 +55,15 @@ vi.mock('../src/utils/prompt.js', () => ({
 /* Mock progress bar */
 const mockProgressBar = { start: vi.fn(), stop: vi.fn(), update: vi.fn() };
 
-// describe: Command actions
+// Tests for Command actions
 describe('Command actions', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  // describe: downloadAction
+  // Tests for downloadAction
   describe('downloadAction', () => {
-    // it: should exit with error when dependencies missing
+    // Should should exit with error when dependencies missing
     it('should exit with error when dependencies missing', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       vi.mocked(checkDependencies).mockResolvedValue({ ok: false, missing: ['ffmpeg'] });
@@ -71,11 +71,11 @@ describe('Command actions', () => {
 
       await downloadAction('https://example.com', {});
 
-      // expect: process.exit is called with 1
+      // Expect process.exit is called with 1
       expect(exitSpy).toHaveBeenCalledWith(1);
     });
 
-    // it: should exit with error when URL is invalid
+    // Should should exit with error when URL is invalid
     it('should exit with error when URL is invalid', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateUrl } = await import('../src/utils/validations.js');
@@ -85,11 +85,11 @@ describe('Command actions', () => {
 
       await downloadAction('not-a-url', {});
 
-      // expect: process.exit is called with 1
+      // Expect process.exit is called with 1
       expect(exitSpy).toHaveBeenCalledWith(1);
     });
 
-    // it: should download video with default options
+    // Should should download video with default options
     it('should download video with default options', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateUrl, validateFormat } = await import('../src/utils/validations.js');
@@ -105,11 +105,11 @@ describe('Command actions', () => {
 
       await downloadAction('https://example.com/video', {});
 
-      // expect: downloadVideo is called
+      // Expect downloadVideo is called
       expect(downloadVideo).toHaveBeenCalled();
     });
 
-    // it: should use provided output and format options
+    // Should should use provided output and format options
     it('should use provided output and format options', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateUrl, validateFormat } = await import('../src/utils/validations.js');
@@ -125,13 +125,13 @@ describe('Command actions', () => {
 
       await downloadAction('https://example.com', { output: 'myvideo', format: 'mkv' });
 
-      // expect: output uses requested format instead of videoInfo.ext
+      // Expect output uses requested format instead of videoInfo.ext
       const callArgs = vi.mocked(downloadVideo).mock.calls[0];
       expect(callArgs?.[1]).toBe('myvideo.mkv');
       expect(callArgs?.[2]).toBe('mkv');
     });
 
-    // it: should append extension when output has no dot
+    // Should should append extension when output has no dot
     it('should append extension when output has no dot', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateUrl, validateFormat } = await import('../src/utils/validations.js');
@@ -147,12 +147,12 @@ describe('Command actions', () => {
 
       await downloadAction('https://example.com', { output: 'myvideo', format: 'mp3' });
 
-      // expect: output appends format extension
+      // Expect output appends format extension
       const callArgs = vi.mocked(downloadVideo).mock.calls[0];
       expect(callArgs?.[1]).toBe('myvideo.mp3');
     });
 
-    // it: should call progressCallback and update progress bar
+    // Should should call progressCallback and update progress bar
     it('should call progressCallback and update progress bar', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateUrl, validateFormat } = await import('../src/utils/validations.js');
@@ -171,11 +171,11 @@ describe('Command actions', () => {
 
       await downloadAction('https://example.com', {});
 
-      // expect: progress bar is updated with percentage
+      // Expect progress bar is updated with percentage
       expect(mockProgressBar.update).toHaveBeenCalledWith(50, { total: 100 });
     });
 
-    // it: should handle thrown errors and exit 1
+    // Should should handle thrown errors and exit 1
     it('should handle thrown errors and exit 1', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateUrl, validateFormat } = await import('../src/utils/validations.js');
@@ -192,11 +192,11 @@ describe('Command actions', () => {
 
       await downloadAction('https://example.com', {});
 
-      // expect: process.exit is called with 1
+      // Expect process.exit is called with 1
       expect(exitSpy).toHaveBeenCalledWith(1);
     });
 
-    // it: should handle non-Error thrown values
+    // Should should handle non-Error thrown values
     it('should handle non-Error thrown values', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateUrl, validateFormat } = await import('../src/utils/validations.js');
@@ -213,11 +213,11 @@ describe('Command actions', () => {
 
       await downloadAction('https://example.com', {});
 
-      // expect: process.exit is called with 1
+      // Expect process.exit is called with 1
       expect(exitSpy).toHaveBeenCalledWith(1);
     });
 
-    // it: should exit when validateFormat throws error
+    // Should should exit when validateFormat throws error
     it('should exit when validateFormat throws error', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateUrl, validateFormat } = await import('../src/utils/validations.js');
@@ -231,11 +231,11 @@ describe('Command actions', () => {
 
       await downloadAction('https://example.com', {});
 
-      // expect: process.exit is called with 1
+      // Expect process.exit is called with 1
       expect(exitSpy).toHaveBeenCalledWith(1);
     });
 
-    // it: should handle non-Error thrown values in outer catch
+    // Should should handle non-Error thrown values in outer catch
     it('should handle non-Error thrown values in outer catch', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateUrl } = await import('../src/utils/validations.js');
@@ -246,14 +246,14 @@ describe('Command actions', () => {
 
       await downloadAction('https://example.com', {});
 
-      // expect: process.exit is called with 1
+      // Expect process.exit is called with 1
       expect(exitSpy).toHaveBeenCalledWith(1);
     });
   });
 
-  // describe: convertAction
+  // Tests for convertAction
   describe('convertAction', () => {
-    // it: should exit when dependencies missing
+    // Should should exit when dependencies missing
     it('should exit when dependencies missing', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       vi.mocked(checkDependencies).mockResolvedValue({ ok: false, missing: ['ffmpeg'] });
@@ -261,11 +261,11 @@ describe('Command actions', () => {
 
       await convertAction('input.avi', {});
 
-      // expect: process.exit is called with 1
+      // Expect process.exit is called with 1
       expect(exitSpy).toHaveBeenCalledWith(1);
     });
 
-    // it: should convert video with default options
+    // Should should convert video with default options
     it('should convert video with default options', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateFileExists, validateFormat, validatePreset } = await import('../src/utils/validations.js');
@@ -281,11 +281,11 @@ describe('Command actions', () => {
 
       await convertAction('input.avi', {});
 
-      // expect: convertVideo is called
+      // Expect convertVideo is called
       expect(convertVideo).toHaveBeenCalled();
     });
 
-    // it: should use provided output option
+    // Should should use provided output option
     it('should use provided output option', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateFileExists, validateFormat, validatePreset } = await import('../src/utils/validations.js');
@@ -301,12 +301,12 @@ describe('Command actions', () => {
 
       await convertAction('input.avi', { output: 'custom_out.mp4', format: 'mp4', preset: 'slow' });
 
-      // expect: convertVideo is called with custom output
+      // Expect convertVideo is called with custom output
       const callArgs = vi.mocked(convertVideo).mock.calls[0];
       expect(callArgs?.[1]).toBe('custom_out.mp4');
     });
 
-    // it: should invoke progressCallback
+    // Should should invoke progressCallback
     it('should invoke progressCallback', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateFileExists, validateFormat, validatePreset } = await import('../src/utils/validations.js');
@@ -324,11 +324,11 @@ describe('Command actions', () => {
 
       await convertAction('input.avi', {});
 
-      // expect: progress bar is updated
+      // Expect progress bar is updated
       expect(mockProgressBar.update).toHaveBeenCalledWith(50);
     });
 
-    // it: should not update progress bar when percentage is 0
+    // Should should not update progress bar when percentage is 0
     it('should not update progress bar when percentage is 0', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateFileExists, validateFormat, validatePreset } = await import('../src/utils/validations.js');
@@ -346,11 +346,11 @@ describe('Command actions', () => {
 
       await convertAction('input.avi', {});
 
-      // expect: progress bar update is not called
+      // Expect progress bar update is not called
       expect(mockProgressBar.update).not.toHaveBeenCalled();
     });
 
-    // it: should handle errors and exit 1
+    // Should should handle errors and exit 1
     it('should handle errors and exit 1', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateFileExists } = await import('../src/utils/validations.js');
@@ -360,11 +360,11 @@ describe('Command actions', () => {
 
       await convertAction('input.avi', {});
 
-      // expect: process.exit is called with 1
+      // Expect process.exit is called with 1
       expect(exitSpy).toHaveBeenCalledWith(1);
     });
 
-    // it: should handle non-Error thrown values
+    // Should should handle non-Error thrown values
     it('should handle non-Error thrown values', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateFileExists } = await import('../src/utils/validations.js');
@@ -374,11 +374,11 @@ describe('Command actions', () => {
 
       await convertAction('input.avi', {});
 
-      // expect: process.exit is called with 1
+      // Expect process.exit is called with 1
       expect(exitSpy).toHaveBeenCalledWith(1);
     });
 
-    // it: should exit when validateFormat throws error
+    // Should should exit when validateFormat throws error
     it('should exit when validateFormat throws error', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateFileExists, validateFormat } = await import('../src/utils/validations.js');
@@ -391,11 +391,11 @@ describe('Command actions', () => {
 
       await convertAction('input.avi', {});
 
-      // expect: process.exit is called with 1
+      // Expect process.exit is called with 1
       expect(exitSpy).toHaveBeenCalledWith(1);
     });
 
-    // it: should exit when validatePreset throws error
+    // Should should exit when validatePreset throws error
     it('should exit when validatePreset throws error', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateFileExists, validateFormat, validatePreset } = await import('../src/utils/validations.js');
@@ -409,11 +409,11 @@ describe('Command actions', () => {
 
       await convertAction('input.avi', {});
 
-      // expect: process.exit is called with 1
+      // Expect process.exit is called with 1
       expect(exitSpy).toHaveBeenCalledWith(1);
     });
 
-    // it: should handle convertVideo errors and exit 1
+    // Should should handle convertVideo errors and exit 1
     it('should handle convertVideo errors and exit 1', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateFileExists, validateFormat, validatePreset } = await import('../src/utils/validations.js');
@@ -430,15 +430,15 @@ describe('Command actions', () => {
 
       await convertAction('input.avi', {});
 
-      // expect: progress bar is stopped and process exits with 1
+      // Expect progress bar is stopped and process exits with 1
       expect(mockProgressBar.stop).toHaveBeenCalled();
       expect(exitSpy).toHaveBeenCalledWith(1);
     });
   });
 
-  // describe: compressAction
+  // Tests for compressAction
   describe('compressAction', () => {
-    // it: should exit when dependencies missing
+    // Should should exit when dependencies missing
     it('should exit when dependencies missing', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       vi.mocked(checkDependencies).mockResolvedValue({ ok: false, missing: ['ffmpeg'] });
@@ -446,11 +446,11 @@ describe('Command actions', () => {
 
       await compressAction('input.mp4', {});
 
-      // expect: process.exit is called with 1
+      // Expect process.exit is called with 1
       expect(exitSpy).toHaveBeenCalledWith(1);
     });
 
-    // it: should compress video with default options
+    // Should should compress video with default options
     it('should compress video with default options', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateFileExists, validatePreset, validateCRF } = await import('../src/utils/validations.js');
@@ -466,11 +466,11 @@ describe('Command actions', () => {
 
       await compressAction('input.mp4', {});
 
-      // expect: compressVideo is called
+      // Expect compressVideo is called
       expect(compressVideo).toHaveBeenCalled();
     });
 
-    // it: should use provided output option
+    // Should should use provided output option
     it('should use provided output option', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateFileExists, validatePreset, validateCRF } = await import('../src/utils/validations.js');
@@ -486,13 +486,13 @@ describe('Command actions', () => {
 
       await compressAction('input.mp4', { output: 'small.mp4', crf: 23, preset: 'slow' });
 
-      // expect: compressVideo is called with custom output and crf
+      // Expect compressVideo is called with custom output and crf
       const callArgs = vi.mocked(compressVideo).mock.calls[0];
       expect(callArgs?.[1]).toBe('small.mp4');
       expect(callArgs?.[2]).toBe(23);
     });
 
-    // it: should invoke progressCallback
+    // Should should invoke progressCallback
     it('should invoke progressCallback', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateFileExists, validatePreset, validateCRF } = await import('../src/utils/validations.js');
@@ -510,11 +510,11 @@ describe('Command actions', () => {
 
       await compressAction('input.mp4', {});
 
-      // expect: progress bar is updated
+      // Expect progress bar is updated
       expect(mockProgressBar.update).toHaveBeenCalledWith(75);
     });
 
-    // it: should not update progress bar when percentage is 0
+    // Should should not update progress bar when percentage is 0
     it('should not update progress bar when percentage is 0', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateFileExists, validatePreset, validateCRF } = await import('../src/utils/validations.js');
@@ -532,11 +532,11 @@ describe('Command actions', () => {
 
       await compressAction('input.mp4', {});
 
-      // expect: progress bar update is not called
+      // Expect progress bar update is not called
       expect(mockProgressBar.update).not.toHaveBeenCalled();
     });
 
-    // it: should handle errors and exit 1
+    // Should should handle errors and exit 1
     it('should handle errors and exit 1', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateFileExists } = await import('../src/utils/validations.js');
@@ -546,11 +546,11 @@ describe('Command actions', () => {
 
       await compressAction('input.mp4', {});
 
-      // expect: process.exit is called with 1
+      // Expect process.exit is called with 1
       expect(exitSpy).toHaveBeenCalledWith(1);
     });
 
-    // it: should handle non-Error thrown values
+    // Should should handle non-Error thrown values
     it('should handle non-Error thrown values', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateFileExists } = await import('../src/utils/validations.js');
@@ -560,11 +560,11 @@ describe('Command actions', () => {
 
       await compressAction('input.mp4', {});
 
-      // expect: process.exit is called with 1
+      // Expect process.exit is called with 1
       expect(exitSpy).toHaveBeenCalledWith(1);
     });
 
-    // it: should exit when validatePreset throws error
+    // Should should exit when validatePreset throws error
     it('should exit when validatePreset throws error', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateFileExists, validatePreset } = await import('../src/utils/validations.js');
@@ -577,11 +577,11 @@ describe('Command actions', () => {
 
       await compressAction('input.mp4', {});
 
-      // expect: process.exit is called with 1
+      // Expect process.exit is called with 1
       expect(exitSpy).toHaveBeenCalledWith(1);
     });
 
-    // it: should handle compressVideo errors and exit 1
+    // Should should handle compressVideo errors and exit 1
     it('should handle compressVideo errors and exit 1', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateFileExists, validatePreset, validateCRF } = await import('../src/utils/validations.js');
@@ -598,12 +598,12 @@ describe('Command actions', () => {
 
       await compressAction('input.mp4', {});
 
-      // expect: progress bar is stopped and process exits with 1
+      // Expect progress bar is stopped and process exits with 1
       expect(mockProgressBar.stop).toHaveBeenCalled();
       expect(exitSpy).toHaveBeenCalledWith(1);
     });
 
-    // it: should exit when validateCRF throws error
+    // Should should exit when validateCRF throws error
     it('should exit when validateCRF throws error', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateFileExists, validateCRF } = await import('../src/utils/validations.js');
@@ -616,11 +616,11 @@ describe('Command actions', () => {
 
       await compressAction('input.mp4', {});
 
-      // expect: process.exit is called with 1
+      // Expect process.exit is called with 1
       expect(exitSpy).toHaveBeenCalledWith(1);
     });
 
-    // it: should handle non-Error thrown values in outer catch
+    // Should should handle non-Error thrown values in outer catch
     it('should handle non-Error thrown values in outer catch', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       vi.mocked(checkDependencies).mockRejectedValue('unknown error');
@@ -628,14 +628,14 @@ describe('Command actions', () => {
 
       await compressAction('input.mp4', {});
 
-      // expect: process.exit is called with 1
+      // Expect process.exit is called with 1
       expect(exitSpy).toHaveBeenCalledWith(1);
     });
   });
 
-  // describe: speedupAction
+  // Tests for speedupAction
   describe('speedupAction', () => {
-    // it: should exit when dependencies missing
+    // Should should exit when dependencies missing
     it('should exit when dependencies missing', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       vi.mocked(checkDependencies).mockResolvedValue({ ok: false, missing: ['ffmpeg'] });
@@ -643,11 +643,11 @@ describe('Command actions', () => {
 
       await speedupAction('input.mp4', {});
 
-      // expect: process.exit is called with 1
+      // Expect process.exit is called with 1
       expect(exitSpy).toHaveBeenCalledWith(1);
     });
 
-    // it: should speed up video with default rate
+    // Should should speed up video with default rate
     it('should speed up video with default rate', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateFileExists, validateSpeedRate } = await import('../src/utils/validations.js');
@@ -662,11 +662,11 @@ describe('Command actions', () => {
 
       await speedupAction('input.mp4', {});
 
-      // expect: speedUpVideo is called
+      // Expect speedUpVideo is called
       expect(speedUpVideo).toHaveBeenCalled();
     });
 
-    // it: should use provided output option
+    // Should should use provided output option
     it('should use provided output option', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateFileExists, validateSpeedRate } = await import('../src/utils/validations.js');
@@ -681,12 +681,12 @@ describe('Command actions', () => {
 
       await speedupAction('input.mp4', { output: 'out_fast.mp4', rate: 2 });
 
-      // expect: speedUpVideo is called with custom output
+      // Expect speedUpVideo is called with custom output
       const callArgs = vi.mocked(speedUpVideo).mock.calls[0];
       expect(callArgs?.[1]).toBe('out_fast.mp4');
     });
 
-    // it: should invoke progressCallback
+    // Should should invoke progressCallback
     it('should invoke progressCallback', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateFileExists, validateSpeedRate } = await import('../src/utils/validations.js');
@@ -703,11 +703,11 @@ describe('Command actions', () => {
 
       await speedupAction('input.mp4', { rate: 2 });
 
-      // expect: progress bar is updated
+      // Expect progress bar is updated
       expect(mockProgressBar.update).toHaveBeenCalledWith(80);
     });
 
-    // it: should not update progress bar when percentage is 0
+    // Should should not update progress bar when percentage is 0
     it('should not update progress bar when percentage is 0', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateFileExists, validateSpeedRate } = await import('../src/utils/validations.js');
@@ -724,11 +724,11 @@ describe('Command actions', () => {
 
       await speedupAction('input.mp4', { rate: 2 });
 
-      // expect: progress bar update is not called
+      // Expect progress bar update is not called
       expect(mockProgressBar.update).not.toHaveBeenCalled();
     });
 
-    // it: should not log faster or slower when rate is 1
+    // Should should not log faster or slower when rate is 1
     it('should not log faster or slower when rate is 1', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateFileExists, validateSpeedRate } = await import('../src/utils/validations.js');
@@ -743,13 +743,13 @@ describe('Command actions', () => {
 
       await speedupAction('input.mp4', { rate: 1 });
 
-      // expect: console.log is not called with 'faster' or 'slower'
+      // Expect console.log is not called with 'faster' or 'slower'
       const consoleCalls = vi.mocked(console.log).mock.calls.map((c: unknown[]) => String(c[0]));
       expect(consoleCalls.some((m: string) => m?.includes('faster'))).toBe(false);
       expect(consoleCalls.some((m: string) => m?.includes('slower'))).toBe(false);
     });
 
-    // it: should handle errors and exit 1
+    // Should should handle errors and exit 1
     it('should handle errors and exit 1', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateFileExists } = await import('../src/utils/validations.js');
@@ -759,11 +759,11 @@ describe('Command actions', () => {
 
       await speedupAction('input.mp4', {});
 
-      // expect: process.exit is called with 1
+      // Expect process.exit is called with 1
       expect(exitSpy).toHaveBeenCalledWith(1);
     });
 
-    // it: should handle non-Error thrown values
+    // Should should handle non-Error thrown values
     it('should handle non-Error thrown values', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateFileExists } = await import('../src/utils/validations.js');
@@ -773,11 +773,11 @@ describe('Command actions', () => {
 
       await speedupAction('input.mp4', {});
 
-      // expect: process.exit is called with 1
+      // Expect process.exit is called with 1
       expect(exitSpy).toHaveBeenCalledWith(1);
     });
 
-    // it: should exit when validateSpeedRate throws error
+    // Should should exit when validateSpeedRate throws error
     it('should exit when validateSpeedRate throws error', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateFileExists, validateSpeedRate } = await import('../src/utils/validations.js');
@@ -790,11 +790,11 @@ describe('Command actions', () => {
 
       await speedupAction('input.mp4', {});
 
-      // expect: process.exit is called with 1
+      // Expect process.exit is called with 1
       expect(exitSpy).toHaveBeenCalledWith(1);
     });
 
-    // it: should handle speedUpVideo errors and exit 1
+    // Should should handle speedUpVideo errors and exit 1
     it('should handle speedUpVideo errors and exit 1', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateFileExists, validateSpeedRate } = await import('../src/utils/validations.js');
@@ -810,12 +810,12 @@ describe('Command actions', () => {
 
       await speedupAction('input.mp4', {});
 
-      // expect: progress bar is stopped and process exits with 1
+      // Expect progress bar is stopped and process exits with 1
       expect(mockProgressBar.stop).toHaveBeenCalled();
       expect(exitSpy).toHaveBeenCalledWith(1);
     });
 
-    // it: should handle non-Error thrown values in outer catch
+    // Should should handle non-Error thrown values in outer catch
     it('should handle non-Error thrown values in outer catch', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       vi.mocked(checkDependencies).mockRejectedValue('unknown error');
@@ -823,14 +823,14 @@ describe('Command actions', () => {
 
       await speedupAction('input.mp4', {});
 
-      // expect: process.exit is called with 1
+      // Expect process.exit is called with 1
       expect(exitSpy).toHaveBeenCalledWith(1);
     });
   });
 
-  // describe: audioAction
+  // Tests for audioAction
   describe('audioAction', () => {
-    // it: should exit when dependencies missing
+    // Should should exit when dependencies missing
     it('should exit when dependencies missing', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       vi.mocked(checkDependencies).mockResolvedValue({ ok: false, missing: ['ffmpeg'] });
@@ -838,11 +838,11 @@ describe('Command actions', () => {
 
       await audioAction('input.mp4', {});
 
-      // expect: process.exit is called with 1
+      // Expect process.exit is called with 1
       expect(exitSpy).toHaveBeenCalledWith(1);
     });
 
-    // it: should extract audio with defaults
+    // Should should extract audio with defaults
     it('should extract audio with defaults', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateFileExists, validateFormat, validateBitrate } = await import('../src/utils/validations.js');
@@ -856,11 +856,11 @@ describe('Command actions', () => {
 
       await audioAction('input.mp4', {});
 
-      // expect: extractAudio is called
+      // Expect extractAudio is called
       expect(extractAudio).toHaveBeenCalled();
     });
 
-    // it: should use provided output, format and bitrate
+    // Should should use provided output, format and bitrate
     it('should use provided output, format and bitrate', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateFileExists, validateFormat, validateBitrate } = await import('../src/utils/validations.js');
@@ -874,14 +874,14 @@ describe('Command actions', () => {
 
       await audioAction('input.mp4', { output: 'track.wav', format: 'wav', bitrate: '320k' });
 
-      // expect: extractAudio is called with custom options
+      // Expect extractAudio is called with custom options
       const callArgs = vi.mocked(extractAudio).mock.calls[0];
       expect(callArgs?.[1]).toBe('track.wav');
       expect(callArgs?.[2]).toBe('wav');
       expect(callArgs?.[3]).toBe('320k');
     });
 
-    // it: should handle errors and exit 1
+    // Should should handle errors and exit 1
     it('should handle errors and exit 1', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateFileExists } = await import('../src/utils/validations.js');
@@ -891,11 +891,11 @@ describe('Command actions', () => {
 
       await audioAction('input.mp4', {});
 
-      // expect: process.exit is called with 1
+      // Expect process.exit is called with 1
       expect(exitSpy).toHaveBeenCalledWith(1);
     });
 
-    // it: should handle non-Error thrown values
+    // Should should handle non-Error thrown values
     it('should handle non-Error thrown values', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateFileExists } = await import('../src/utils/validations.js');
@@ -905,11 +905,11 @@ describe('Command actions', () => {
 
       await audioAction('input.mp4', {});
 
-      // expect: process.exit is called with 1
+      // Expect process.exit is called with 1
       expect(exitSpy).toHaveBeenCalledWith(1);
     });
 
-    // it: should exit when validateBitrate throws error
+    // Should should exit when validateBitrate throws error
     it('should exit when validateBitrate throws error', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateFileExists, validateBitrate } = await import('../src/utils/validations.js');
@@ -922,11 +922,11 @@ describe('Command actions', () => {
 
       await audioAction('input.mp4', {});
 
-      // expect: process.exit is called with 1
+      // Expect process.exit is called with 1
       expect(exitSpy).toHaveBeenCalledWith(1);
     });
 
-    // it: should handle extractAudio errors and exit 1
+    // Should should handle extractAudio errors and exit 1
     it('should handle extractAudio errors and exit 1', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateFileExists, validateFormat, validateBitrate } = await import('../src/utils/validations.js');
@@ -941,11 +941,11 @@ describe('Command actions', () => {
 
       await audioAction('input.mp4', {});
 
-      // expect: process.exit is called with 1
+      // Expect process.exit is called with 1
       expect(exitSpy).toHaveBeenCalledWith(1);
     });
 
-    // it: should exit when validateFormat throws error
+    // Should should exit when validateFormat throws error
     it('should exit when validateFormat throws error', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateFileExists, validateFormat } = await import('../src/utils/validations.js');
@@ -958,11 +958,11 @@ describe('Command actions', () => {
 
       await audioAction('input.mp4', {});
 
-      // expect: process.exit is called with 1
+      // Expect process.exit is called with 1
       expect(exitSpy).toHaveBeenCalledWith(1);
     });
 
-    // it: should handle non-Error thrown values in outer catch
+    // Should should handle non-Error thrown values in outer catch
     it('should handle non-Error thrown values in outer catch', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       vi.mocked(checkDependencies).mockRejectedValue('unknown error');
@@ -970,14 +970,14 @@ describe('Command actions', () => {
 
       await audioAction('input.mp4', {});
 
-      // expect: process.exit is called with 1
+      // Expect process.exit is called with 1
       expect(exitSpy).toHaveBeenCalledWith(1);
     });
   });
 
-  // describe: compactAction
+  // Tests for compactAction
   describe('compactAction', () => {
-    // it: should exit when dependencies missing
+    // Should should exit when dependencies missing
     it('should exit when dependencies missing', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       vi.mocked(checkDependencies).mockResolvedValue({ ok: false, missing: ['ffmpeg'] });
@@ -985,11 +985,11 @@ describe('Command actions', () => {
 
       await compactAction('input.mp4', {});
 
-      // expect: process.exit is called with 1
+      // Expect process.exit is called with 1
       expect(exitSpy).toHaveBeenCalledWith(1);
     });
 
-    // it: should compact video with default options
+    // Should should compact video with default options
     it('should compact video with default options', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateFileExists } = await import('../src/utils/validations.js');
@@ -1001,11 +1001,11 @@ describe('Command actions', () => {
 
       await compactAction('input.mp4', {});
 
-      // expect: progress bar is started
+      // Expect progress bar is started
       expect(mockProgressBar.start).toHaveBeenCalled();
     });
 
-    // it: should handle non-Error thrown values in outer catch
+    // Should should handle non-Error thrown values in outer catch
     it('should handle non-Error thrown values in outer catch', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       vi.mocked(checkDependencies).mockRejectedValue('unknown error');
@@ -1013,14 +1013,14 @@ describe('Command actions', () => {
 
       await compactAction('input.mp4', {});
 
-      // expect: process.exit is called with 1
+      // Expect process.exit is called with 1
       expect(exitSpy).toHaveBeenCalledWith(1);
     });
   });
 
-  // describe: sliceAction
+  // Tests for sliceAction
   describe('sliceAction', () => {
-    // it: should exit when dependencies missing
+    // Should should exit when dependencies missing
     it('should exit when dependencies missing', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       vi.mocked(checkDependencies).mockResolvedValue({ ok: false, missing: ['ffmpeg'] });
@@ -1028,11 +1028,11 @@ describe('Command actions', () => {
 
       await sliceAction('input.mp4', { start: '10', end: '30' });
 
-      // expect: process.exit is called with 1
+      // Expect process.exit is called with 1
       expect(exitSpy).toHaveBeenCalledWith(1);
     });
 
-    // it: should exit when start/end not provided
+    // Should should exit when start/end not provided
     it('should exit when start/end not provided', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateFileExists } = await import('../src/utils/validations.js');
@@ -1043,11 +1043,11 @@ describe('Command actions', () => {
 
       await sliceAction('input.mp4', {});
 
-      // expect: process.exit is called with 1
+      // Expect process.exit is called with 1
       expect(exitSpy).toHaveBeenCalledWith(1);
     });
 
-    // it: should handle non-Error thrown values in outer catch
+    // Should should handle non-Error thrown values in outer catch
     it('should handle non-Error thrown values in outer catch', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       vi.mocked(checkDependencies).mockRejectedValue('unknown error');
@@ -1055,14 +1055,14 @@ describe('Command actions', () => {
 
       await sliceAction('input.mp4', { start: '10', end: '30' });
 
-      // expect: process.exit is called with 1
+      // Expect process.exit is called with 1
       expect(exitSpy).toHaveBeenCalledWith(1);
     });
   });
 
-  // describe: splitAction
+  // Tests for splitAction
   describe('splitAction', () => {
-    // it: should exit when dependencies missing
+    // Should should exit when dependencies missing
     it('should exit when dependencies missing', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       vi.mocked(checkDependencies).mockResolvedValue({ ok: false, missing: ['ffmpeg'] });
@@ -1070,11 +1070,11 @@ describe('Command actions', () => {
 
       await splitAction('input.mp4', { preset: 'instagram' });
 
-      // expect: process.exit is called with 1
+      // Expect process.exit is called with 1
       expect(exitSpy).toHaveBeenCalledWith(1);
     });
 
-    // it: should exit when neither preset nor duration provided
+    // Should should exit when neither preset nor duration provided
     it('should exit when neither preset nor duration provided', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateFileExists } = await import('../src/utils/validations.js');
@@ -1085,11 +1085,11 @@ describe('Command actions', () => {
 
       await splitAction('input.mp4', {});
 
-      // expect: process.exit is called with 1
+      // Expect process.exit is called with 1
       expect(exitSpy).toHaveBeenCalledWith(1);
     });
 
-    // it: should exit when both preset and duration provided
+    // Should should exit when both preset and duration provided
     it('should exit when both preset and duration provided', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateFileExists } = await import('../src/utils/validations.js');
@@ -1100,11 +1100,11 @@ describe('Command actions', () => {
 
       await splitAction('input.mp4', { preset: 'instagram', duration: '60' });
 
-      // expect: process.exit is called with 1
+      // Expect process.exit is called with 1
       expect(exitSpy).toHaveBeenCalledWith(1);
     });
 
-    // it: should handle non-Error thrown values in outer catch
+    // Should should handle non-Error thrown values in outer catch
     it('should handle non-Error thrown values in outer catch', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       vi.mocked(checkDependencies).mockRejectedValue('unknown error');
@@ -1112,7 +1112,7 @@ describe('Command actions', () => {
 
       await splitAction('input.mp4', { preset: 'instagram' });
 
-      // expect: process.exit is called with 1
+      // Expect process.exit is called with 1
       expect(exitSpy).toHaveBeenCalledWith(1);
     });
   });

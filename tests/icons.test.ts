@@ -2,67 +2,73 @@ import { describe, it, expect } from 'vitest';
 
 import { info, success, warning, error, loading } from '../src/utils/icons.js';
 
-// describe: icons utilities
+// Tests for icons utilities
 describe('icons', () => {
-  // describe: info icon
+  // Tests for info icon
   describe('info', () => {
-    // it: should render info icon
+    // Should render info icon with blue colored i
     it('should render info icon', () => {
-      // expect: info icon contains blue colored i
+      // Expect info icon contains blue colored 'i'
       expect(info).toContain('i');
+      // Expect info icon is truthy
       expect(info).toBeTruthy();
     });
   });
 
-  // describe: success icon
+  // Tests for success icon
   describe('success', () => {
-    // it: should render success icon
+    // Should render success icon with green checkmark
     it('should render success icon', () => {
-      // expect: success icon contains green checkmark
+      // Expect success icon contains green checkmark
       expect(success).toContain('✓');
+      // Expect success icon is truthy
       expect(success).toBeTruthy();
     });
   });
 
-  // describe: warning icon
+  // Tests for warning icon
   describe('warning', () => {
-    // it: should render warning icon
+    // Should render warning icon with yellow warning symbol
     it('should render warning icon', () => {
-      // expect: warning icon contains yellow warning symbol
+      // Expect warning icon contains yellow warning symbol
       expect(warning).toContain('‼');
+      // Expect warning icon is truthy
       expect(warning).toBeTruthy();
     });
   });
 
-  // describe: error icon
+  // Tests for error icon
   describe('error', () => {
-    // it: should render error icon
+    // Should render error icon with red X
     it('should render error icon', () => {
-      // expect: error icon contains red X
+      // Expect error icon contains red X
       expect(error).toContain('×');
+      // Expect error icon is truthy
       expect(error).toBeTruthy();
     });
   });
 
-  // describe: loading icon
+  // Tests for loading icon
   describe('loading', () => {
-    // it: should render loading icon
+    // Should render loading icon with tilde symbol
     it('should render loading icon', () => {
-      // expect: loading icon is defined and contains tilde
+      // Expect loading icon is defined
       expect(loading).toBeDefined();
+      // Expect loading icon contains tilde
       expect(loading).toContain('~');
     });
 
-    // it: should return a string
+    // Should return a non-empty string
     it('should return a string', () => {
-      // expect: loading icon returns a non-empty string
+      // Expect loading icon type is string
       expect(typeof loading).toBe('string');
+      // Expect loading icon length is greater than 0
       expect(loading.length).toBeGreaterThan(0);
     });
 
-    // it: should be white colored
+    // Should be white colored with tilde
     it('should be white colored', () => {
-      // expect: loading icon contains the tilde symbol
+      // Expect loading icon matches tilde pattern
       expect(loading).toMatch(/~/);
     });
   });

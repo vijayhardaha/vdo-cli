@@ -1,138 +1,123 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-vi.mock('../src/utils/dependencies.js', () => ({ runCommand: vi.fn() }));
-
 import { sanitizeFilename, slugify } from '../src/utils/sanitize.js';
 
-// describe: sanitize utilities
+// Tests for sanitize utilities
 describe('sanitize utils', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  // describe: sanitizeFilename
+  // Tests for sanitizeFilename
   describe('sanitizeFilename', () => {
-    // it: should return untitled for empty string
+    // Should return 'untitled' for empty string
     it('should return untitled for empty string', () => {
+      // Expect empty string becomes 'untitled'
       const result = sanitizeFilename('');
-
-      // expect: result is 'untitled'
       expect(result).toBe('untitled');
     });
 
-    // it: should trim whitespace
+    // Should trim whitespace from input
     it('should trim whitespace', () => {
+      // Expect whitespace-only input becomes dashes
       const result = sanitizeFilename('  test video  ');
-
-      // expect: result is trimmed with dashes
       expect(result).toBe('test-video');
     });
 
-    // it: should replace spaces with dashes
+    // Should replace multiple spaces with single dashes
     it('should replace spaces with dashes', () => {
+      // Expect multiple spaces become single dash
       const result = sanitizeFilename('test    video   name');
-
-      // expect: multiple spaces become single dash
       expect(result).toBe('test-video-name');
     });
 
-    // it: should remove colon on unix and replace space with dash
+    // Should remove colons and replace spaces with dashes on unix
     it('should remove colon on unix and replace space with dash', () => {
+      // Expect colons are stripped, spaces become dashes
       const result = sanitizeFilename('test: video');
-
-      // expect: colon is removed, space becomes dash
       expect(result).toBe('test-video');
     });
 
-    // it: should truncate to max length
+    // Should truncate filename to max length
     it('should truncate to max length', () => {
+      // Expect long filename is cut to specified length
       const longName = 'a'.repeat(250);
       const result = sanitizeFilename(longName, 100);
-
-      // expect: result length is within max length
       expect(result.length).toBeLessThanOrEqual(100);
     });
 
-    // it: should truncate at punctuation boundary near max length
+    // Should truncate at punctuation boundary
     it('should truncate at punctuation boundary near max length', () => {
+      // Expect truncation happens at punctuation, not mid-word
       const name = 'a'.repeat(100) + '!!!end';
       const result = sanitizeFilename(name, 50);
-
-      // expect: result is truncated at punctuation, not in middle of word
       expect(result.length).toBeLessThanOrEqual(50);
       expect(result).not.toContain('end');
     });
 
-    // it: should filter control characters
+    // Should filter out control characters
     it('should filter control characters', () => {
+      // Expect control characters are removed
       const result = sanitizeFilename('test\u0000video');
-
-      // expect: control character is removed
       expect(result).toBe('testvideo');
     });
 
-    // it: should remove trailing dots and spaces on Windows
+    // Should remove trailing dots and spaces on Windows
     it('should remove trailing dots and spaces on Windows', () => {
+      // Expect trailing punctuation is stripped on Windows
       const platformMock = vi.spyOn(process, 'platform', 'get');
       platformMock.mockReturnValue('win32');
 
       const result = sanitizeFilename('test video...   ');
 
-      // expect: trailing dots and spaces are removed
       expect(result).toBe('test-video');
 
       platformMock.mockRestore();
     });
 
-    // it: should truncate without punctuation when no cutoff symbols exist
+    // Should truncate at max length when no punctuation exists
     it('should truncate without punctuation when no cutoff symbols exist', () => {
+      // Expect truncation at exact maxLength
       const longName = 'a'.repeat(250);
       const result = sanitizeFilename(longName, 100);
-
-      // expect: result is truncated at maxLength
       expect(result.length).toBe(100);
     });
   });
 
-  // describe: slugify
+  // Tests for slugify
   describe('slugify', () => {
-    // it: should convert to lowercase
+    // Should convert input to lowercase
     it('should convert to lowercase', () => {
+      // Expect result is all lowercase
       const result = slugify('TEST Video');
-
-      // expect: result is lowercase
       expect(result).toBe('test-video');
     });
 
-    // it: should trim whitespace
+    // Should trim leading and trailing whitespace
     it('should trim whitespace', () => {
+      // Expect whitespace is removed
       const result = slugify('  test video  ');
-
-      // expect: result is trimmed
       expect(result).toBe('test-video');
     });
 
-    // it: should replace spaces and underscores with hyphens
+    // Should replace spaces and underscores with hyphens
     it('should replace spaces and underscores with hyphens', () => {
+      // Expect mixed separators become hyphens
       const result = slugify('test_video-name');
-
-      // expect: underscores become hyphens
       expect(result).toBe('test-video-name');
     });
 
-    // it: should remove non-word characters except hyphens
+    // Should remove non-word characters except hyphens
     it('should remove non-word characters except hyphens', () => {
+      // Expect special chars are stripped, hyphens preserved
       const result = slugify('test@#$%video');
-
-      // expect: special chars are removed
       expect(result).toBe('testvideo');
     });
 
-    // it: should remove leading and trailing hyphens
+    // Should remove leading and trailing hyphens
     it('should remove leading and trailing hyphens', () => {
+      // Expect hyphens at edges are trimmed
       const result = slugify('---test video---');
-
-      // expect: leading/trailing hyphens are removed
       expect(result).toBe('test-video');
     });
   });

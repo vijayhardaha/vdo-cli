@@ -8,7 +8,7 @@ vi.mock('../src/commands/speedup.js', () => ({ setupSpeedup: vi.fn() }));
 vi.mock('../src/commands/audio.js', () => ({ setupAudio: vi.fn() }));
 vi.mock('module', () => ({ createRequire: vi.fn(() => () => ({ version: '1.0.0', name: 'vdo' })) }));
 
-// Test suite for bin/vdo CLI entry point
+// Tests for bin/vdo CLI entry point
 describe('bin/vdo', () => {
   // Should register all 5 commands on the program
   it('should register all 5 commands on the program', async () => {
