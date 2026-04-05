@@ -5,6 +5,48 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.2] - 2026-04-06
+
+### Added
+
+- **Output Resolution Utility**: Created centralized `resolveOutputFile()` utility for consistent output path generation
+  - Handles format extension matching (appends if different, keeps if same)
+  - Generates default filenames with configurable suffixes
+  - Preserves input file extensions when no format specified
+  - Comprehensive test suite with 11 test cases covering edge cases
+
+- **Split Output Helper**: Added `generateSplitOutputPaths()` helper for split command
+  - Generates sequential output paths for split operations
+  - Preserves input file extensions in generated paths
+
+### Changed
+
+- **Command Refactoring**: Migrated multiple commands to use `resolveOutputFile()` utility
+  - `convert`: Removed duplicate output logic, now uses centralized utility
+  - `compress`: Simplified output path generation
+  - `compact`: Simplified output path generation with HEVC support
+  - `slice`: Simplified output path generation with descriptive suffixes
+  - `speedup`: Simplified output path generation with rate-based suffixes
+  - `split`: Updated to preserve input extensions in generated paths
+
+- **Download Extension Logic**: Improved output extension matching in download command
+  - Fixed extension comparison to properly handle format matching
+  - Uses `extname` for consistent extension checking
+  - Simplified conditional logic for output path generation
+
+### Fixed
+
+- **Extension Matching**: Corrected output extension matching logic in download command
+  - Properly handles cases where output extension differs from requested format
+  - Ensures correct format extension is appended when needed
+
+### Testing
+
+- Added comprehensive tests for `resolveOutputFile()` utility (11 test cases)
+- Added tests for convert command format extension matching scenarios
+- Added tests for compact, compress, and speedup commands
+- Improved test coverage for output path resolution edge cases
+
 ## [1.0.1] - 2026-04-05
 
 ### Added
