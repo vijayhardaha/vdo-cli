@@ -57,7 +57,7 @@ describe('Commands Setup', () => {
 
       expect(commands).toHaveLength(1);
       expect(commands[0]?.name()).toBe('convert');
-      expect(commands[0]?.aliases()).toContain('cv');
+      expect(commands[0]?.aliases()).toContain('cvt');
     });
 
     // Should have to option
@@ -86,7 +86,7 @@ describe('Commands Setup', () => {
 
       expect(commands).toHaveLength(1);
       expect(commands[0]?.name()).toBe('compress');
-      expect(commands[0]?.aliases()).toContain('cm');
+      expect(commands[0]?.aliases()).toContain('cps');
     });
 
     // Should have crf option
@@ -117,7 +117,7 @@ describe('Commands Setup', () => {
 
       expect(commands).toHaveLength(1);
       expect(commands[0]?.name()).toBe('speedup');
-      expect(commands[0]?.aliases()).toContain('sp');
+      expect(commands[0]?.aliases()).toContain('sup');
     });
 
     // Should have rate option
@@ -170,7 +170,7 @@ describe('Commands Setup', () => {
 
       expect(commands).toHaveLength(1);
       expect(commands[0]?.name()).toBe('compact');
-      expect(commands[0]?.aliases()).toContain('cp');
+      expect(commands[0]?.aliases()).toContain('cpt');
     });
 
     // Should have target option
@@ -219,7 +219,7 @@ describe('Commands Setup', () => {
 
       expect(commands).toHaveLength(1);
       expect(commands[0]?.name()).toBe('slice');
-      expect(commands[0]?.aliases()).toContain('sl');
+      expect(commands[0]?.aliases()).toContain('slc');
     });
 
     // Should have start option
@@ -277,6 +277,7 @@ describe('Commands Setup', () => {
 
       expect(commands).toHaveLength(1);
       expect(commands[0]?.name()).toBe('split');
+      expect(commands[0]?.aliases()).toContain('spl');
     });
 
     // Should have preset option
