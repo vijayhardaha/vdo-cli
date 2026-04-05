@@ -204,4 +204,4 @@ git commit -m "feat: add version dropdown selector
 
 **Types:** `feat`, `fix`, `docs`, `test`, `refactor`, `style`, `build`, `chore`
 
-**Rules:** Subject line ≤50 chars, blank line after subject, body wrapped at 72 chars, lowercase only.
+**Rules:** Subject line ≤72 chars, blank line after subject, body wrapped at 100 chars.
