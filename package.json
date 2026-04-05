@@ -1,6 +1,6 @@
 {
   "name": "@vijayhardaha/vdo-cli",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "A Node.js CLI tool for video utilities using yt-dlp and ffmpeg",
   "type": "module",
   "main": "./dist/vdo.js",
