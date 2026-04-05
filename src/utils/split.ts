@@ -42,9 +42,7 @@ export function parseDuration(durationStr: string): number {
   return parseFloat(durationStr);
 }
 
-/**
- * Valid preset names for split value parsing
- */
+/* Valid preset names for split value parsing */
 const VALID_PRESETS: SplitPreset[] = ['instagram', 'ig', 'whatsapp', 'wa', 'facebook', 'fb'];
 
 /**
