@@ -104,16 +104,17 @@ interface Bar {
 const myVar = "value";
 ```
 
-#### Test Comments (describe, it, expect)
+#### Test Comments (describe, it)
 
 ```ts
-// describe: {Test suite name}
-// it: {Expected behavior}
-// expect: {What is being tested}
+// Tests for {Test suite name}
 describe("foo", () => {
-  // it: should return bar when given valid input
+  // Should return {Expected behavior}
   it("should return bar", () => {
-    // expect: foo('input') returns 'bar'
+    .
+    .
+    .
+    // Expect {What is being tested}
     expect(foo("input")).toBe("bar");
   });
 });
