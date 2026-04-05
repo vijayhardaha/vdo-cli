@@ -37,18 +37,18 @@
 src/
 ├── bin/
 │   ├── vdo.ts           # Entry point, wires up Commander
-│   └── __tests__/        # Tests for bin/vdo.ts
+│   └── __tests__/       # Tests for bin/vdo.ts
 │       └── vdo.test.ts
 ├── commands/
 │   ├── audio.ts         # setupAudio() + audioAction()
 │   ├── compact.ts       # setupCompact() + compactAction()
 │   ├── compress.ts      # setupCompress() + compressAction()
-│   ├── convert.ts      # setupConvert() + convertAction()
+│   ├── convert.ts       # setupConvert() + convertAction()
 │   ├── download.ts      # setupDownload() + downloadAction()
-│   ├── slice.ts        # setupSlice() + sliceAction()
-│   ├── speedup.ts      # setupSpeedup() + speedupAction()
-│   ├── split.ts        # setupSplit() + splitAction()
-│   └── __tests__/      # Tests for commands (setup + action tests)
+│   ├── slice.ts         # setupSlice() + sliceAction()
+│   ├── speedup.ts       # setupSpeedup() + speedupAction()
+│   ├── split.ts         # setupSplit() + splitAction()
+│   └── __tests__/       # Tests for commands (setup + action tests)
 │       ├── audio.test.ts
 │       ├── compact.test.ts
 │       ├── compress.test.ts
@@ -70,9 +70,9 @@ src/
 │   │   ├── split.test.ts
 │   │   ├── validations.test.ts
 │   │   └── ytdlp.test.ts
-│   ├── dependencies.ts  # checkDependencies(), runCommand()
+│   ├── dependencies.ts  # ensureDependencies(), checkDependencies(), runCommand()
 │   ├── icons.ts         # Icons (info, success, warning, error, loading)
-│   ├── log.ts          # Logging utility (log.succeed, log.fail, etc.)
+│   ├── log.ts           # Logging utility (log.succeed, log.fail, etc.)
 │   ├── progress.ts      # Progress bar utilities
 │   ├── sanitize.ts      # Filename sanitization
 │   ├── validations.ts   # Input validation helpers
@@ -188,7 +188,7 @@ import { log } from "./log";
 
 Every action must:
 
-1. Call `checkDependencies()` first → `process.exit(1)` if missing
+1. Call `ensureDependencies()` first - handles dependency check, logging, and exit
 2. Validate all inputs before spawning processes
 3. Catch errors → `log.fail('<message>')` → `process.exit(1)`
 4. On success → `log.succeed('<Action> completed successfully!')`
