@@ -1,5 +1,6 @@
 import { runCommand } from './dependencies';
 import { parseFFmpegProgress } from './progress';
+import { checkAndPromptOverwrite } from './prompt';
 import type { ProgressInfo } from '../types/index';
 
 /**
@@ -66,6 +67,11 @@ export async function compactVideo(
   hevc: boolean,
   onProgress?: (progress: number) => void
 ): Promise<void> {
+  const shouldProceed = await checkAndPromptOverwrite([outputPath]);
+  if (!shouldProceed) {
+    process.exit(0);
+  }
+
   const videoCodec = hevc ? 'libx265' : 'libx264';
   const pass1Log = 'ffmpeg2pass-0.log';
 
@@ -124,6 +130,11 @@ export async function compactVideoCRF(
   hevc: boolean,
   onProgress?: (progress: number) => void
 ): Promise<void> {
+  const shouldProceed = await checkAndPromptOverwrite([outputPath]);
+  if (!shouldProceed) {
+    process.exit(0);
+  }
+
   const videoCodec = hevc ? 'libx265' : 'libx264';
   const command = `ffmpeg -y -i "${inputPath}" -c:v ${videoCodec} -crf ${crf} -preset ${preset} -c:a aac -b:a ${audioBitrate} "${outputPath}"`;
 

@@ -11,6 +11,7 @@ import { checkDependencies } from '../utils/dependencies';
 import { convertVideo } from '../utils/ffmpeg';
 import { log } from '../utils/log';
 import { createProgressBar, formatFileSize } from '../utils/progress';
+import { checkAndPromptOverwrite } from '../utils/prompt';
 import { parseSplitValue } from '../utils/split';
 import { validateUrl, validateFormat } from '../utils/validations';
 import { downloadVideo, getVideoInfo, generateFilename } from '../utils/ytdlp';
@@ -66,6 +67,11 @@ export async function downloadAction(url: string, options: DownloadOptions): Pro
         : `${options.output}.${format === 'mp3' ? 'mp3' : format}`;
     } else {
       outputFile = generateFilename(videoInfo, format);
+    }
+
+    const shouldProceed = await checkAndPromptOverwrite([outputFile]);
+    if (!shouldProceed) {
+      process.exit(0);
     }
 
     const { value: total, unit } = formatFileSize(videoInfo.filesize || 0);

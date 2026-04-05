@@ -1,5 +1,6 @@
 import { runCommand } from './dependencies';
 import { parseFFmpegProgress } from './progress';
+import { checkAndPromptOverwrite } from './prompt';
 
 /**
  * Get video duration using ffprobe
@@ -31,6 +32,11 @@ export async function convertVideo(
   preset = 'fast',
   onProgress: ((percentage: number, currentTime: number, totalTime: number) => void) | null = null
 ): Promise<void> {
+  const shouldProceed = await checkAndPromptOverwrite([outputPath]);
+  if (!shouldProceed) {
+    process.exit(0);
+  }
+
   const presetMap: Record<string, string> = {
     ultrafast: 'ultrafast',
     fast: 'fast',
@@ -86,6 +92,11 @@ export async function compressVideo(
   preset = 'medium',
   onProgress: ((percentage: number, currentTime: number, totalTime: number) => void) | null = null
 ): Promise<void> {
+  const shouldProceed = await checkAndPromptOverwrite([outputPath]);
+  if (!shouldProceed) {
+    process.exit(0);
+  }
+
   const command = `ffmpeg -y -i "${inputPath}" -c:v libx264 -crf ${crf} -preset ${preset} -c:a copy "${outputPath}"`;
 
   let totalTime = 0;
@@ -158,6 +169,12 @@ export async function speedUpVideo(
   }
 
   const videoFilter = `-vf "setpts=${1 / rate}*PTS"`;
+
+  const shouldProceed = await checkAndPromptOverwrite([outputPath]);
+  if (!shouldProceed) {
+    process.exit(0);
+  }
+
   const command = `ffmpeg -y -i "${inputPath}" ${videoFilter} ${audioFilter} -c:v libx264 -c:a aac "${outputPath}"`;
 
   let totalTime = 0;
@@ -209,6 +226,11 @@ export async function extractAudio(
 
   const ffmpegFormat = formatMap[format.toLowerCase()];
   const ffmpegCodec = codecMap[format.toLowerCase()];
+
+  const shouldProceed = await checkAndPromptOverwrite([outputPath]);
+  if (!shouldProceed) {
+    process.exit(0);
+  }
 
   const command = `ffmpeg -y -i "${inputPath}" -vn -acodec ${ffmpegCodec} -b:a ${bitrate} -f ${ffmpegFormat} "${outputPath}"`;
 
