@@ -10,6 +10,7 @@ describe('icons', () => {
     it('should render info icon', () => {
       // Expect info icon contains blue colored 'i'
       expect(info).toContain('i');
+
       // Expect info icon is truthy
       expect(info).toBeTruthy();
     });
@@ -21,6 +22,7 @@ describe('icons', () => {
     it('should render success icon', () => {
       // Expect success icon contains green checkmark
       expect(success).toContain('✓');
+
       // Expect success icon is truthy
       expect(success).toBeTruthy();
     });
@@ -32,6 +34,7 @@ describe('icons', () => {
     it('should render warning icon', () => {
       // Expect warning icon contains yellow warning symbol
       expect(warning).toContain('‼');
+
       // Expect warning icon is truthy
       expect(warning).toBeTruthy();
     });
@@ -43,6 +46,7 @@ describe('icons', () => {
     it('should render error icon', () => {
       // Expect error icon contains red X
       expect(error).toContain('×');
+
       // Expect error icon is truthy
       expect(error).toBeTruthy();
     });
@@ -54,6 +58,7 @@ describe('icons', () => {
     it('should render loading icon', () => {
       // Expect loading icon is defined
       expect(loading).toBeDefined();
+
       // Expect loading icon contains tilde
       expect(loading).toContain('~');
     });
@@ -62,6 +67,7 @@ describe('icons', () => {
     it('should return a string', () => {
       // Expect loading icon type is string
       expect(typeof loading).toBe('string');
+
       // Expect loading icon length is greater than 0
       expect(loading.length).toBeGreaterThan(0);
     });

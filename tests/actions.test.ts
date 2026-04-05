@@ -147,8 +147,9 @@ describe('Command actions', () => {
 
       await downloadAction('https://example.com', { output: 'myvideo', format: 'mp3' });
 
-      // Expect output appends format extension
       const callArgs = vi.mocked(downloadVideo).mock.calls[0];
+
+      // Expect output appends format extension
       expect(callArgs?.[1]).toBe('myvideo.mp3');
     });
 
@@ -301,8 +302,9 @@ describe('Command actions', () => {
 
       await convertAction('input.avi', { output: 'custom_out.mp4', format: 'mp4', preset: 'slow' });
 
-      // Expect convertVideo is called with custom output
       const callArgs = vi.mocked(convertVideo).mock.calls[0];
+
+      // Expect convertVideo is called with custom output
       expect(callArgs?.[1]).toBe('custom_out.mp4');
     });
 
@@ -405,6 +407,7 @@ describe('Command actions', () => {
       vi.mocked(validatePreset).mockImplementation(() => {
         throw new Error('Invalid preset: invalid');
       });
+
       const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
 
       await convertAction('input.avi', {});
@@ -426,6 +429,7 @@ describe('Command actions', () => {
       vi.mocked(validatePreset).mockReturnValue(undefined);
       vi.mocked(convertVideo).mockRejectedValue(new Error('Conversion failed'));
       vi.mocked(createProgressBar).mockReturnValue(mockProgressBar as never);
+
       const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
 
       await convertAction('input.avi', {});
@@ -441,7 +445,9 @@ describe('Command actions', () => {
     // Should should exit when dependencies missing
     it('should exit when dependencies missing', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
+
       vi.mocked(checkDependencies).mockResolvedValue({ ok: false, missing: ['ffmpeg'] });
+
       const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
 
       await compressAction('input.mp4', {});
@@ -486,8 +492,9 @@ describe('Command actions', () => {
 
       await compressAction('input.mp4', { output: 'small.mp4', crf: 23, preset: 'slow' });
 
-      // Expect compressVideo is called with custom output and crf
       const callArgs = vi.mocked(compressVideo).mock.calls[0];
+
+      // Expect compressVideo is called with custom output and crf
       expect(callArgs?.[1]).toBe('small.mp4');
       expect(callArgs?.[2]).toBe(23);
     });
@@ -540,8 +547,10 @@ describe('Command actions', () => {
     it('should handle errors and exit 1', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateFileExists } = await import('../src/utils/validations.js');
+
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateFileExists).mockRejectedValue(new Error('File not found'));
+
       const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
 
       await compressAction('input.mp4', {});
@@ -554,8 +563,10 @@ describe('Command actions', () => {
     it('should handle non-Error thrown values', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateFileExists } = await import('../src/utils/validations.js');
+
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateFileExists).mockRejectedValue('string error');
+
       const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
 
       await compressAction('input.mp4', {});
@@ -568,11 +579,13 @@ describe('Command actions', () => {
     it('should exit when validatePreset throws error', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateFileExists, validatePreset } = await import('../src/utils/validations.js');
+
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateFileExists).mockResolvedValue(undefined);
       vi.mocked(validatePreset).mockImplementation(() => {
         throw new Error('Invalid preset');
       });
+
       const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
 
       await compressAction('input.mp4', {});
@@ -594,6 +607,7 @@ describe('Command actions', () => {
       vi.mocked(validateCRF).mockReturnValue(undefined);
       vi.mocked(compressVideo).mockRejectedValue(new Error('Compression failed'));
       vi.mocked(createProgressBar).mockReturnValue(mockProgressBar as never);
+
       const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
 
       await compressAction('input.mp4', {});
@@ -607,11 +621,13 @@ describe('Command actions', () => {
     it('should exit when validateCRF throws error', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateFileExists, validateCRF } = await import('../src/utils/validations.js');
+
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateFileExists).mockResolvedValue(undefined);
       vi.mocked(validateCRF).mockImplementation(() => {
         throw new Error('Invalid CRF');
       });
+
       const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
 
       await compressAction('input.mp4', {});
@@ -623,7 +639,9 @@ describe('Command actions', () => {
     // Should should handle non-Error thrown values in outer catch
     it('should handle non-Error thrown values in outer catch', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
+
       vi.mocked(checkDependencies).mockRejectedValue('unknown error');
+
       const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
 
       await compressAction('input.mp4', {});
@@ -638,7 +656,9 @@ describe('Command actions', () => {
     // Should should exit when dependencies missing
     it('should exit when dependencies missing', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
+
       vi.mocked(checkDependencies).mockResolvedValue({ ok: false, missing: ['ffmpeg'] });
+
       const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
 
       await speedupAction('input.mp4', {});
@@ -743,8 +763,9 @@ describe('Command actions', () => {
 
       await speedupAction('input.mp4', { rate: 1 });
 
-      // Expect console.log is not called with 'faster' or 'slower'
       const consoleCalls = vi.mocked(console.log).mock.calls.map((c: unknown[]) => String(c[0]));
+
+      // Expect console.log is not called with 'faster' or 'slower'
       expect(consoleCalls.some((m: string) => m?.includes('faster'))).toBe(false);
       expect(consoleCalls.some((m: string) => m?.includes('slower'))).toBe(false);
     });
@@ -753,8 +774,10 @@ describe('Command actions', () => {
     it('should handle errors and exit 1', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateFileExists } = await import('../src/utils/validations.js');
+
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateFileExists).mockRejectedValue(new Error('File not found'));
+
       const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
 
       await speedupAction('input.mp4', {});
@@ -767,8 +790,10 @@ describe('Command actions', () => {
     it('should handle non-Error thrown values', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateFileExists } = await import('../src/utils/validations.js');
+
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateFileExists).mockRejectedValue('string error');
+
       const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
 
       await speedupAction('input.mp4', {});
@@ -781,11 +806,13 @@ describe('Command actions', () => {
     it('should exit when validateSpeedRate throws error', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateFileExists, validateSpeedRate } = await import('../src/utils/validations.js');
+
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateFileExists).mockResolvedValue(undefined);
       vi.mocked(validateSpeedRate).mockImplementation(() => {
         throw new Error('Invalid speed rate');
       });
+
       const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
 
       await speedupAction('input.mp4', {});
@@ -806,6 +833,7 @@ describe('Command actions', () => {
       vi.mocked(validateSpeedRate).mockReturnValue(undefined);
       vi.mocked(speedUpVideo).mockRejectedValue(new Error('Speed adjustment failed'));
       vi.mocked(createProgressBar).mockReturnValue(mockProgressBar as never);
+
       const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
 
       await speedupAction('input.mp4', {});
@@ -818,7 +846,9 @@ describe('Command actions', () => {
     // Should should handle non-Error thrown values in outer catch
     it('should handle non-Error thrown values in outer catch', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
+
       vi.mocked(checkDependencies).mockRejectedValue('unknown error');
+
       const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
 
       await speedupAction('input.mp4', {});
@@ -833,7 +863,9 @@ describe('Command actions', () => {
     // Should should exit when dependencies missing
     it('should exit when dependencies missing', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
+
       vi.mocked(checkDependencies).mockResolvedValue({ ok: false, missing: ['ffmpeg'] });
+
       const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
 
       await audioAction('input.mp4', {});
@@ -885,8 +917,10 @@ describe('Command actions', () => {
     it('should handle errors and exit 1', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateFileExists } = await import('../src/utils/validations.js');
+
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateFileExists).mockRejectedValue(new Error('File not found'));
+
       const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
 
       await audioAction('input.mp4', {});
@@ -899,8 +933,10 @@ describe('Command actions', () => {
     it('should handle non-Error thrown values', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateFileExists } = await import('../src/utils/validations.js');
+
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateFileExists).mockRejectedValue('string error');
+
       const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
 
       await audioAction('input.mp4', {});
@@ -913,11 +949,13 @@ describe('Command actions', () => {
     it('should exit when validateBitrate throws error', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateFileExists, validateBitrate } = await import('../src/utils/validations.js');
+
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateFileExists).mockResolvedValue(undefined);
       vi.mocked(validateBitrate).mockImplementation(() => {
         throw new Error('Invalid bitrate');
       });
+
       const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
 
       await audioAction('input.mp4', {});
@@ -937,6 +975,7 @@ describe('Command actions', () => {
       vi.mocked(validateFormat).mockReturnValue(undefined);
       vi.mocked(validateBitrate).mockReturnValue(undefined);
       vi.mocked(extractAudio).mockRejectedValue(new Error('Audio extraction failed'));
+
       const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
 
       await audioAction('input.mp4', {});
@@ -949,11 +988,13 @@ describe('Command actions', () => {
     it('should exit when validateFormat throws error', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
       const { validateFileExists, validateFormat } = await import('../src/utils/validations.js');
+
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateFileExists).mockResolvedValue(undefined);
       vi.mocked(validateFormat).mockImplementation(() => {
         throw new Error('Invalid format');
       });
+
       const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
 
       await audioAction('input.mp4', {});
@@ -965,7 +1006,9 @@ describe('Command actions', () => {
     // Should should handle non-Error thrown values in outer catch
     it('should handle non-Error thrown values in outer catch', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
+
       vi.mocked(checkDependencies).mockRejectedValue('unknown error');
+
       const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
 
       await audioAction('input.mp4', {});
@@ -980,7 +1023,9 @@ describe('Command actions', () => {
     // Should should exit when dependencies missing
     it('should exit when dependencies missing', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
+
       vi.mocked(checkDependencies).mockResolvedValue({ ok: false, missing: ['ffmpeg'] });
+
       const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
 
       await compactAction('input.mp4', {});
@@ -1008,7 +1053,9 @@ describe('Command actions', () => {
     // Should should handle non-Error thrown values in outer catch
     it('should handle non-Error thrown values in outer catch', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
+
       vi.mocked(checkDependencies).mockRejectedValue('unknown error');
+
       const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
 
       await compactAction('input.mp4', {});
@@ -1023,7 +1070,9 @@ describe('Command actions', () => {
     // Should should exit when dependencies missing
     it('should exit when dependencies missing', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
+
       vi.mocked(checkDependencies).mockResolvedValue({ ok: false, missing: ['ffmpeg'] });
+
       const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
 
       await sliceAction('input.mp4', { start: '10', end: '30' });
@@ -1039,6 +1088,7 @@ describe('Command actions', () => {
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateFileExists).mockResolvedValue(undefined);
+
       const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
 
       await sliceAction('input.mp4', {});
@@ -1050,7 +1100,9 @@ describe('Command actions', () => {
     // Should should handle non-Error thrown values in outer catch
     it('should handle non-Error thrown values in outer catch', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
+
       vi.mocked(checkDependencies).mockRejectedValue('unknown error');
+
       const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
 
       await sliceAction('input.mp4', { start: '10', end: '30' });
@@ -1065,7 +1117,9 @@ describe('Command actions', () => {
     // Should should exit when dependencies missing
     it('should exit when dependencies missing', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
+
       vi.mocked(checkDependencies).mockResolvedValue({ ok: false, missing: ['ffmpeg'] });
+
       const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
 
       await splitAction('input.mp4', { preset: 'instagram' });
@@ -1081,6 +1135,7 @@ describe('Command actions', () => {
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateFileExists).mockResolvedValue(undefined);
+
       const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
 
       await splitAction('input.mp4', {});
@@ -1096,6 +1151,7 @@ describe('Command actions', () => {
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateFileExists).mockResolvedValue(undefined);
+
       const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
 
       await splitAction('input.mp4', { preset: 'instagram', duration: '60' });
@@ -1107,7 +1163,9 @@ describe('Command actions', () => {
     // Should should handle non-Error thrown values in outer catch
     it('should handle non-Error thrown values in outer catch', async () => {
       const { checkDependencies } = await import('../src/utils/dependencies.js');
+
       vi.mocked(checkDependencies).mockRejectedValue('unknown error');
+
       const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
 
       await splitAction('input.mp4', { preset: 'instagram' });

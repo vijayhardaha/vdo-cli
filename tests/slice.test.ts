@@ -33,6 +33,7 @@ describe('slice utils', () => {
     // Should handle plain seconds
     it('should handle plain seconds', () => {
       const result = formatTimeForFFmpeg('90');
+
       // Expect formatTimeForFFmpeg converts seconds to HH:MM:SS
       expect(result).toBe('00:01:30');
     });
@@ -40,6 +41,7 @@ describe('slice utils', () => {
     // Should handle 0 seconds
     it('should handle 0 seconds', () => {
       const result = formatTimeForFFmpeg('0');
+
       // Expect formatTimeForFFmpeg handles zero
       expect(result).toBe('00:00:00');
     });
@@ -47,6 +49,7 @@ describe('slice utils', () => {
     // Should handle large hours
     it('should handle large hours', () => {
       const result = formatTimeForFFmpeg('3661');
+
       // Expect formatTimeForFFmpeg formats hours correctly
       expect(result).toBe('01:01:01');
     });
@@ -62,6 +65,7 @@ describe('slice utils', () => {
 
       // Expect sliceVideoStreamCopy builds correct ffmpeg command
       expect(runCommand).toHaveBeenCalledTimes(1);
+
       // Expect sliceVideoStreamCopy uses correct command arguments
       expect(runCommand).toHaveBeenCalledWith(
         'ffmpeg -y -ss "00:00:10" -i "input.mp4" -to "00:00:30" -c copy "output.mp4"',
@@ -90,6 +94,7 @@ describe('slice utils', () => {
 
       // Expect sliceVideoReencode uses libx264 for h264
       expect(runCommand).toHaveBeenCalledTimes(1);
+
       // Expect sliceVideoReencode uses correct h264 command arguments
       expect(runCommand).toHaveBeenCalledWith(
         'ffmpeg -y -ss "00:00:10" -i "input.mp4" -to "00:00:30" -c:v libx264 -crf 23 -c:a aac "output.mp4"',
@@ -136,10 +141,13 @@ describe('slice utils', () => {
 
       // Expect sliceMultipleSegments generates correct output paths
       expect(runCommand).toHaveBeenCalledTimes(2);
+
       // Expect sliceMultipleSegments returns correct number of segments
       expect(result.length).toBe(2);
+
       // Expect first segment has correct filename
       expect(result[0]).toContain('segment_1_0_10.mp4');
+
       // Expect second segment has correct filename
       expect(result[1]).toContain('segment_2_30_45.mp4');
     });
@@ -154,6 +162,7 @@ describe('slice utils', () => {
 
       // Expect sliceMultipleSegments processes segments correctly
       expect(runCommand).toHaveBeenCalledTimes(1);
+
       // Expect sliceMultipleSegments returns correct length
       expect(result.length).toBe(1);
     });
@@ -173,6 +182,7 @@ describe('slice utils', () => {
 
       // Expect sliceMultipleSegments updates progress correctly at 50%
       expect(progressCallback).toHaveBeenCalledWith(50, 1);
+
       // Expect sliceMultipleSegments updates progress correctly at 100%
       expect(progressCallback).toHaveBeenCalledWith(100, 2);
     });
