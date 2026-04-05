@@ -84,7 +84,9 @@ vdo download <url> [options]
 **Options:**
 
 - `-o, --output <file>` - Output file name
-- `--format <format>` - Select format (mp4, mkv, mp3) (default: "mp4")
+- `--format <format>` - Select format (mp4, mkv, webm, avi, mov, mp3) (default: "mp4")
+- `--convert` - Convert the downloaded file using ffmpeg after download
+- `--split <value>` - Split after download (ig|wa|fb|instagram|whatsapp|facebook or seconds)
 
 **Examples:**
 
@@ -100,6 +102,18 @@ vdo download https://youtube.com/watch?v=example --format mkv
 
 # Download audio only (MP3)
 vdo download https://youtube.com/watch?v=example --format mp3
+
+# Download and convert (remuxes to ensure clean file)
+vdo download https://youtube.com/watch?v=example --convert
+
+# Download and split for Instagram (60s parts)
+vdo download https://youtube.com/watch?v=example --split ig
+
+# Download and split by custom duration (45 seconds)
+vdo download https://youtube.com/watch?v=example --split 45
+
+# Download, convert, and split for WhatsApp (90s parts)
+vdo download https://youtube.com/watch?v=example --convert --split wa
 ```
 
 **Aliases:** `dl`
