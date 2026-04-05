@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-import { sanitizeFilename, slugify } from '../src/utils/sanitize.js';
+import { sanitizeFilename, slugify } from '../sanitize.js';
 
 // Tests for sanitize utilities
 describe('sanitize utils', () => {

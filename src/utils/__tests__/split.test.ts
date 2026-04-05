@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-import { runCommand } from '../src/utils/dependencies.js';
+import { runCommand } from '../dependencies.js';
 import {
   parseDuration,
   calculateNumParts,
@@ -10,9 +10,9 @@ import {
   splitVideoStreamCopy,
   parseSplitValue,
   PRESET_DURATIONS,
-} from '../src/utils/split.js';
+} from '../split.js';
 
-vi.mock('../src/utils/dependencies.js', () => ({ runCommand: vi.fn() }));
+vi.mock('../dependencies.js', () => ({ runCommand: vi.fn() }));
 
 // Tests for split utils
 describe('split utils', () => {

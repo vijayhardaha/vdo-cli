@@ -1,18 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-import {
-  parseSizeToMB,
-  calculateTargetBitrate,
-  getCRFForQuality,
-  compactVideo,
-  compactVideoCRF,
-} from '../src/utils/compact.js';
-import { runCommand } from '../src/utils/dependencies.js';
-import { checkAndPromptOverwrite } from '../src/utils/prompt.js';
+import { parseSizeToMB, calculateTargetBitrate, getCRFForQuality, compactVideo, compactVideoCRF } from '../compact.js';
+import { runCommand } from '../dependencies.js';
+import { checkAndPromptOverwrite } from '../prompt.js';
 
-vi.mock('../src/utils/dependencies.js', () => ({ runCommand: vi.fn() }));
+vi.mock('../dependencies.js', () => ({ runCommand: vi.fn() }));
 
-vi.mock('../src/utils/prompt.js', () => ({ checkAndPromptOverwrite: vi.fn().mockResolvedValue(true) }));
+vi.mock('../prompt.js', () => ({ checkAndPromptOverwrite: vi.fn().mockResolvedValue(true) }));
 
 // Tests for compact utils
 describe('compact utils', () => {

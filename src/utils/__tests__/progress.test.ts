@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 
-import { parseFFmpegProgress, parseYtDlpProgress, kbToMB, createProgressBar } from '../src/utils/progress.js';
+import { parseFFmpegProgress, parseYtDlpProgress, kbToMB, createProgressBar } from '../progress.js';
 
 vi.mock('cli-progress', () => ({
   default: {
@@ -199,7 +199,7 @@ describe('Progress', () => {
   describe('formatFileSize', () => {
     // Should return bytes when less than 1024
     it('should return bytes when less than 1024', async () => {
-      const { formatFileSize } = await import('../src/utils/progress.js');
+      const { formatFileSize } = await import('../progress.js');
 
       const result = formatFileSize(500);
 
@@ -212,7 +212,7 @@ describe('Progress', () => {
 
     // Should return KB for values < 1MB
     it('should return KB for values < 1MB', async () => {
-      const { formatFileSize } = await import('../src/utils/progress.js');
+      const { formatFileSize } = await import('../progress.js');
 
       const result = formatFileSize(1024);
 
@@ -225,7 +225,7 @@ describe('Progress', () => {
 
     // Should return MB for values < 1GB
     it('should return MB for values < 1GB', async () => {
-      const { formatFileSize } = await import('../src/utils/progress.js');
+      const { formatFileSize } = await import('../progress.js');
 
       const result = formatFileSize(1024 * 1024);
 
@@ -238,7 +238,7 @@ describe('Progress', () => {
 
     // Should return GB for values < 1TB
     it('should return GB for values < 1TB', async () => {
-      const { formatFileSize } = await import('../src/utils/progress.js');
+      const { formatFileSize } = await import('../progress.js');
 
       const result = formatFileSize(1024 * 1024 * 1024);
 
@@ -251,7 +251,7 @@ describe('Progress', () => {
 
     // Should return TB for values >= 1TB
     it('should return TB for values >= 1TB', async () => {
-      const { formatFileSize } = await import('../src/utils/progress.js');
+      const { formatFileSize } = await import('../progress.js');
 
       const result = formatFileSize(1024 * 1024 * 1024 * 1024);
 
