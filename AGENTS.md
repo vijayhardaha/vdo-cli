@@ -35,12 +35,44 @@
 
 ```
 src/
-├── bin/vdo.ts           # Entry point, wires up Commander
-├── commands/*.ts        # setup<Name>() + <name>Action()
+├── bin/
+│   ├── vdo.ts           # Entry point, wires up Commander
+│   └── __tests__/        # Tests for bin/vdo.ts
+│       └── vdo.test.ts
+├── commands/
+│   ├── audio.ts         # setupAudio() + audioAction()
+│   ├── compact.ts       # setupCompact() + compactAction()
+│   ├── compress.ts      # setupCompress() + compressAction()
+│   ├── convert.ts      # setupConvert() + convertAction()
+│   ├── download.ts      # setupDownload() + downloadAction()
+│   ├── slice.ts        # setupSlice() + sliceAction()
+│   ├── speedup.ts      # setupSpeedup() + speedupAction()
+│   ├── split.ts        # setupSplit() + splitAction()
+│   └── __tests__/      # Tests for commands (setup + action tests)
+│       ├── audio.test.ts
+│       ├── compact.test.ts
+│       ├── compress.test.ts
+│       ├── convert.test.ts
+│       ├── download.test.ts
+│       ├── slice.test.ts
+│       ├── speedup.test.ts
+│       └── split.test.ts
 ├── utils/
+│   ├── __tests__/      # Tests for utilities
+│   │   ├── compact.test.ts
+│   │   ├── dependencies.test.ts
+│   │   ├── ffmpeg.test.ts
+│   │   ├── icons.test.ts
+│   │   ├── progress.test.ts
+│   │   ├── prompt.test.ts
+│   │   ├── sanitize.test.ts
+│   │   ├── slice.test.ts
+│   │   ├── split.test.ts
+│   │   ├── validations.test.ts
+│   │   └── ytdlp.test.ts
 │   ├── dependencies.ts  # checkDependencies(), runCommand()
 │   ├── icons.ts         # Icons (info, success, warning, error, loading)
-│   ├── log.ts           # Logging utility (log.succeed, log.fail, etc.)
+│   ├── log.ts          # Logging utility (log.succeed, log.fail, etc.)
 │   ├── progress.ts      # Progress bar utilities
 │   ├── sanitize.ts      # Filename sanitization
 │   ├── validations.ts   # Input validation helpers
@@ -48,7 +80,8 @@ src/
 │   ├── ytdlp.ts         # yt-dlp wrappers
 │   ├── compact.ts       # Compact/two-pass encoding utilities
 │   ├── slice.ts         # Slice/trim utilities
-│   └── split.ts         # Split utilities (parseSplitValue, etc.)
+│   ├── split.ts         # Split utilities (parseSplitValue, etc.)
+│   └── prompt.ts        # Prompt utilities (checkAndPromptOverwrite, etc.)
 └── types/index.ts       # All shared interfaces
 ```
 
@@ -164,7 +197,7 @@ Every action must:
 
 ### Unit Tests
 
-- Test files in `tests/` matching `*.test.ts`
+- Test files in `__tests__/` directories matching `*.test.ts`
 - Vitest globals available without importing (`describe`, `it`, `expect`, `vi`)
 - Mock all external dependencies (no real ffmpeg/yt-dlp processes)
 - `vitest.setup.ts` mocks `console.*` globally
@@ -192,7 +225,7 @@ Install: `brew install ffmpeg yt-dlp`
 1. Create `src/commands/<name>.ts` with `setup<Name>()` and `<name>Action()`
 2. Add interface to `src/types/index.ts`
 3. Import and call `setup<Name>(program)` in `src/bin/vdo.ts`
-4. Add test file `tests/<name>.test.ts`
+4. Add test file `src/commands/__tests__/<name>.test.ts` with both setup and action tests
 5. Document in README.md
 
 ## Documentation

@@ -60,8 +60,11 @@ bun run format:check # Check formatting
 ```
 vdo-cli/
 ├── src/
-│   ├── bin/vdo.ts           # Entry point
+│   ├── bin/
+│   │   ├── vdo.ts           # Entry point
+│   │   └── __tests__/       # Tests for bin
 │   ├── commands/            # Command implementations
+│   │   ├── __tests__/       # Tests for commands
 │   │   ├── audio.ts
 │   │   ├── compress.ts
 │   │   ├── compact.ts
@@ -71,11 +74,13 @@ vdo-cli/
 │   │   ├── speedup.ts
 │   │   └── split.ts
 │   ├── utils/               # Utility functions
+│   │   ├── __tests__/       # Tests for utilities
 │   │   ├── dependencies.ts
 │   │   ├── ffmpeg.ts
 │   │   ├── icons.ts
 │   │   ├── log.ts
 │   │   ├── progress.ts
+│   │   ├── prompt.ts
 │   │   ├── sanitize.ts
 │   │   ├── slice.ts
 │   │   ├── split.ts
@@ -83,7 +88,6 @@ vdo-cli/
 │   │   └── ytdlp.ts
 │   └── types/               # TypeScript types
 │       └── index.ts
-├── tests/                   # Test files
 ├── docs/                    # Documentation
 └── dist/                    # Build output
 ```
@@ -129,7 +133,7 @@ vdo-cli/
    setupNewCmd(program);
    ```
 
-4. Add tests in `tests/newcmd.test.ts`
+4. Add tests in `src/commands/__tests__/newcmd.test.ts`
 
 5. Document in README.md
 

@@ -542,7 +542,9 @@ bun run tsc
 vdo/
 ├── src/
 │   ├── bin/
-│   │   └── vdo.ts              # Main entry point
+│   │   ├── vdo.ts              # Main entry point
+│   │   └── __tests__/
+│   │       └── vdo.test.ts
 │   ├── commands/
 │   │   ├── download.ts         # Download command
 │   │   ├── convert.ts          # Convert command
@@ -550,6 +552,7 @@ vdo/
 │   │   ├── compact.ts          # Compact command
 │   │   ├── slice.ts            # Slice command
 │   │   ├── speedup.ts          # Speed adjustment command
+│   │   ├── split.ts            # Split command
 │   │   └── audio.ts            # Audio extraction command
 │   ├── utils/
 │   │   ├── dependencies.ts     # Dependency checking utilities
@@ -561,20 +564,10 @@ vdo/
 │   │   ├── progress.ts          # Progress bar utilities
 │   │   ├── compact.ts           # Compact utilities
 │   │   ├── slice.ts            # Slice utilities
-│   │   └── split.ts            # Split utilities
+│   │   ├── split.ts            # Split utilities
+│   │   └── prompt.ts           # Prompt utilities
 │   └── types/
 │       └── index.ts             # TypeScript type definitions
-├── tests/
-│   ├── actions.test.ts
-│   ├── commands.test.ts
-│   ├── dependencies.test.ts
-│   ├── ffmpeg.test.ts
-│   ├── progress.test.ts
-│   ├── sanitize.test.ts
-│   ├── ytdlp.test.ts
-│   ├── compact.test.ts
-│   ├── slice.test.ts
-│   └── split.test.ts
 ├── package.json
 ├── vitest.config.ts
 └── README.md
