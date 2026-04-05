@@ -11,8 +11,8 @@ import { log } from '../utils/log';
 import { createProgressBar } from '../utils/progress';
 import { validateFileExists, validateFormat, validatePreset } from '../utils/validations';
 
-/* Allowed video formats for conversion */
-const ALLOWED_FORMATS = ['mp4', 'mkv', 'avi', 'mov', 'webm', 'flv'];
+/* Allowed video formats for conversion (webm not supported - requires VP9/Opus codec) */
+const ALLOWED_FORMATS = ['mp4', 'mkv', 'avi', 'mov', 'flv'];
 /* Allowed encoding presets for ffmpeg */
 const ALLOWED_PRESETS = ['ultrafast', 'fast', 'medium', 'slow', 'high-quality'];
 
@@ -108,7 +108,7 @@ export function setupConvert(program: Command): void {
     .alias('cvt')
     .description('Convert local video to different format')
     .option('-o, --output <file>', 'Output file name')
-    .option('-f, --format <format>', 'Target format (mp4, mkv, avi, mov, webm, flv)', 'mp4')
+    .option('-f, --format <format>', 'Target format (mp4, mkv, avi, mov, flv)', 'mp4')
     .option('--preset <preset>', 'Encoding preset (ultrafast, fast, medium, slow, high-quality)', 'fast')
     .action(convertAction);
 }
