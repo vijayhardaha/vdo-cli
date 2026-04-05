@@ -57,16 +57,16 @@ src/
 ## Development Commands
 
 ```bash
-bun dev                # Run CLI in development
+bun run dev            # Run CLI in development
 bun run build          # Build to dist/vdo.js
-bun test               # Vitest single run
+bun run test           # Vitest single run
 bun run test:watch     # Vitest watch mode
 bun run test:coverage  # Vitest with coverage
 bun run tsc            # TypeScript check
 bun run lint           # ESLint check
 bun run lint:fix       # ESLint auto-fix
 bun run format         # Format code
-bun run format:check    # Check formatting
+bun run format:check   # Check formatting
 ```
 
 ## Coding Conventions

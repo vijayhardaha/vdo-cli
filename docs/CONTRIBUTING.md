@@ -40,8 +40,8 @@ bun run build        # Build for production
 ### Running Tests
 
 ```bash
-bun test             # Run all tests
-bun run test:watch   # Run tests in watch mode
+bun run test          # Run all tests
+bun run test:watch    # Run tests in watch mode
 bun run test:coverage # Run with coverage
 ```
 

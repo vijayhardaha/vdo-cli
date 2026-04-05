@@ -515,7 +515,7 @@ source ~/.bashrc
 ### Running Tests
 
 ```bash
-bun test
+bun run test
 ```
 
 ### Running Tests with Coverage
