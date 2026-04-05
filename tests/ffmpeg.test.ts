@@ -521,12 +521,12 @@ describe('ffmpeg utils', () => {
     // it: should extract mp3 with libmp3lame codec
     it('should extract mp3 with libmp3lame codec', async () => {
       const { runCommand } = await import('../src/utils/dependencies.js');
-      vi.mocked(runCommand).mockResolvedValue({ stdout: '', stderr: '' });
+      vi.mocked(runCommand).mockResolvedValue({ stdout: '120', stderr: '' });
 
       await extractAudio('input.mp4', 'output.mp3', 'mp3', '192k');
 
-      // expect: command uses correct mp3 settings
-      const cmd = vi.mocked(runCommand).mock.calls[0]?.[0];
+      // expect: command uses correct mp3 settings (last call is ffmpeg)
+      const cmd = vi.mocked(runCommand).mock.calls.at(-1)?.[0];
       expect(cmd).toContain('libmp3lame');
       expect(cmd).toContain('-b:a 192k');
       expect(cmd).toContain('-f mp3');
@@ -535,12 +535,12 @@ describe('ffmpeg utils', () => {
     // it: should extract wav with pcm_s16le codec
     it('should extract wav with pcm_s16le codec', async () => {
       const { runCommand } = await import('../src/utils/dependencies.js');
-      vi.mocked(runCommand).mockResolvedValue({ stdout: '', stderr: '' });
+      vi.mocked(runCommand).mockResolvedValue({ stdout: '120', stderr: '' });
 
       await extractAudio('input.mp4', 'output.wav', 'wav', '320k');
 
-      // expect: command uses correct wav settings
-      const cmd = vi.mocked(runCommand).mock.calls[0]?.[0];
+      // expect: command uses correct wav settings (last call is ffmpeg)
+      const cmd = vi.mocked(runCommand).mock.calls.at(-1)?.[0];
       expect(cmd).toContain('pcm_s16le');
       expect(cmd).toContain('-f wav');
     });
@@ -548,12 +548,12 @@ describe('ffmpeg utils', () => {
     // it: should extract aac with adts format
     it('should extract aac with adts format', async () => {
       const { runCommand } = await import('../src/utils/dependencies.js');
-      vi.mocked(runCommand).mockResolvedValue({ stdout: '', stderr: '' });
+      vi.mocked(runCommand).mockResolvedValue({ stdout: '120', stderr: '' });
 
       await extractAudio('input.mp4', 'output.aac', 'aac', '128k');
 
-      // expect: command uses correct aac settings
-      const cmd = vi.mocked(runCommand).mock.calls[0]?.[0];
+      // expect: command uses correct aac settings (last call is ffmpeg)
+      const cmd = vi.mocked(runCommand).mock.calls.at(-1)?.[0];
       expect(cmd).toContain('aac');
       expect(cmd).toContain('-f adts');
     });
@@ -561,12 +561,12 @@ describe('ffmpeg utils', () => {
     // it: should use default format mp3 and bitrate 192k
     it('should use default format mp3 and bitrate 192k', async () => {
       const { runCommand } = await import('../src/utils/dependencies.js');
-      vi.mocked(runCommand).mockResolvedValue({ stdout: '', stderr: '' });
+      vi.mocked(runCommand).mockResolvedValue({ stdout: '120', stderr: '' });
 
       await extractAudio('input.mp4', 'output.mp3');
 
-      // expect: command uses default mp3 settings
-      const cmd = vi.mocked(runCommand).mock.calls[0]?.[0];
+      // expect: command uses default mp3 settings (last call is ffmpeg)
+      const cmd = vi.mocked(runCommand).mock.calls.at(-1)?.[0];
       expect(cmd).toContain('libmp3lame');
       expect(cmd).toContain('-b:a 192k');
     });
