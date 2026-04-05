@@ -5,12 +5,12 @@
   "type": "module",
   "main": "./dist/vdo.js",
   "bin": {
-    "vdo": "./dist/vdo.js"
+    "vdo": "dist/vdo.js"
   },
   "homepage": "https://github.com/vijayhardaha/vdo-cli",
   "repository": {
     "type": "git",
-    "url": "https://github.com/vijayhardaha/vdo-cli.git"
+    "url": "git+https://github.com/vijayhardaha/vdo-cli.git"
   },
   "bugs": {
     "url": "https://github.com/vijayhardaha/vdo-cli/issues"
@@ -26,6 +26,9 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "tsc": "tsc --noEmit",
+    "prepublishOnly": "bun run build",
+    "release": "release-it",
+    "release:dry": "release-it --dry-run",
     "prepare": "husky"
   },
   "keywords": [
