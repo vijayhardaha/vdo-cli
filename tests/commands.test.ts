@@ -8,6 +8,7 @@ import { setupConvert } from '../src/commands/convert.js';
 import { setupDownload } from '../src/commands/download.js';
 import { setupSlice } from '../src/commands/slice.js';
 import { setupSpeedup } from '../src/commands/speedup.js';
+import { setupSplit } from '../src/commands/split.js';
 
 describe('Commands Setup', () => {
   let program: Command;
@@ -264,6 +265,64 @@ describe('Commands Setup', () => {
       const segmentsOption = cmd?.options.find((opt) => opt.long === '--segments');
 
       expect(segmentsOption).toBeDefined();
+    });
+  });
+
+  // Tests for split command setup
+  describe('split command', () => {
+    // Should register split command with correct options
+    it('should register split command with correct options', () => {
+      setupSplit(program);
+      const commands = program.commands;
+
+      expect(commands).toHaveLength(1);
+      expect(commands[0]?.name()).toBe('split');
+      expect(commands[0]?.aliases()).toContain('sp');
+    });
+
+    // Should have preset option
+    it('should have preset option', () => {
+      setupSplit(program);
+      const cmd = program.commands[0];
+      const presetOption = cmd?.options.find((opt) => opt.long === '--preset');
+
+      expect(presetOption).toBeDefined();
+    });
+
+    // Should have duration option
+    it('should have duration option', () => {
+      setupSplit(program);
+      const cmd = program.commands[0];
+      const durationOption = cmd?.options.find((opt) => opt.long === '--duration');
+
+      expect(durationOption).toBeDefined();
+    });
+
+    // Should have fast option
+    it('should have fast option', () => {
+      setupSplit(program);
+      const cmd = program.commands[0];
+      const fastOption = cmd?.options.find((opt) => opt.long === '--fast');
+
+      expect(fastOption).toBeDefined();
+    });
+
+    // Should have precise option
+    it('should have precise option', () => {
+      setupSplit(program);
+      const cmd = program.commands[0];
+      const preciseOption = cmd?.options.find((opt) => opt.long === '--precise');
+
+      expect(preciseOption).toBeDefined();
+    });
+
+    // Should have codec option
+    it('should have codec option', () => {
+      setupSplit(program);
+      const cmd = program.commands[0];
+      const codecOption = cmd?.options.find((opt) => opt.long === '--codec');
+
+      expect(codecOption).toBeDefined();
     });
   });
 });

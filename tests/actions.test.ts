@@ -7,6 +7,7 @@ import { convertAction } from '../src/commands/convert.js';
 import { downloadAction } from '../src/commands/download.js';
 import { sliceAction } from '../src/commands/slice.js';
 import { speedupAction } from '../src/commands/speedup.js';
+import { splitAction } from '../src/commands/split.js';
 
 vi.mock('../src/utils/dependencies.js', () => ({ checkDependencies: vi.fn(), runCommand: vi.fn() }));
 
@@ -22,6 +23,11 @@ vi.mock('../src/utils/ffmpeg.js', () => ({
   speedUpVideo: vi.fn(),
   extractAudio: vi.fn(),
   getVideoDuration: vi.fn(() => Promise.resolve(60)),
+}));
+
+vi.mock('../src/utils/split.js', () => ({
+  splitVideoReencode: vi.fn(() => Promise.resolve(['output_001.mp4', 'output_002.mp4'])),
+  splitVideoStreamCopy: vi.fn(() => Promise.resolve(['output_001.mp4', 'output_002.mp4'])),
 }));
 
 vi.mock('../src/utils/validations.js', () => ({
@@ -1043,6 +1049,63 @@ describe('Command actions', () => {
       const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
 
       await sliceAction('input.mp4', { start: '10', end: '30' });
+
+      // expect: process.exit is called with 1
+      expect(exitSpy).toHaveBeenCalledWith(1);
+    });
+  });
+
+  // describe: splitAction
+  describe('splitAction', () => {
+    // it: should exit when dependencies missing
+    it('should exit when dependencies missing', async () => {
+      const { checkDependencies } = await import('../src/utils/dependencies.js');
+      vi.mocked(checkDependencies).mockResolvedValue({ ok: false, missing: ['ffmpeg'] });
+      const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
+
+      await splitAction('input.mp4', { preset: 'instagram' });
+
+      // expect: process.exit is called with 1
+      expect(exitSpy).toHaveBeenCalledWith(1);
+    });
+
+    // it: should exit when neither preset nor duration provided
+    it('should exit when neither preset nor duration provided', async () => {
+      const { checkDependencies } = await import('../src/utils/dependencies.js');
+      const { validateFileExists } = await import('../src/utils/validations.js');
+
+      vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
+      vi.mocked(validateFileExists).mockResolvedValue(undefined);
+      const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
+
+      await splitAction('input.mp4', {});
+
+      // expect: process.exit is called with 1
+      expect(exitSpy).toHaveBeenCalledWith(1);
+    });
+
+    // it: should exit when both preset and duration provided
+    it('should exit when both preset and duration provided', async () => {
+      const { checkDependencies } = await import('../src/utils/dependencies.js');
+      const { validateFileExists } = await import('../src/utils/validations.js');
+
+      vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
+      vi.mocked(validateFileExists).mockResolvedValue(undefined);
+      const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
+
+      await splitAction('input.mp4', { preset: 'instagram', duration: '60' });
+
+      // expect: process.exit is called with 1
+      expect(exitSpy).toHaveBeenCalledWith(1);
+    });
+
+    // it: should handle non-Error thrown values in outer catch
+    it('should handle non-Error thrown values in outer catch', async () => {
+      const { checkDependencies } = await import('../src/utils/dependencies.js');
+      vi.mocked(checkDependencies).mockRejectedValue('unknown error');
+      const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
+
+      await splitAction('input.mp4', { preset: 'instagram' });
 
       // expect: process.exit is called with 1
       expect(exitSpy).toHaveBeenCalledWith(1);
