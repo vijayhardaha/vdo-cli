@@ -100,6 +100,8 @@ export async function sliceAction(input: string, options: SliceOptions): Promise
 
       const progressBar = createProgressBar(`${loading} Slicing | ${options.segments.length} segments | ${mode}`);
 
+      progressBar.start(100, 0);
+
       try {
         const outputPaths = await sliceMultipleSegments(
           input,
@@ -160,6 +162,8 @@ export async function sliceAction(input: string, options: SliceOptions): Promise
     log.succeed(`Slicing started | ${startDisplay} to ${endDisplay} | Mode: ${mode}`);
 
     const progressBar = createProgressBar(`${loading} Slicing | ${startDisplay} to ${endDisplay}`);
+
+    progressBar.start(100, 0);
 
     try {
       if (options.fast) {
