@@ -17,6 +17,54 @@ const DEFAULT_CODEC: 'h264' | 'hevc' = 'h264';
 const DEFAULT_CRF = 23;
 
 /**
+ * Format seconds to smart filename string
+ * - Removes unnecessary leading zeros
+ * - Only includes hours if >= 1 hour
+ * - Uses underscores as separators
+ *
+ * @param {number} seconds - Duration in seconds
+ * @returns {string} Smart formatted string (e.g., "10s", "1m_30s", "00h_10m_30s")
+ */
+function formatSecondsToFilename(seconds: number): string {
+  const hours = Math.floor(seconds / 3600);
+  const mins = Math.floor((seconds % 3600) / 60);
+  const secs = Math.floor(seconds % 60);
+
+  if (hours > 0) {
+    return `${hours}h_${mins.toString().padStart(2, '0')}m_${secs.toString().padStart(2, '0')}s`;
+  }
+  if (mins > 0) {
+    return `${mins}m_${secs.toString().padStart(2, '0')}s`;
+  }
+  return `${secs}s`;
+}
+
+/**
+ * Parse time string to seconds
+ *
+ * @param {string} timeStr - Time string (e.g., '10', '1:30', '00:01:30')
+ * @returns {number} Duration in seconds
+ */
+function parseTimeToSeconds(timeStr: string): number {
+  const hmsMatch = timeStr.match(/^(\d+):(\d{2}):(\d{2})(?:\.(\d+))?$/);
+  if (hmsMatch) {
+    const hours = parseInt(hmsMatch[1], 10);
+    const mins = parseInt(hmsMatch[2], 10);
+    const secs = parseInt(hmsMatch[3], 10);
+    return hours * 3600 + mins * 60 + secs;
+  }
+
+  const msMatch = timeStr.match(/^(\d+):(\d{2})(?:\.(\d+))?$/);
+  if (msMatch) {
+    const mins = parseInt(msMatch[1], 10);
+    const secs = parseInt(msMatch[2], 10);
+    return mins * 60 + secs;
+  }
+
+  return parseFloat(timeStr);
+}
+
+/**
  * Slice/trim video segment
  *
  * @param {string} input - Path to input video file
@@ -82,50 +130,50 @@ export async function sliceAction(input: string, options: SliceOptions): Promise
       process.exit(1);
     }
 
-    const start = formatTimeForFFmpeg(options.start);
-    let end = options.end ? formatTimeForFFmpeg(options.end) : undefined;
+    const startTime = parseTimeToSeconds(options.start);
+    let endTime = options.end ? parseTimeToSeconds(options.end) : undefined;
     const mode = options.fast ? 'fast' : options.precise ? 'precise' : 'auto';
 
     // check: if duration is provided instead of end
-    if (!end && options.duration) {
-      const durationSec = parseFloat(options.duration);
-      const startSec = parseFloat(options.start);
+    if (endTime === undefined && options.duration) {
+      const durationSec = parseTimeToSeconds(options.duration);
+      const startSec = parseTimeToSeconds(options.start);
       if (!isNaN(durationSec) && !isNaN(startSec)) {
-        const endSec = startSec + durationSec;
-        const hours = Math.floor(endSec / 3600);
-        const mins = Math.floor((endSec % 3600) / 60);
-        const secs = Math.floor(endSec % 60);
-        end = `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        endTime = startSec + durationSec;
       }
     }
+
+    // Format for ffmpeg and display
+    const startFFmpeg = formatTimeForFFmpeg(options.start);
+    const endFFmpeg = options.end ? formatTimeForFFmpeg(options.end) : formatTimeForFFmpeg(String(endTime));
+    const startDisplay = formatSecondsToFilename(startTime);
+    const endDisplay = endTime !== undefined ? formatSecondsToFilename(endTime) : '';
 
     let outputFile = options.output;
     // check: if output path not provided, generate descriptive default
     if (!outputFile) {
       const dir = dirname(input);
       const ext = extname(input);
-      const safeStart = start.replace(/:/g, 'h') + 'm';
-      const safeEnd = end ? end.replace(/:/g, 'h') + 'm' : '';
-      outputFile = join(dir, `${basename(input, ext)}_${safeStart}_${safeEnd}${ext}`);
+      outputFile = join(dir, `${basename(input, ext)}_${startDisplay}_${endDisplay}${ext}`);
     }
 
-    log.succeed(`Slicing started | ${start} to ${end} | Mode: ${mode}`);
+    log.succeed(`Slicing started | ${startDisplay} to ${endDisplay} | Mode: ${mode}`);
 
-    const progressBar = createProgressBar(`${loading} Slicing | ${start} to ${end}`);
+    const progressBar = createProgressBar(`${loading} Slicing | ${startDisplay} to ${endDisplay}`);
 
     try {
       if (options.fast) {
-        await sliceVideoStreamCopy(input, outputFile, start, end!, (_progress) => {
+        await sliceVideoStreamCopy(input, outputFile, startFFmpeg, endFFmpeg, (_progress) => {
           // Stream copy is fast, progress callback optional
         });
       } else if (options.precise) {
         const codec = options.codec === 'hevc' ? 'hevc' : 'h264';
-        await sliceVideoReencode(input, outputFile, start, end!, codec, DEFAULT_CRF, (progress) => {
+        await sliceVideoReencode(input, outputFile, startFFmpeg, endFFmpeg, codec, DEFAULT_CRF, (progress) => {
           progressBar.update(progress);
         });
       } else {
         // Smart default: use stream copy (faster)
-        await sliceVideoStreamCopy(input, outputFile, start, end!, (_progress) => {
+        await sliceVideoStreamCopy(input, outputFile, startFFmpeg, endFFmpeg, (_progress) => {
           // Stream copy is fast
         });
       }
