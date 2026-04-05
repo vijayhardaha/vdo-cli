@@ -1,0 +1,18 @@
+{
+  "$schema": "https://unpkg.com/release-it@19.2.4/schema/release-it.json",
+  "git": {
+    "requireCleanWorkingDir": true,
+    "commitMessage": "build(release): bump version to ${version}",
+    "tagAnnotation": "v${version}",
+    "tagName": "v${version}"
+  },
+  "npm": { "publish": true, "publishArgs": ["--access=public"], "ignoreVersion": true },
+  "github": { "releaseName": "Release v${version}" },
+  "hooks": {
+    "before:init": ["bun run tsc", "bun run format:check", "bun run lint", "bun test"],
+    "before:git:commit": ["bun run build"],
+    "before:release": "echo \"Publishing v${version}...\"",
+    "after:release": "echo \"Released v${version} successfully! 🎉\"",
+    "after:git:release": "echo \"Git tag v${version} pushed!\""
+  }
+}
