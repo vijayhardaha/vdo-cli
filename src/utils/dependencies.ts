@@ -1,4 +1,5 @@
 import { exec, spawn } from 'child_process';
+import os from 'node:os';
 
 import type { DependencyCheck, CommandResult } from '@/types/index';
 import { log } from '@/utils/log';
@@ -84,6 +85,35 @@ export function runCommand(
 }
 
 /**
+ * Get the appropriate install command based on the OS platform
+ *
+ * @param {string[]} missing - Array of missing dependency names
+ * @returns {string} - Platform-specific install command
+ */
+export function getInstallCommand(missing: string[]): string {
+  const platform = os.platform();
+  const packages = missing.join(' ');
+
+  // check: if running on macOS
+  if (platform === 'darwin') {
+    return `brew install ${packages}`;
+  }
+
+  // check: if running on Linux
+  if (platform === 'linux') {
+    return `sudo apt install ${packages}`;
+  }
+
+  // check: if running on Windows
+  if (platform === 'win32') {
+    return `winget install ${packages}`;
+  }
+
+  // fallback: generic message for unknown platforms
+  return `install ${packages} manually`;
+}
+
+/**
  * Ensure dependencies are available, exit with error if missing
  *
  * @returns {Promise<boolean>} true if all dependencies are available
@@ -93,7 +123,7 @@ export async function ensureDependencies(): Promise<boolean> {
   const deps = await checkDependencies();
   if (!deps.ok) {
     log.fail(`Missing dependencies: ${deps.missing.join(', ')}`);
-    log.warn('Install using: brew install ffmpeg yt-dlp');
+    log.warn(`Install using: ${getInstallCommand(deps.missing)}`);
     process.exit(1);
   }
   return true;

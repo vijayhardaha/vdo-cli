@@ -1,13 +1,15 @@
+import os from 'node:os';
+
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-import { checkCommand, checkDependencies, runCommand } from '@/utils/dependencies';
+import { checkCommand, checkDependencies, runCommand, getInstallCommand } from '@/utils/dependencies';
 
 type ExecCallback = (err: Error | null) => void;
 type MockFn = ReturnType<typeof vi.fn>;
 
 vi.mock('child_process', () => ({ exec: vi.fn(), spawn: vi.fn() }));
 
-// Test suite for dependency utility functions
+// Tests for dependency utility functions
 describe('dependencies', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -208,6 +210,54 @@ describe('dependencies', () => {
       const result = await runCommand('cmd', null);
 
       expect(result.stdout).toBe('data');
+    });
+  });
+
+  // Tests for getInstallCommand function
+  describe('getInstallCommand', () => {
+    // Should return brew install command on macOS
+    it('should return brew install command on macOS', () => {
+      vi.spyOn(os, 'platform').mockReturnValue('darwin');
+
+      const result = getInstallCommand(['ffmpeg', 'yt-dlp']);
+
+      expect(result).toBe('brew install ffmpeg yt-dlp');
+    });
+
+    // Should return apt install command on Linux
+    it('should return apt install command on Linux', () => {
+      vi.spyOn(os, 'platform').mockReturnValue('linux');
+
+      const result = getInstallCommand(['ffmpeg', 'yt-dlp']);
+
+      expect(result).toBe('sudo apt install ffmpeg yt-dlp');
+    });
+
+    // Should return winget install command on Windows
+    it('should return winget install command on Windows', () => {
+      vi.spyOn(os, 'platform').mockReturnValue('win32');
+
+      const result = getInstallCommand(['ffmpeg', 'yt-dlp']);
+
+      expect(result).toBe('winget install ffmpeg yt-dlp');
+    });
+
+    // Should return manual install message on unknown platform
+    it('should return manual install message on unknown platform', () => {
+      vi.spyOn(os, 'platform').mockReturnValue('freebsd' as ReturnType<typeof os.platform>);
+
+      const result = getInstallCommand(['ffmpeg', 'yt-dlp']);
+
+      expect(result).toBe('install ffmpeg yt-dlp manually');
+    });
+
+    // Should handle single missing package
+    it('should handle single missing package', () => {
+      vi.spyOn(os, 'platform').mockReturnValue('darwin');
+
+      const result = getInstallCommand(['ffmpeg']);
+
+      expect(result).toBe('brew install ffmpeg');
     });
   });
 });
