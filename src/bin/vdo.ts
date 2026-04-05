@@ -11,6 +11,7 @@ import { setupConvert } from '../commands/convert';
 import { setupDownload } from '../commands/download';
 import { setupSlice } from '../commands/slice';
 import { setupSpeedup } from '../commands/speedup';
+import { setupSplit } from '../commands/split';
 
 /* Create require function for ESM modules */
 const require = createRequire(import.meta.url);
@@ -33,6 +34,7 @@ setupCompress(program);
 setupCompact(program);
 setupSpeedup(program);
 setupSlice(program);
+setupSplit(program);
 setupAudio(program);
 
 /* Add help examples */
@@ -46,6 +48,7 @@ Examples:
   $ vdo compress video.mp4 --crf 23 --preset slow
   $ vdo compact video.mp4 --target 25MB --discord
   $ vdo slice video.mp4 --start 10 --end 30 --precise
+  $ vdo split video.mp4 --preset instagram
   $ vdo speedup video.mp4 --rate 1.5
   $ vdo audio video.mp4 --format mp3 --bitrate 320k
 
