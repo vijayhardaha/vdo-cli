@@ -1,4 +1,4 @@
-import { resolve, dirname, basename, extname, join } from 'path';
+import { resolve } from 'path';
 
 import type { Command } from 'commander';
 
@@ -7,6 +7,7 @@ import { ensureDependencies } from '@/utils/dependencies';
 import { compressVideo } from '@/utils/ffmpeg';
 import { loading } from '@/utils/icons';
 import { log } from '@/utils/log';
+import { resolveOutputFile } from '@/utils/output';
 import { createProgressBar } from '@/utils/progress';
 import { validateFileExists, validatePreset, validateCRF } from '@/utils/validations';
 
@@ -50,13 +51,7 @@ export async function compressAction(input: string, options: CompressOptions): P
       process.exit(1);
     }
 
-    let outputFile = options.output;
-    // check: if output path not provided, generate default
-    if (!outputFile) {
-      const dir = dirname(input);
-      const name = basename(input, extname(input));
-      outputFile = join(dir, `${name}_compressed.mp4`);
-    }
+    const outputFile = resolveOutputFile({ input, output: options.output, suffix: '_compressed' });
 
     log.succeed(`Compression started | CRF: ${crf} | Preset: ${preset}`);
 

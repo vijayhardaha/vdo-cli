@@ -18,6 +18,27 @@ import {
 } from '@/utils/split';
 import { validateFileExists } from '@/utils/validations';
 
+/**
+ * Generate output file paths for split operation
+ *
+ * @param {string} input - Input video file path
+ * @param {number} numParts - Number of parts to split into
+ * @returns {string[]} Array of output file paths
+ */
+function generateSplitOutputPaths(input: string, numParts: number): string[] {
+  const dir = dirname(input);
+  const ext = extname(input).slice(1) || 'mp4';
+  const baseName = basename(input, extname(input));
+  const outputPaths: string[] = [];
+
+  for (let i = 0; i < numParts; i++) {
+    const paddedIndex = String(i + 1).padStart(3, '0');
+    outputPaths.push(`${dir}/${baseName}_${paddedIndex}.${ext}`);
+  }
+
+  return outputPaths;
+}
+
 /* Default codec */
 const DEFAULT_CODEC: 'h264' | 'hevc' = 'h264';
 /* Default CRF */
@@ -83,14 +104,7 @@ export async function splitAction(input: string, options: SplitOptions): Promise
     const mode = options.fast ? 'fast' : 'precise';
 
     // Build list of output paths for overwrite check
-    const dir = dirname(input);
-    const ext = extname(input);
-    const baseName = basename(input, ext);
-    const outputPaths: string[] = [];
-    for (let i = 0; i < numParts; i++) {
-      const paddedIndex = String(i + 1).padStart(3, '0');
-      outputPaths.push(`${dir}/${baseName}_${paddedIndex}.mp4`);
-    }
+    const outputPaths = generateSplitOutputPaths(input, numParts);
 
     const shouldProceed = await checkAndPromptOverwrite(outputPaths);
     if (!shouldProceed) {

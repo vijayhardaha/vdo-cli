@@ -1,4 +1,4 @@
-import { resolve, dirname, basename, extname, join } from 'path';
+import { resolve } from 'path';
 
 import type { Command } from 'commander';
 
@@ -14,6 +14,7 @@ import { ensureDependencies } from '@/utils/dependencies';
 import { getVideoDuration } from '@/utils/ffmpeg';
 import { loading } from '@/utils/icons';
 import { log } from '@/utils/log';
+import { resolveOutputFile } from '@/utils/output';
 import { createProgressBar } from '@/utils/progress';
 import { validateFileExists } from '@/utils/validations';
 
@@ -48,14 +49,8 @@ export async function compactAction(input: string, options: CompactOptions): Pro
     const preset = options.preset || 'medium';
     const hevc = options.hevc || false;
 
-    let outputFile = options.output;
-    // check: if output path not provided, generate default
-    if (!outputFile) {
-      const dir = dirname(input);
-      const name = basename(input, extname(input));
-      const suffix = hevc ? '_compact_hevc' : '_compact';
-      outputFile = join(dir, `${name}${suffix}.mp4`);
-    }
+    const suffix = hevc ? '_compact_hevc' : '_compact';
+    const outputFile = resolveOutputFile({ input, output: options.output, suffix });
 
     // check: if discord preset is requested
     if (options.discord) {

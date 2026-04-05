@@ -123,6 +123,27 @@ describe('speedup command', () => {
       expect(callArgs?.[1]).toBe('out_fast.mp4');
     });
 
+    // Should preserve input extension when no output provided
+    it('should preserve input extension when no output provided', async () => {
+      const { checkDependencies } = await import('../../utils/dependencies');
+      const { validateFileExists, validateSpeedRate } = await import('../../utils/validations');
+      const { speedUpVideo } = await import('../../utils/ffmpeg');
+      const { createProgressBar } = await import('../../utils/progress');
+
+      vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
+      vi.mocked(validateFileExists).mockResolvedValue(undefined);
+      vi.mocked(validateSpeedRate).mockReturnValue(undefined);
+      vi.mocked(speedUpVideo).mockResolvedValue(undefined);
+      vi.mocked(createProgressBar).mockReturnValue(mockProgressBar as never);
+
+      await speedupAction('input.avi', { rate: 2 });
+
+      const callArgs = vi.mocked(speedUpVideo).mock.calls[0];
+
+      // Expect output preserves input extension: input_2x.avi
+      expect(callArgs?.[1]).toContain('_2x.avi');
+    });
+
     // Should should invoke progressCallback
     it('should invoke progressCallback', async () => {
       const { checkDependencies } = await import('../../utils/dependencies');

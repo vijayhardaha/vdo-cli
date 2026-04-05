@@ -1,4 +1,4 @@
-import { resolve, dirname, basename, extname, join } from 'path';
+import { resolve, dirname } from 'path';
 
 import type { Command } from 'commander';
 
@@ -6,6 +6,7 @@ import type { SliceOptions, SliceSegment } from '@/types/index';
 import { ensureDependencies } from '@/utils/dependencies';
 import { loading } from '@/utils/icons';
 import { log } from '@/utils/log';
+import { resolveOutputFile } from '@/utils/output';
 import { createProgressBar } from '@/utils/progress';
 import { checkAndPromptOverwrite } from '@/utils/prompt';
 import { sliceVideoStreamCopy, sliceVideoReencode, sliceMultipleSegments, formatTimeForFFmpeg } from '@/utils/slice';
@@ -152,13 +153,7 @@ export async function sliceAction(input: string, options: SliceOptions): Promise
     const startDisplay = formatSecondsToFilename(startTime);
     const endDisplay = endTime !== undefined ? formatSecondsToFilename(endTime) : '';
 
-    let outputFile = options.output;
-    // check: if output path not provided, generate descriptive default
-    if (!outputFile) {
-      const dir = dirname(input);
-      const ext = extname(input);
-      outputFile = join(dir, `${basename(input, ext)}_${startDisplay}_${endDisplay}${ext}`);
-    }
+    const outputFile = resolveOutputFile({ input, output: options.output, suffix: `_${startDisplay}_${endDisplay}` });
 
     const shouldProceed = await checkAndPromptOverwrite([outputFile]);
     if (!shouldProceed) {

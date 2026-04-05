@@ -140,6 +140,28 @@ describe('compress command', () => {
       expect(callArgs?.[2]).toBe(23);
     });
 
+    // Should preserve input extension when no output provided
+    it('should preserve input extension when no output provided', async () => {
+      const { checkDependencies } = await import('../../utils/dependencies');
+      const { validateFileExists, validatePreset, validateCRF } = await import('../../utils/validations');
+      const { compressVideo } = await import('../../utils/ffmpeg');
+      const { createProgressBar } = await import('../../utils/progress');
+
+      vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
+      vi.mocked(validateFileExists).mockResolvedValue(undefined);
+      vi.mocked(validatePreset).mockReturnValue(undefined);
+      vi.mocked(validateCRF).mockReturnValue(undefined);
+      vi.mocked(compressVideo).mockResolvedValue(undefined);
+      vi.mocked(createProgressBar).mockReturnValue(mockProgressBar as never);
+
+      await compressAction('input.avi', {});
+
+      const callArgs = vi.mocked(compressVideo).mock.calls[0];
+
+      // Expect output preserves input extension: input_compressed.avi
+      expect(callArgs?.[1]).toContain('_compressed.avi');
+    });
+
     // Should should invoke progressCallback
     it('should invoke progressCallback', async () => {
       const { checkDependencies } = await import('../../utils/dependencies');

@@ -139,6 +139,23 @@ describe('compact command', () => {
       expect(compactVideoCRF).toHaveBeenCalled();
     });
 
+    // Should preserve input extension when no output provided
+    it('should preserve input extension when no output provided', async () => {
+      vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
+      vi.mocked(validateFileExists).mockResolvedValue(undefined);
+      vi.mocked(createProgressBar).mockReturnValue(mockProgressBar as never);
+      vi.mocked(getVideoDuration).mockResolvedValue(60);
+      vi.mocked(compactVideoCRF).mockResolvedValue(undefined);
+      vi.mocked(checkAndPromptOverwrite).mockResolvedValue(true);
+
+      await compactAction('input.avi', {});
+
+      const callArgs = vi.mocked(compactVideoCRF).mock.calls[0];
+
+      // Expect output preserves input extension: input_compact.avi
+      expect(callArgs?.[1]).toContain('_compact.avi');
+    });
+
     // Should verify compactVideoCRF mock is set up
     it('should verify compactVideoCRF is a function', () => {
       expect(typeof compactVideoCRF).toBe('function');

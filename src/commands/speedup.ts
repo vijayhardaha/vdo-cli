@@ -1,4 +1,4 @@
-import { resolve, dirname, basename, extname, join } from 'path';
+import { resolve } from 'path';
 
 import type { Command } from 'commander';
 
@@ -7,6 +7,7 @@ import { ensureDependencies } from '@/utils/dependencies';
 import { speedUpVideo } from '@/utils/ffmpeg';
 import { loading } from '@/utils/icons';
 import { log } from '@/utils/log';
+import { resolveOutputFile } from '@/utils/output';
 import { createProgressBar } from '@/utils/progress';
 import { validateFileExists, validateSpeedRate } from '@/utils/validations';
 
@@ -39,13 +40,7 @@ export async function speedupAction(input: string, options: SpeedupOptions): Pro
       process.exit(1);
     }
 
-    let outputFile = options.output;
-    // check: if output path not provided, generate default
-    if (!outputFile) {
-      const dir = dirname(input);
-      const name = basename(input, extname(input));
-      outputFile = join(dir, `${name}_${rate}x.mp4`);
-    }
+    const outputFile = resolveOutputFile({ input, output: options.output, suffix: `_${rate}x` });
 
     log.succeed(`Speed adjustment started | Rate: ${rate}x`);
 
