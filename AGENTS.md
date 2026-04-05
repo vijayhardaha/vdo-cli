@@ -4,7 +4,7 @@
 
 ## Project Overview
 
-`vdo` is a Node.js CLI for video utilities wrapping `yt-dlp` (download) and `ffmpeg` (convert/compress/speedup/audio).
+`vdo` is a Node.js CLI for video utilities wrapping `yt-dlp` (download) and `ffmpeg` (convert/compress/slice/split/speedup/audio).
 
 - **Runtime:** Node.js ≥ 20, ESM only, bun package manager
 - **Language:** TypeScript 5, strict mode, `moduleResolution: bundler`
@@ -13,16 +13,23 @@
 
 ## Commands
 
-| Command            | Alias | Description            | Key Options                          |
-| ------------------ | ----- | ---------------------- | ------------------------------------ |
-| `download <url>`   | `dl`  | Download from URL      | `-o`, `--format`                     |
-| `convert <input>`  | `cvt` | Convert video format   | `--format`, `--preset`, `-o`         |
-| `compress <input>` | `cps` | Compress with CRF      | `--crf`, `--preset`, `-o`            |
-| `compact <input>`  | `cpt` | Compact to target size | `--target`, `--discord`, `--percent` |
-| `slice <input>`    | `slc` | Slice/trim segment     | `--start`, `--end`, `--segments`     |
-| `split <input>`    | `spl` | Split into parts       | `--preset`, `--duration`             |
-| `speedup <input>`  | `sup` | Change playback speed  | `--rate`, `-o`                       |
-| `audio <input>`    | `au`  | Extract audio          | `--format`, `--bitrate`, `-o`        |
+| Command            | Alias | Description            | Key Options                              |
+| ------------------ | ----- | ---------------------- | ---------------------------------------- |
+| `download <url>`   | `dl`  | Download from URL      | `-o`, `--format`, `--convert`, `--split` |
+| `convert <input>`  | `cvt` | Convert video format   | `--format`, `--preset`, `-o`             |
+| `compress <input>` | `cps` | Compress with CRF      | `--crf`, `--preset`, `-o`                |
+| `compact <input>`  | `cpt` | Compact to target size | `--target`, `--discord`, `--percent`     |
+| `slice <input>`    | `slc` | Slice/trim segment     | `--start`, `--end`, `--segments`         |
+| `split <input>`    | `spl` | Split into parts       | `--preset`, `--duration`                 |
+| `speedup <input>`  | `sup` | Change playback speed  | `--rate`, `-o`                           |
+| `audio <input>`    | `au`  | Extract audio          | `--format`, `--bitrate`, `-o`            |
+
+### Download Command Options
+
+- `--format <format>` - mp4, mkv, webm, avi, mov, mp3
+- `--output <file>` - Custom output filename
+- `--convert` - Convert downloaded file after download
+- `--split <value>` - Split after download (ig/wa/fb/instagram/whatsapp/facebook or seconds)
 
 ## Architecture
 
@@ -32,13 +39,16 @@ src/
 ├── commands/*.ts        # setup<Name>() + <name>Action()
 ├── utils/
 │   ├── dependencies.ts  # checkDependencies(), runCommand()
-│   ├── icons.ts         # Nerd icons (info, success, warning, error)
+│   ├── icons.ts         # Icons (info, success, warning, error, loading)
 │   ├── log.ts           # Logging utility (log.succeed, log.fail, etc.)
 │   ├── progress.ts      # Progress bar utilities
 │   ├── sanitize.ts      # Filename sanitization
 │   ├── validations.ts   # Input validation helpers
 │   ├── ffmpeg.ts        # FFmpeg wrappers
-│   └── ytdlp.ts         # yt-dlp wrappers
+│   ├── ytdlp.ts         # yt-dlp wrappers
+│   ├── compact.ts       # Compact/two-pass encoding utilities
+│   ├── slice.ts         # Slice/trim utilities
+│   └── split.ts         # Split utilities (parseSplitValue, etc.)
 └── types/index.ts       # All shared interfaces
 ```
 
@@ -151,10 +161,23 @@ Every action must:
 
 ## Testing
 
+### Unit Tests
+
 - Test files in `tests/` matching `*.test.ts`
 - Vitest globals available without importing (`describe`, `it`, `expect`, `vi`)
 - Mock all external dependencies (no real ffmpeg/yt-dlp processes)
 - `vitest.setup.ts` mocks `console.*` globally
+
+### CLI Integration Tests
+
+For testing with real URLs:
+
+1. Build the CLI: `bun run build`
+2. Create test directory: `mkdir -p tmp-dir`
+3. Run commands from tmp-dir: `node ../dist/vdo.js dl <url>`
+4. Document results in `tmp-dir/summary.md` and `tmp-dir/error.md`
+
+See [docs/CLI_TEST_GUIDE.md](docs/CLI_TEST_GUIDE.md) for detailed testing instructions.
 
 ## External Dependencies
 
@@ -169,10 +192,12 @@ Install: `brew install ffmpeg yt-dlp`
 2. Add interface to `src/types/index.ts`
 3. Import and call `setup<Name>(program)` in `src/bin/vdo.ts`
 4. Add test file `tests/<name>.test.ts`
+5. Document in README.md
 
 ## Documentation
 
 - Add JSDoc comments for exported functions and complex types only
+- Update CHANGELOG.md for all changes
 
 ## Git Workflow
 
