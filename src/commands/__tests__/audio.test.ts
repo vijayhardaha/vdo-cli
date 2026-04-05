@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-import { setupAudio, audioAction } from '../audio';
+import { setupAudio, audioAction } from '@/commands/audio';
 
 vi.mock('../../utils/dependencies', () => {
   const mockCheckDependencies = vi.fn();

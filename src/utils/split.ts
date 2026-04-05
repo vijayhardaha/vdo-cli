@@ -1,6 +1,6 @@
-import { runCommand } from './dependencies';
-import { parseFFmpegProgress } from './progress';
-import type { ProgressInfo, SplitPreset } from '../types/index';
+import type { ProgressInfo, SplitPreset } from '@/types/index';
+import { runCommand } from '@/utils/dependencies';
+import { parseFFmpegProgress } from '@/utils/progress';
 
 /**
  * Platform preset durations in seconds

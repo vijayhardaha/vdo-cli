@@ -1,6 +1,6 @@
-import { runCommand } from './dependencies';
-import { parseFFmpegProgress } from './progress';
-import type { ProgressInfo, SliceSegment } from '../types/index';
+import type { ProgressInfo, SliceSegment } from '@/types/index';
+import { runCommand } from '@/utils/dependencies';
+import { parseFFmpegProgress } from '@/utils/progress';
 
 /**
  * Slice video segment using stream copy (fast, may not be frame-accurate)

@@ -2,22 +2,21 @@ import { resolve, dirname, basename, extname } from 'path';
 
 import type { Command } from 'commander';
 
+import type { SplitOptions, SplitPreset } from '@/types/index';
+import { ensureDependencies } from '@/utils/dependencies';
+import { getVideoDuration } from '@/utils/ffmpeg';
 import { loading } from '@/utils/icons';
-
-import type { SplitOptions, SplitPreset } from '../types/index';
-import { ensureDependencies } from '../utils/dependencies';
-import { getVideoDuration } from '../utils/ffmpeg';
-import { log } from '../utils/log';
-import { createProgressBar } from '../utils/progress';
-import { checkAndPromptOverwrite } from '../utils/prompt';
+import { log } from '@/utils/log';
+import { createProgressBar } from '@/utils/progress';
+import { checkAndPromptOverwrite } from '@/utils/prompt';
 import {
   splitVideoReencode,
   splitVideoStreamCopy,
   parseDuration,
   getPresetDuration,
   calculateNumParts,
-} from '../utils/split';
-import { validateFileExists } from '../utils/validations';
+} from '@/utils/split';
+import { validateFileExists } from '@/utils/validations';
 
 /* Default codec */
 const DEFAULT_CODEC: 'h264' | 'hevc' = 'h264';

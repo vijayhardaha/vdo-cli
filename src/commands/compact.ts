@@ -2,21 +2,20 @@ import { resolve, dirname, basename, extname, join } from 'path';
 
 import type { Command } from 'commander';
 
-import { loading } from '@/utils/icons';
-
-import type { CompactOptions } from '../types/index';
+import type { CompactOptions } from '@/types/index';
 import {
   compactVideo,
   compactVideoCRF,
   parseSizeToMB,
   calculateTargetBitrate,
   getCRFForQuality,
-} from '../utils/compact';
-import { ensureDependencies } from '../utils/dependencies';
-import { getVideoDuration } from '../utils/ffmpeg';
-import { log } from '../utils/log';
-import { createProgressBar } from '../utils/progress';
-import { validateFileExists } from '../utils/validations';
+} from '@/utils/compact';
+import { ensureDependencies } from '@/utils/dependencies';
+import { getVideoDuration } from '@/utils/ffmpeg';
+import { loading } from '@/utils/icons';
+import { log } from '@/utils/log';
+import { createProgressBar } from '@/utils/progress';
+import { validateFileExists } from '@/utils/validations';
 
 /* Discord file size limit in MB (with buffer) */
 const DISCORD_SIZE_MB = 24.5;

@@ -1,6 +1,6 @@
 import cliProgress from 'cli-progress';
 
-import type { ProgressInfo } from '../types/index';
+import type { ProgressInfo } from '@/types/index';
 
 /**
  * Create a progress bar instance for displaying CLI progress

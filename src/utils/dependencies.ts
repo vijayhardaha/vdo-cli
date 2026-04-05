@@ -1,7 +1,7 @@
 import { exec, spawn } from 'child_process';
 
-import { log } from './log';
-import type { DependencyCheck, CommandResult } from '../types/index';
+import type { DependencyCheck, CommandResult } from '@/types/index';
+import { log } from '@/utils/log';
 
 /**
  * Check if a command exists in the system PATH

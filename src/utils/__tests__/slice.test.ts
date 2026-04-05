@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-import { runCommand } from '../dependencies';
-import { sliceVideoStreamCopy, sliceVideoReencode, sliceMultipleSegments, formatTimeForFFmpeg } from '../slice';
+import { runCommand } from '@/utils/dependencies';
+import { sliceVideoStreamCopy, sliceVideoReencode, sliceMultipleSegments, formatTimeForFFmpeg } from '@/utils/slice';
 
 vi.mock('../dependencies', () => ({ runCommand: vi.fn() }));
 

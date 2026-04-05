@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-import { setupSplit, splitAction } from '../split';
+import { setupSplit, splitAction } from '@/commands/split';
 
 vi.mock('../../utils/dependencies', () => {
   const mockCheckDependencies = vi.fn();

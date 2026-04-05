@@ -1,6 +1,6 @@
-import { runCommand } from './dependencies';
-import { parseYtDlpProgress } from './progress';
-import { sanitizeFilename } from './sanitize';
+import { runCommand } from '@/utils/dependencies';
+import { parseYtDlpProgress } from '@/utils/progress';
+import { sanitizeFilename } from '@/utils/sanitize';
 
 /* Video information returned from yt-dlp */
 export interface VideoInfo {

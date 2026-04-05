@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-import { downloadVideo, getVideoInfo, generateFilename } from '../ytdlp';
+import { downloadVideo, getVideoInfo, generateFilename } from '@/utils/ytdlp';
 
 vi.mock('../dependencies', () => ({ runCommand: vi.fn() }));
 

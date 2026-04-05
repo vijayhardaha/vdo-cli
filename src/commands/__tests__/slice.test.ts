@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-import { setupSlice, sliceAction } from '../slice';
+import { setupSlice, sliceAction } from '@/commands/slice';
 
 vi.mock('../../utils/dependencies', () => {
   const mockCheckDependencies = vi.fn();

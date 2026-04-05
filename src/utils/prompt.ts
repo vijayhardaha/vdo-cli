@@ -1,6 +1,6 @@
 import * as readline from 'node:readline';
 
-import { log } from './log';
+import { log } from '@/utils/log';
 
 /**
  * Prompt user for confirmation

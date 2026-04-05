@@ -2,15 +2,14 @@ import { resolve, dirname, basename, extname, join } from 'path';
 
 import type { Command } from 'commander';
 
+import type { SliceOptions, SliceSegment } from '@/types/index';
+import { ensureDependencies } from '@/utils/dependencies';
 import { loading } from '@/utils/icons';
-
-import type { SliceOptions, SliceSegment } from '../types/index';
-import { ensureDependencies } from '../utils/dependencies';
-import { log } from '../utils/log';
-import { createProgressBar } from '../utils/progress';
-import { checkAndPromptOverwrite } from '../utils/prompt';
-import { sliceVideoStreamCopy, sliceVideoReencode, sliceMultipleSegments, formatTimeForFFmpeg } from '../utils/slice';
-import { validateFileExists } from '../utils/validations';
+import { log } from '@/utils/log';
+import { createProgressBar } from '@/utils/progress';
+import { checkAndPromptOverwrite } from '@/utils/prompt';
+import { sliceVideoStreamCopy, sliceVideoReencode, sliceMultipleSegments, formatTimeForFFmpeg } from '@/utils/slice';
+import { validateFileExists } from '@/utils/validations';
 
 /* Default codec for re-encoding */
 const DEFAULT_CODEC: 'h264' | 'hevc' = 'h264';

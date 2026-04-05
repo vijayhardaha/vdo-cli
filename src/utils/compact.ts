@@ -1,7 +1,7 @@
-import { runCommand } from './dependencies';
-import { parseFFmpegProgress } from './progress';
-import { checkAndPromptOverwrite } from './prompt';
-import type { ProgressInfo } from '../types/index';
+import type { ProgressInfo } from '@/types/index';
+import { runCommand } from '@/utils/dependencies';
+import { parseFFmpegProgress } from '@/utils/progress';
+import { checkAndPromptOverwrite } from '@/utils/prompt';
 
 /**
  * Quality preset CRF values

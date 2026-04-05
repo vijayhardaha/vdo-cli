@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-import { convertVideo, compressVideo, speedUpVideo, extractAudio } from '../ffmpeg';
+import { convertVideo, compressVideo, speedUpVideo, extractAudio } from '@/utils/ffmpeg';
 
 vi.mock('../dependencies', () => ({ runCommand: vi.fn() }));
 

@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-import { setupConvert, convertAction } from '../convert';
+import { setupConvert, convertAction } from '@/commands/convert';
 
 vi.mock('../../utils/dependencies', () => {
   const mockCheckDependencies = vi.fn();

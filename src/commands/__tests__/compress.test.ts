@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-import { setupCompress, compressAction } from '../compress';
+import { setupCompress, compressAction } from '@/commands/compress';
 
 vi.mock('../../utils/dependencies', () => {
   const mockCheckDependencies = vi.fn();

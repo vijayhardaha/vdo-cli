@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-import { promptOverwrite, checkAndPromptOverwrite } from '../prompt';
+import { promptOverwrite, checkAndPromptOverwrite } from '@/utils/prompt';
 
 vi.mock('../log', () => ({ log: { info: vi.fn() } }));
 

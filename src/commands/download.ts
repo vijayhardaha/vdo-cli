@@ -3,18 +3,17 @@ import { resolve, dirname, basename, extname, join } from 'path';
 
 import type { Command } from 'commander';
 
+import { splitAction } from '@/commands/split';
+import type { DownloadOptions, SplitOptions } from '@/types/index';
+import { ensureDependencies } from '@/utils/dependencies';
+import { convertVideo } from '@/utils/ffmpeg';
 import { loading } from '@/utils/icons';
-
-import { splitAction } from './split';
-import type { DownloadOptions, SplitOptions } from '../types/index';
-import { ensureDependencies } from '../utils/dependencies';
-import { convertVideo } from '../utils/ffmpeg';
-import { log } from '../utils/log';
-import { createProgressBar, formatFileSize } from '../utils/progress';
-import { checkAndPromptOverwrite } from '../utils/prompt';
-import { parseSplitValue } from '../utils/split';
-import { validateUrl, validateFormat } from '../utils/validations';
-import { downloadVideo, getVideoInfo, generateFilename } from '../utils/ytdlp';
+import { log } from '@/utils/log';
+import { createProgressBar, formatFileSize } from '@/utils/progress';
+import { checkAndPromptOverwrite } from '@/utils/prompt';
+import { parseSplitValue } from '@/utils/split';
+import { validateUrl, validateFormat } from '@/utils/validations';
+import { downloadVideo, getVideoInfo, generateFilename } from '@/utils/ytdlp';
 
 /* Allowed video/audio formats for download */
 const ALLOWED_FORMATS = ['mp4', 'mkv', 'webm', 'avi', 'mov', 'mp3'];

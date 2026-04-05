@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 
-import { parseFFmpegProgress, parseYtDlpProgress, kbToMB, createProgressBar } from '../progress';
+import { parseFFmpegProgress, parseYtDlpProgress, kbToMB, createProgressBar } from '@/utils/progress';
 
 vi.mock('cli-progress', () => ({
   default: {

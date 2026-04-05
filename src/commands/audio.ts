@@ -2,14 +2,13 @@ import { resolve, dirname, basename, extname, join } from 'path';
 
 import type { Command } from 'commander';
 
+import type { AudioOptions } from '@/types/index';
+import { ensureDependencies } from '@/utils/dependencies';
+import { extractAudio } from '@/utils/ffmpeg';
 import { loading } from '@/utils/icons';
-
-import type { AudioOptions } from '../types/index';
-import { ensureDependencies } from '../utils/dependencies';
-import { extractAudio } from '../utils/ffmpeg';
-import { log } from '../utils/log';
-import { createProgressBar } from '../utils/progress';
-import { validateFileExists, validateFormat, validateBitrate } from '../utils/validations';
+import { log } from '@/utils/log';
+import { createProgressBar } from '@/utils/progress';
+import { validateFileExists, validateFormat, validateBitrate } from '@/utils/validations';
 
 /* Allowed audio formats for extraction */
 const ALLOWED_FORMATS = ['mp3', 'wav', 'aac'];

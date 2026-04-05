@@ -1,8 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-import { parseSizeToMB, calculateTargetBitrate, getCRFForQuality, compactVideo, compactVideoCRF } from '../compact';
-import { runCommand } from '../dependencies';
-import { checkAndPromptOverwrite } from '../prompt';
+import {
+  parseSizeToMB,
+  calculateTargetBitrate,
+  getCRFForQuality,
+  compactVideo,
+  compactVideoCRF,
+} from '@/utils/compact';
+import { runCommand } from '@/utils/dependencies';
+import { checkAndPromptOverwrite } from '@/utils/prompt';
 
 vi.mock('../dependencies', () => ({ runCommand: vi.fn() }));
 

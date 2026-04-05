@@ -1,13 +1,13 @@
 import { Command } from 'commander';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-import { compactVideo, compactVideoCRF } from '../../utils/compact';
-import { checkDependencies } from '../../utils/dependencies';
-import { getVideoDuration } from '../../utils/ffmpeg';
-import { createProgressBar } from '../../utils/progress';
-import { checkAndPromptOverwrite } from '../../utils/prompt';
-import { validateFileExists } from '../../utils/validations';
-import { setupCompact, compactAction } from '../compact';
+import { setupCompact, compactAction } from '@/commands/compact';
+import { compactVideo, compactVideoCRF } from '@/utils/compact';
+import { checkDependencies } from '@/utils/dependencies';
+import { getVideoDuration } from '@/utils/ffmpeg';
+import { createProgressBar } from '@/utils/progress';
+import { checkAndPromptOverwrite } from '@/utils/prompt';
+import { validateFileExists } from '@/utils/validations';
 
 vi.mock('../../utils/dependencies', () => {
   const mockCheckDependencies = vi.fn();

@@ -1,6 +1,6 @@
-import { runCommand } from './dependencies';
-import { parseFFmpegProgress } from './progress';
-import { checkAndPromptOverwrite } from './prompt';
+import { runCommand } from '@/utils/dependencies';
+import { parseFFmpegProgress } from '@/utils/progress';
+import { checkAndPromptOverwrite } from '@/utils/prompt';
 
 /**
  * Get video duration using ffprobe
