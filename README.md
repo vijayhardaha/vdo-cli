@@ -131,7 +131,7 @@ vdo convert <input> [options]
 **Options:**
 
 - `-o, --output <file>` - Output file name
-- `--format <format>` - Target format (mp4, mkv, avi, mov, webm, flv) (default: "mp4")
+- `--format <format>` - Target format (mp4, mkv, avi, mov, flv) (default: "mp4")
 - `--preset <preset>` - Encoding preset (fast, high-quality, custom) (default: "fast")
 
 **Examples:**
@@ -144,7 +144,7 @@ vdo convert input.avi --format mp4
 vdo convert video.mov --format mkv --preset high-quality
 
 # Specify output file
-vdo convert source.webm --format mp4 -o output.mp4
+vdo convert source.avi --format mp4 -o output.mp4
 ```
 
 **Aliases:** `cvt`
