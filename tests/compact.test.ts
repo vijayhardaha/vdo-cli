@@ -101,11 +101,11 @@ describe('compact utils', () => {
   describe('compactVideo', () => {
     // Should perform two-pass encoding with h264 codec
     it('should call runCommand with h264 codec for two-pass encoding', async () => {
-      // Expect compactVideo runs two ffmpeg passes
       vi.mocked(runCommand).mockResolvedValue({ stdout: '', stderr: 'frames: 100' });
 
       await compactVideo('input.mp4', 'output.mp4', 1000, '128k', 'medium', false);
 
+      // Expect compactVideo runs two ffmpeg passes
       expect(runCommand).toHaveBeenCalledTimes(2);
       // Expect pass 1 uses libx264 with pass 1 flag
       expect(runCommand).toHaveBeenCalledWith(
@@ -121,11 +121,11 @@ describe('compact utils', () => {
 
     // Should use hevc codec when specified
     it('should call runCommand with hevc codec when specified', async () => {
-      // Expect compactVideo uses libx265 for hevc
       vi.mocked(runCommand).mockResolvedValue({ stdout: '', stderr: 'frames: 100' });
 
       await compactVideo('input.mp4', 'output.mp4', 1000, '128k', 'medium', true);
 
+      // Expect compactVideo uses libx265 for hevc
       expect(runCommand).toHaveBeenCalledWith(
         'ffmpeg -y -i "input.mp4" -c:v libx265 -b:v 1000k -pass 1 -preset medium -an -f null "ffmpeg2pass-0.log"',
         expect.any(Function)
@@ -134,9 +134,9 @@ describe('compact utils', () => {
 
     // Should throw error on pass 1 failure
     it('should throw error on pass 1 failure', async () => {
-      // Expect error message indicates pass 1 failure
       vi.mocked(runCommand).mockResolvedValue({ stdout: '', stderr: 'error occurred' });
 
+      // Expect error message indicates pass 1 failure
       await expect(compactVideo('input.mp4', 'output.mp4', 1000, '128k', 'medium', false)).rejects.toThrow(
         'Pass 1 failed'
       );
@@ -144,11 +144,11 @@ describe('compact utils', () => {
 
     // Should throw error on pass 2 failure
     it('should throw error on pass 2 failure', async () => {
-      // Expect error message indicates pass 2 failure
       vi.mocked(runCommand)
         .mockResolvedValueOnce({ stdout: '', stderr: 'frames: 100' })
         .mockResolvedValueOnce({ stdout: '', stderr: 'error occurred' });
 
+      // Expect error message indicates pass 2 failure
       await expect(compactVideo('input.mp4', 'output.mp4', 1000, '128k', 'medium', false)).rejects.toThrow(
         'Pass 2 failed'
       );
@@ -159,11 +159,11 @@ describe('compact utils', () => {
   describe('compactVideoCRF', () => {
     // Should use h264 codec with CRF
     it('should call runCommand with h264 codec', async () => {
-      // Expect compactVideoCRF uses libx264
       vi.mocked(runCommand).mockResolvedValue({ stdout: '', stderr: 'frames: 100' });
 
       await compactVideoCRF('input.mp4', 'output.mp4', 23, 'medium', '128k', false);
 
+      // Expect compactVideoCRF uses libx264
       expect(runCommand).toHaveBeenCalledTimes(1);
       expect(runCommand).toHaveBeenCalledWith(
         'ffmpeg -y -i "input.mp4" -c:v libx264 -crf 23 -preset medium -c:a aac -b:a 128k "output.mp4"',
@@ -173,11 +173,11 @@ describe('compact utils', () => {
 
     // Should use hevc codec when specified
     it('should call runCommand with hevc codec when specified', async () => {
-      // Expect compactVideoCRF uses libx265 for hevc
       vi.mocked(runCommand).mockResolvedValue({ stdout: '', stderr: 'frames: 100' });
 
       await compactVideoCRF('input.mp4', 'output.mp4', 23, 'medium', '128k', true);
 
+      // Expect compactVideoCRF uses libx265 for hevc
       expect(runCommand).toHaveBeenCalledWith(
         'ffmpeg -y -i "input.mp4" -c:v libx265 -crf 23 -preset medium -c:a aac -b:a 128k "output.mp4"',
         expect.any(Function)
@@ -186,9 +186,9 @@ describe('compact utils', () => {
 
     // Should throw error on failure
     it('should throw error on failure', async () => {
-      // Expect error message indicates compression failure
       vi.mocked(runCommand).mockResolvedValue({ stdout: '', stderr: 'error occurred' });
 
+      // Expect error message indicates compression failure
       await expect(compactVideoCRF('input.mp4', 'output.mp4', 23, 'medium', '128k', false)).rejects.toThrow(
         'Compression failed'
       );
