@@ -7,6 +7,8 @@ A powerful Node.js command-line tool for video processing and downloading, built
 - 📥 **Download** videos from YouTube and thousands of other sites
 - 🔄 **Convert** videos to different formats
 - 🗜️ **Compress** videos with customizable quality
+- 📦 **Compact** videos to target size using two-pass encoding
+- ✂️ **Slice** video segments with precision
 - ⚡ **Speed up** or slow down videos
 - 🎵 **Extract** audio from videos
 
@@ -164,7 +166,91 @@ vdo compress input.mp4 -o compressed.mp4
 
 ---
 
-#### 4. speedup - Speed up or slow down video
+#### 4. compact - Compact video to target size
+
+Compact video files to a specific size using two-pass encoding for optimal quality.
+
+```bash
+vdo compact <input> [options]
+```
+
+**Options:**
+
+- `-o, --output <file>` - Output file name
+- `--target <size>` - Target size (e.g., 25MB, 100MB)
+- `--percent <value>` - Reduce to percentage of original size
+- `--quality <level>` - Quality preset (low, medium, high, lossless)
+- `--preset <preset>` - Encoding preset (ultrafast, fast, medium, slow) (default: "medium")
+- `--audio-bitrate <bitrate>` - Audio bitrate (e.g., 128k) (default: "128k")
+- `--hevc` - Use HEVC codec for better compression
+- `--discord` - Optimize for Discord (24.5MB limit)
+
+**Examples:**
+
+```bash
+# Compact to specific size (two-pass encoding)
+vdo compact video.mp4 --target 25MB
+
+# Compact for Discord (24.5MB with buffer)
+vdo compact video.mp4 --discord
+
+# Use HEVC for better compression
+vdo compact video.mp4 --target 20MB --hevc
+
+# Quality preset (single-pass, faster)
+vdo compact video.mp4 --quality high
+
+# Reduce to 50% of original size
+vdo compact video.mp4 --percent 50
+```
+
+**Aliases:** `cp`
+
+---
+
+#### 5. slice - Slice/trim video segment
+
+Extract a segment from video with precision control.
+
+```bash
+vdo slice <input> [options]
+```
+
+**Options:**
+
+- `-o, --output <file>` - Output file name
+- `-s, --start <time>` - Start time (e.g., 0, 10, 1:30, 00:01:30)
+- `-e, --end <time>` - End time (e.g., 10, 1:40, 00:01:40)
+- `-d, --duration <time>` - Duration instead of end time
+- `--segments <string>` - Multiple segments (e.g., "0-10,30-45,60-90")
+- `--fast` - Use stream copy (fast, may not be frame-accurate)
+- `--precise` - Re-encode for frame accuracy (slower)
+- `--codec <codec>` - Codec for re-encoding (h264, hevc) (default: "h264")
+
+**Examples:**
+
+```bash
+# Slice segment (smart default - stream copy)
+vdo slice video.mp4 --start 10 --end 30
+
+# Frame-accurate slice (slower, re-encodes)
+vdo slice video.mp4 --start 10.5 --end 30.25 --precise
+
+# Use duration instead of end time
+vdo slice video.mp4 --start 10 --duration 20
+
+# Multiple segments at once
+vdo slice video.mp4 --segments "0-10,30-45,60-90"
+
+# Fast mode (stream copy)
+vdo slice video.mp4 --start 0 --end 60 --fast
+```
+
+**Aliases:** `sl`
+
+---
+
+#### 6. speedup - Speed up or slow down video
 
 Adjust video playback speed.
 
@@ -197,7 +283,7 @@ vdo speedup video.mp4 --rate 2 -o fast_video.mp4
 
 ---
 
-#### 5. audio - Extract audio from video
+#### 7. audio - Extract audio from video
 
 Extract audio track from video files.
 
@@ -440,6 +526,12 @@ vdo cv movie.avi --format mp4
 
 # Compress a large video file
 vdo cm vacation.mp4 --crf 23 --preset slow
+
+# Compact video to 25MB for Discord
+vdo cp video.mp4 --discord
+
+# Slice a segment from video
+vdo sl video.mp4 --start 10 --end 30
 
 # Create a timelapse (speed up)
 vdo sp timelapse-source.mp4 --rate 4
