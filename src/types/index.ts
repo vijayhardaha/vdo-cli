@@ -129,3 +129,20 @@ export interface SliceOptions {
   precise?: boolean;
   codec?: 'copy' | 'h264' | 'hevc';
 }
+
+/**
+ * Platform preset for split command
+ */
+export type SplitPreset = 'instagram' | 'ig' | 'whatsapp' | 'wa' | 'facebook' | 'fb';
+
+/**
+ * Options for split command
+ */
+export interface SplitOptions {
+  output?: string;
+  preset?: SplitPreset;
+  duration?: string;
+  fast?: boolean;
+  precise?: boolean;
+  codec?: 'h264' | 'hevc';
+}
