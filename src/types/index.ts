@@ -88,3 +88,44 @@ export interface AudioOptions {
   format?: AudioFormat;
   bitrate?: string;
 }
+
+/**
+ * Quality preset for compact command
+ */
+export type CompactQuality = 'low' | 'medium' | 'high' | 'lossless';
+
+/**
+ * Options for compact command
+ */
+export interface CompactOptions {
+  output?: string;
+  target?: string;
+  percent?: number;
+  quality?: CompactQuality;
+  preset?: 'ultrafast' | 'fast' | 'medium' | 'slow';
+  audioBitrate?: string;
+  hevc?: boolean;
+  discord?: boolean;
+}
+
+/**
+ * Segment definition for slice command
+ */
+export interface SliceSegment {
+  start: string;
+  end: string;
+}
+
+/**
+ * Options for slice command
+ */
+export interface SliceOptions {
+  output?: string;
+  start?: string;
+  end?: string;
+  duration?: string;
+  segments?: SliceSegment[];
+  fast?: boolean;
+  precise?: boolean;
+  codec?: 'copy' | 'h264' | 'hevc';
+}
