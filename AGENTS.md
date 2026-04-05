@@ -13,13 +13,16 @@
 
 ## Commands
 
-| Command            | Alias | Description           | Key Options                   |
-| ------------------ | ----- | --------------------- | ----------------------------- |
-| `download <url>`   | `dl`  | Download from URL     | `-o`, `--format`              |
-| `convert <input>`  | `cv`  | Convert video format  | `--format`, `--preset`, `-o`  |
-| `compress <input>` | `cm`  | Compress with CRF     | `--crf`, `--preset`, `-o`     |
-| `speedup <input>`  | `sp`  | Change playback speed | `--rate`, `-o`                |
-| `audio <input>`    | `au`  | Extract audio         | `--format`, `--bitrate`, `-o` |
+| Command            | Alias | Description            | Key Options                          |
+| ------------------ | ----- | ---------------------- | ------------------------------------ |
+| `download <url>`   | `dl`  | Download from URL      | `-o`, `--format`                     |
+| `convert <input>`  | `cvt` | Convert video format   | `--format`, `--preset`, `-o`         |
+| `compress <input>` | `cps` | Compress with CRF      | `--crf`, `--preset`, `-o`            |
+| `compact <input>`  | `cpt` | Compact to target size | `--target`, `--discord`, `--percent` |
+| `slice <input>`    | `slc` | Slice/trim segment     | `--start`, `--end`, `--segments`     |
+| `split <input>`    | `spl` | Split into parts       | `--preset`, `--duration`             |
+| `speedup <input>`  | `sup` | Change playback speed  | `--rate`, `-o`                       |
+| `audio <input>`    | `au`  | Extract audio          | `--format`, `--bitrate`, `-o`        |
 
 ## Architecture
 

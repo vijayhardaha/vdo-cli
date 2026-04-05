@@ -1,6 +1,10 @@
 # vdo - Video Utilities CLI
 
-A powerful Node.js command-line tool for video processing and downloading, built on top of **yt-dlp** and **ffmpeg**.
+> **Video downloader, converter, compressor, and editor** — all in one CLI tool.
+
+A powerful, all-in-one **video processing CLI** built on top of **yt-dlp** and **ffmpeg**. Download videos from YouTube, Instagram, Facebook, and all sites supported by yt-dlp, convert formats, compress files, trim video segments, split for social media, reduce video size, adjust playback speed, or extract audio — all with a single command.
+
+**Why vdo?** Instead of remembering complex ffmpeg syntax or juggling multiple tools, vdo provides intuitive commands with smart defaults, progress tracking, and optimized encoders for common tasks like Discord-ready files or Instagram splits.
 
 ## Features
 
@@ -42,6 +46,14 @@ choco install ffmpeg yt-dlp
 
 ```bash
 npm install -g @vijayhardaha/vdo-cli
+```
+
+```bash
+pnpm install -g @vijayhardaha/vdo-cli
+```
+
+```bash
+bun install -g @vijayhardaha/vdo-cli
 ```
 
 Or if you're developing locally:
@@ -121,7 +133,7 @@ vdo convert video.mov --format mkv --preset high-quality
 vdo convert source.webm --format mp4 -o output.mp4
 ```
 
-**Aliases:** `cv`
+**Aliases:** `cvt`
 
 ---
 
@@ -163,7 +175,7 @@ vdo compress video.mp4 --crf 23 --preset ultrafast
 vdo compress input.mp4 -o compressed.mp4
 ```
 
-**Aliases:** `cm`
+**Aliases:** `cps`
 
 ---
 
@@ -205,7 +217,7 @@ vdo compact video.mp4 --quality high
 vdo compact video.mp4 --percent 50
 ```
 
-**Aliases:** `cp`
+**Aliases:** `cpt`
 
 ---
 
@@ -247,7 +259,7 @@ vdo slice video.mp4 --segments "0-10,30-45,60-90"
 vdo slice video.mp4 --start 0 --end 60 --fast
 ```
 
-**Aliases:** `sl`
+**Aliases:** `slc`
 
 ---
 
@@ -298,6 +310,8 @@ vdo split video.mp4 --duration 45
 vdo split video.mp4 --preset instagram --fast
 ```
 
+**Aliases:** `spl`
+
 **Output:** `input_001.mp4`, `input_002.mp4`, `input_003.mp4`, ...
 
 ---
@@ -331,7 +345,7 @@ vdo speedup video.mp4 --rate 0.5
 vdo speedup video.mp4 --rate 2 -o fast_video.mp4
 ```
 
-**Aliases:** `sp`
+**Aliases:** `sup`
 
 ---
 
@@ -583,22 +597,22 @@ If you encounter any issues or have questions, please file an issue on the GitHu
 vdo dl https://youtu.be/dQw4w9WgXcQ
 
 # Convert AVI to MP4
-vdo cv movie.avi --format mp4
+vdo cvt movie.avi --format mp4
 
 # Compress a large video file
-vdo cm vacation.mp4 --crf 23 --preset slow
+vdo cps vacation.mp4 --crf 23 --preset slow
 
 # Compact video to 25MB for Discord
-vdo cp video.mp4 --discord
+vdo cpt video.mp4 --discord
 
 # Slice a segment from video
-vdo sl video.mp4 --start 10 --end 30
+vdo slc video.mp4 --start 10 --end 30
 
 # Split video for Instagram (60s parts)
-vdo split video.mp4 --preset ig
+vdo spl video.mp4 --preset ig
 
 # Create a timelapse (speed up)
-vdo sp timelapse-source.mp4 --rate 4
+vdo sup timelapse-source.mp4 --rate 4
 
 # Extract podcast audio
 vdo au interview.mp4 --format mp3 --bitrate 192k
