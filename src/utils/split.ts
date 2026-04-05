@@ -43,6 +43,41 @@ export function parseDuration(durationStr: string): number {
 }
 
 /**
+ * Valid preset names for split value parsing
+ */
+const VALID_PRESETS: SplitPreset[] = ['instagram', 'ig', 'whatsapp', 'wa', 'facebook', 'fb'];
+
+/**
+ * Result type for parseSplitValue
+ */
+export interface ParseSplitValueResult {
+  type: 'preset' | 'duration';
+  value: string | number;
+}
+
+/**
+ * Parse split value string to preset or duration
+ *
+ * @param {string} value - Split value (preset name or seconds)
+ * @returns {ParseSplitValueResult} Parsed result with type and value
+ * @throws {Error} If value is invalid
+ */
+export function parseSplitValue(value: string): ParseSplitValueResult {
+  const normalizedValue = value.toLowerCase();
+
+  if (VALID_PRESETS.includes(normalizedValue as SplitPreset)) {
+    return { type: 'preset', value: normalizedValue };
+  }
+
+  const seconds = parseFloat(value);
+  if (isNaN(seconds) || seconds <= 0) {
+    throw new Error(`Invalid split value "${value}". Use preset (ig, wa, fb) or duration in seconds (e.g., 60)`);
+  }
+
+  return { type: 'duration', value: seconds };
+}
+
+/**
  * Calculate number of parts needed for a video
  *
  * @param {number} totalDuration - Total video duration in seconds

@@ -52,6 +52,8 @@ export type Preset = 'ultrafast' | 'fast' | 'medium' | 'slow' | 'high-quality';
 export interface DownloadOptions {
   output?: string;
   format?: DownloadFormat;
+  convert?: boolean;
+  split?: string;
 }
 
 /**
