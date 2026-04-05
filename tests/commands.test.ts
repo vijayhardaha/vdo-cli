@@ -2,9 +2,11 @@ import { Command } from 'commander';
 import { describe, it, expect, beforeEach } from 'vitest';
 
 import { setupAudio } from '../src/commands/audio.js';
+import { setupCompact } from '../src/commands/compact.js';
 import { setupCompress } from '../src/commands/compress.js';
 import { setupConvert } from '../src/commands/convert.js';
 import { setupDownload } from '../src/commands/download.js';
+import { setupSlice } from '../src/commands/slice.js';
 import { setupSpeedup } from '../src/commands/speedup.js';
 
 describe('Commands Setup', () => {
@@ -155,6 +157,113 @@ describe('Commands Setup', () => {
       const bitrateOption = cmd?.options.find((opt) => opt.long === '--bitrate');
 
       expect(bitrateOption).toBeDefined();
+    });
+  });
+
+  // Tests for compact command setup
+  describe('compact command', () => {
+    // Should register compact command with correct options
+    it('should register compact command with correct options', () => {
+      setupCompact(program);
+      const commands = program.commands;
+
+      expect(commands).toHaveLength(1);
+      expect(commands[0]?.name()).toBe('compact');
+      expect(commands[0]?.aliases()).toContain('cp');
+    });
+
+    // Should have target option
+    it('should have target option', () => {
+      setupCompact(program);
+      const cmd = program.commands[0];
+      const targetOption = cmd?.options.find((opt) => opt.long === '--target');
+
+      expect(targetOption).toBeDefined();
+    });
+
+    // Should have discord option
+    it('should have discord option', () => {
+      setupCompact(program);
+      const cmd = program.commands[0];
+      const discordOption = cmd?.options.find((opt) => opt.long === '--discord');
+
+      expect(discordOption).toBeDefined();
+    });
+
+    // Should have quality option
+    it('should have quality option', () => {
+      setupCompact(program);
+      const cmd = program.commands[0];
+      const qualityOption = cmd?.options.find((opt) => opt.long === '--quality');
+
+      expect(qualityOption).toBeDefined();
+    });
+
+    // Should have hevc option
+    it('should have hevc option', () => {
+      setupCompact(program);
+      const cmd = program.commands[0];
+      const hevcOption = cmd?.options.find((opt) => opt.long === '--hevc');
+
+      expect(hevcOption).toBeDefined();
+    });
+  });
+
+  // Tests for slice command setup
+  describe('slice command', () => {
+    // Should register slice command with correct options
+    it('should register slice command with correct options', () => {
+      setupSlice(program);
+      const commands = program.commands;
+
+      expect(commands).toHaveLength(1);
+      expect(commands[0]?.name()).toBe('slice');
+      expect(commands[0]?.aliases()).toContain('sl');
+    });
+
+    // Should have start option
+    it('should have start option', () => {
+      setupSlice(program);
+      const cmd = program.commands[0];
+      const startOption = cmd?.options.find((opt) => opt.long === '--start');
+
+      expect(startOption).toBeDefined();
+    });
+
+    // Should have end option
+    it('should have end option', () => {
+      setupSlice(program);
+      const cmd = program.commands[0];
+      const endOption = cmd?.options.find((opt) => opt.long === '--end');
+
+      expect(endOption).toBeDefined();
+    });
+
+    // Should have fast option
+    it('should have fast option', () => {
+      setupSlice(program);
+      const cmd = program.commands[0];
+      const fastOption = cmd?.options.find((opt) => opt.long === '--fast');
+
+      expect(fastOption).toBeDefined();
+    });
+
+    // Should have precise option
+    it('should have precise option', () => {
+      setupSlice(program);
+      const cmd = program.commands[0];
+      const preciseOption = cmd?.options.find((opt) => opt.long === '--precise');
+
+      expect(preciseOption).toBeDefined();
+    });
+
+    // Should have segments option
+    it('should have segments option', () => {
+      setupSlice(program);
+      const cmd = program.commands[0];
+      const segmentsOption = cmd?.options.find((opt) => opt.long === '--segments');
+
+      expect(segmentsOption).toBeDefined();
     });
   });
 });
