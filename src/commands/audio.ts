@@ -2,10 +2,13 @@ import { resolve, dirname, basename, extname, join } from 'path';
 
 import type { Command } from 'commander';
 
+import { loading } from '@/utils/icons';
+
 import type { AudioOptions } from '../types/index';
 import { checkDependencies } from '../utils/dependencies';
 import { extractAudio } from '../utils/ffmpeg';
 import { log } from '../utils/log';
+import { createProgressBar } from '../utils/progress';
 import { validateFileExists, validateFormat, validateBitrate } from '../utils/validations';
 
 /* Allowed audio formats for extraction */
@@ -64,12 +67,23 @@ export async function audioAction(input: string, options: AudioOptions): Promise
 
     log.succeed(`Audio extraction started | Format: ${format.toUpperCase()} | Bitrate: ${bitrate}`);
 
+    const progressBar = createProgressBar(`${loading} Extracting audio | ${format.toUpperCase()}`);
+
+    progressBar.start(100, 0);
+
     try {
-      await extractAudio(input, outputFile, format, bitrate);
+      await extractAudio(input, outputFile, format, bitrate, (progress) => {
+        if (progress > 0) {
+          progressBar.update(progress);
+        }
+      });
     } catch (error) {
+      progressBar.stop();
       log.fail(`Audio extraction failed: ${error instanceof Error ? error.message : String(error)}`);
       process.exit(1);
     }
+
+    progressBar.stop();
 
     log.succeed('Audio extraction completed!');
     log.info(`Output: ${resolve(outputFile)}`);

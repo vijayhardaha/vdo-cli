@@ -192,6 +192,7 @@ export async function speedUpVideo(
  * @param {string} outputPath - Path for the output audio file
  * @param {string} [format='mp3'] - Audio format: 'mp3', 'wav', or 'aac' (default: 'mp3')
  * @param {string} [bitrate='192k'] - Audio bitrate (default: '192k')
+ * @param {(percentage: number) => void} [onProgress] - Progress callback
  * @returns {Promise<void>} Promise that resolves when audio extraction is complete
  * @throws {Error} If ffmpeg execution fails or input file is invalid
  */
@@ -199,7 +200,8 @@ export async function extractAudio(
   inputPath: string,
   outputPath: string,
   format = 'mp3',
-  bitrate = '192k'
+  bitrate = '192k',
+  onProgress?: (percentage: number) => void
 ): Promise<void> {
   const formatMap: Record<string, string> = { mp3: 'mp3', wav: 'wav', aac: 'adts' };
 
@@ -210,5 +212,27 @@ export async function extractAudio(
 
   const command = `ffmpeg -i "${inputPath}" -vn -acodec ${ffmpegCodec} -b:a ${bitrate} -f ${ffmpegFormat} "${outputPath}"`;
 
-  await runCommand(command);
+  let totalTime = 0;
+  let currentTime = 0;
+
+  const outputHandler = (data: string, type: 'stdout' | 'stderr') => {
+    if (type === 'stderr' && onProgress) {
+      const progress = parseFFmpegProgress(data);
+      if (progress && progress.type === 'time' && progress.value !== undefined) {
+        currentTime = progress.value;
+        if (totalTime > 0) {
+          const percentage = Math.min(100, Math.round((currentTime / totalTime) * 100));
+          onProgress(percentage);
+        }
+      }
+    }
+  };
+
+  // First, get total duration
+  const infoCommand = `ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "${inputPath}"`;
+  const infoResult = await runCommand(infoCommand);
+  totalTime = parseFloat(infoResult.stdout);
+
+  // Then extract audio
+  await runCommand(command, outputHandler);
 }
