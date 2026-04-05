@@ -294,7 +294,7 @@ describe('Command actions', () => {
       vi.mocked(convertVideo).mockResolvedValue(undefined);
       vi.mocked(createProgressBar).mockReturnValue(mockProgressBar as never);
 
-      await convertAction('input.avi', { output: 'custom_out.mp4', to: 'mp4', preset: 'slow' });
+      await convertAction('input.avi', { output: 'custom_out.mp4', format: 'mp4', preset: 'slow' });
 
       // expect: convertVideo is called with custom output
       const callArgs = vi.mocked(convertVideo).mock.calls[0];

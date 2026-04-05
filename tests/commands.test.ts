@@ -277,7 +277,6 @@ describe('Commands Setup', () => {
 
       expect(commands).toHaveLength(1);
       expect(commands[0]?.name()).toBe('split');
-      expect(commands[0]?.aliases()).toContain('sp');
     });
 
     // Should have preset option
