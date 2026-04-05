@@ -54,9 +54,9 @@ export async function downloadAction(url: string, options: DownloadOptions): Pro
     let outputFile: string;
     // check: if output path is provided
     if (options.output) {
-      outputFile = options.output.includes('.')
-        ? options.output
-        : `${options.output}.${format === 'mp3' ? 'mp3' : format}`;
+      const outputExt = extname(options.output).slice(1);
+      // check: if output extension matches requested format
+      outputFile = outputExt === format ? options.output : `${options.output}.${format}`;
     } else {
       outputFile = generateFilename(videoInfo, format);
     }
