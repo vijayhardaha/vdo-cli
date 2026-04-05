@@ -96,6 +96,8 @@ export async function splitAction(input: string, options: SplitOptions): Promise
 
     const progressBar = createProgressBar(`${loading} Splitting | ${numParts} parts`);
 
+    progressBar.start(100, 0);
+
     try {
       let outputPaths: string[];
 
