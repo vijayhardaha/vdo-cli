@@ -9,6 +9,7 @@ A powerful Node.js command-line tool for video processing and downloading, built
 - 🗜️ **Compress** videos with customizable quality
 - 📦 **Compact** videos to target size using two-pass encoding
 - ✂️ **Slice** video segments with precision
+- 🔀 **Split** videos into multiple parts for social media
 - ⚡ **Speed up** or slow down videos
 - 🎵 **Extract** audio from videos
 
@@ -250,7 +251,60 @@ vdo slice video.mp4 --start 0 --end 60 --fast
 
 ---
 
-#### 6. speedup - Speed up or slow down video
+#### 6. split - Split video into multiple parts
+
+Split videos into smaller parts based on platform limits.
+
+```bash
+vdo split <input> [options]
+```
+
+**Options:**
+
+- `-o, --output <file>` - Output directory or base name
+- `-p, --preset <platform>` - Platform preset (instagram/ig: 60s, whatsapp/wa: 90s, facebook/fb: 120s)
+- `-d, --duration <time>` - Max duration per part (e.g., 60, 1:30, 00:01:30)
+- `--fast` - Use stream copy (fast, may not be frame-accurate)
+- `--precise` - Re-encode for frame accuracy (default)
+- `--codec <codec>` - Codec for re-encoding (h264, hevc) (default: "h264")
+
+**Platform Presets:**
+
+| Preset            | Platform                | Max Duration |
+| ----------------- | ----------------------- | ------------ |
+| `instagram`, `ig` | Instagram Stories/Reels | 60 seconds   |
+| `whatsapp`, `wa`  | WhatsApp Status         | 90 seconds   |
+| `facebook`, `fb`  | Facebook Stories        | 120 seconds  |
+
+**Examples:**
+
+```bash
+# Split for Instagram stories (60s max per part)
+vdo split video.mp4 --preset instagram
+vdo split video.mp4 --preset ig
+
+# Split for WhatsApp status (90s max per part)
+vdo split video.mp4 --preset whatsapp
+vdo split video.mp4 --preset wa
+
+# Split for Facebook (120s max per part)
+vdo split video.mp4 --preset facebook
+vdo split video.mp4 --preset fb
+
+# Custom duration (45 seconds per part)
+vdo split video.mp4 --duration 45
+
+# Fast mode (stream copy)
+vdo split video.mp4 --preset instagram --fast
+```
+
+**Output:** `input_001.mp4`, `input_002.mp4`, `input_003.mp4`, ...
+
+**Aliases:** `sp`
+
+---
+
+#### 7. speedup - Speed up or slow down video
 
 Adjust video playback speed.
 
@@ -283,7 +337,7 @@ vdo speedup video.mp4 --rate 2 -o fast_video.mp4
 
 ---
 
-#### 7. audio - Extract audio from video
+#### 8. audio - Extract audio from video
 
 Extract audio track from video files.
 
@@ -463,6 +517,8 @@ vdo/
 │   │   ├── download.ts         # Download command
 │   │   ├── convert.ts          # Convert command
 │   │   ├── compress.ts         # Compress command
+│   │   ├── compact.ts          # Compact command
+│   │   ├── slice.ts            # Slice command
 │   │   ├── speedup.ts          # Speed adjustment command
 │   │   └── audio.ts            # Audio extraction command
 │   ├── utils/
@@ -472,16 +528,23 @@ vdo/
 │   │   ├── log.ts              # Logging utility
 │   │   ├── ffmpeg.ts           # FFmpeg wrapper functions
 │   │   ├── ytdlp.ts            # yt-dlp wrapper functions
-│   │   └── progress.ts         # Progress bar utilities
+│   │   ├── progress.ts          # Progress bar utilities
+│   │   ├── compact.ts           # Compact utilities
+│   │   ├── slice.ts            # Slice utilities
+│   │   └── split.ts            # Split utilities
 │   └── types/
 │       └── index.ts             # TypeScript type definitions
 ├── tests/
 │   ├── actions.test.ts
+│   ├── commands.test.ts
 │   ├── dependencies.test.ts
 │   ├── ffmpeg.test.ts
 │   ├── progress.test.ts
 │   ├── sanitize.test.ts
-│   └── ytdlp.test.ts
+│   ├── ytdlp.test.ts
+│   ├── compact.test.ts
+│   ├── slice.test.ts
+│   └── split.test.ts
 ├── package.json
 ├── vitest.config.ts
 └── README.md
@@ -532,6 +595,9 @@ vdo cp video.mp4 --discord
 
 # Slice a segment from video
 vdo sl video.mp4 --start 10 --end 30
+
+# Split video for Instagram (60s parts)
+vdo split video.mp4 --preset ig
 
 # Create a timelapse (speed up)
 vdo sp timelapse-source.mp4 --rate 4
