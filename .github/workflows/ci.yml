@@ -6,7 +6,6 @@ on:
       - master
     paths:
       - "src/**"
-      - "tests/**"
       - "vite.config.ts"
       - "vitest.config.ts"
       - "tsconfig.json"
