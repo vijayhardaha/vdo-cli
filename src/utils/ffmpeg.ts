@@ -2,6 +2,18 @@ import { runCommand } from './dependencies';
 import { parseFFmpegProgress } from './progress';
 
 /**
+ * Get video duration using ffprobe
+ *
+ * @param {string} inputPath - Path to the input video file
+ * @returns {Promise<number>} Video duration in seconds
+ */
+export async function getVideoDuration(inputPath: string): Promise<number> {
+  const command = `ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "${inputPath}"`;
+  const result = await runCommand(command);
+  return parseFloat(result.stdout);
+}
+
+/**
  * Convert video to different format using ffmpeg
  *
  * @param {string} inputPath - Path to the input video file
