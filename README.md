@@ -300,8 +300,6 @@ vdo split video.mp4 --preset instagram --fast
 
 **Output:** `input_001.mp4`, `input_002.mp4`, `input_003.mp4`, ...
 
-**Aliases:** `sp`
-
 ---
 
 #### 7. speedup - Speed up or slow down video
