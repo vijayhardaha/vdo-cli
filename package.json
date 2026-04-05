@@ -65,7 +65,7 @@
     "@types/node": "^25.5.2",
     "@typescript-eslint/eslint-plugin": "^8.58.0",
     "@typescript-eslint/parser": "^8.58.0",
-    "@vijayhardaha/dev-config": "^1.0.8",
+    "@vijayhardaha/dev-config": "^1.0.9",
     "@vitest/coverage-v8": "^4.1.2",
     "eslint": "^9.39.4",
     "eslint-config-prettier": "^10.1.8",
