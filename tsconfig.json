@@ -9,7 +9,12 @@
 
 {
   "extends": "@vijayhardaha/dev-config/tsconfig",
-  "compilerOptions": { "baseUrl": "./", "ignoreDeprecations": "6.0", "paths": { "@/*": ["./src/*"] } },
+  "compilerOptions": {
+    "baseUrl": "./",
+    "ignoreDeprecations": "6.0",
+    "paths": { "@/*": ["./src/*"] },
+    "types": ["vitest/globals"]
+  },
 
   // ---- Includes ----
   // Files to include in the project type-checking scope
