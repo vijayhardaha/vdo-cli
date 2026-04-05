@@ -5,9 +5,11 @@ import { createRequire } from 'module';
 import { Command } from 'commander';
 
 import { setupAudio } from '../commands/audio';
+import { setupCompact } from '../commands/compact';
 import { setupCompress } from '../commands/compress';
 import { setupConvert } from '../commands/convert';
 import { setupDownload } from '../commands/download';
+import { setupSlice } from '../commands/slice';
 import { setupSpeedup } from '../commands/speedup';
 
 /* Create require function for ESM modules */
@@ -28,7 +30,9 @@ program
 setupDownload(program);
 setupConvert(program);
 setupCompress(program);
+setupCompact(program);
 setupSpeedup(program);
+setupSlice(program);
 setupAudio(program);
 
 /* Add help examples */
@@ -40,6 +44,8 @@ Examples:
   $ vdo download https://youtube.com/watch?v=example -o myvideo.mp4
   $ vdo convert input.avi --format mp4 --preset fast
   $ vdo compress video.mp4 --crf 23 --preset slow
+  $ vdo compact video.mp4 --target 25MB --discord
+  $ vdo slice video.mp4 --start 10 --end 30 --precise
   $ vdo speedup video.mp4 --rate 1.5
   $ vdo audio video.mp4 --format mp3 --bitrate 320k
 
