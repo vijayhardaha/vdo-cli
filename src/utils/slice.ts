@@ -19,7 +19,7 @@ export async function sliceVideoStreamCopy(
   end: string,
   onProgress?: (progress: number) => void
 ): Promise<void> {
-  const command = `ffmpeg -ss "${start}" -i "${inputPath}" -to "${end}" -c copy "${outputPath}"`;
+  const command = `ffmpeg -y -ss "${start}" -i "${inputPath}" -to "${end}" -c copy "${outputPath}"`;
 
   const totalTime = 0;
   let currentTime = 0;
@@ -65,7 +65,7 @@ export async function sliceVideoReencode(
   onProgress?: (progress: number) => void
 ): Promise<void> {
   const videoCodec = codec === 'hevc' ? 'libx265' : 'libx264';
-  const command = `ffmpeg -ss "${start}" -i "${inputPath}" -to "${end}" -c:v ${videoCodec} -crf ${crf} -c:a aac "${outputPath}"`;
+  const command = `ffmpeg -y -ss "${start}" -i "${inputPath}" -to "${end}" -c:v ${videoCodec} -crf ${crf} -c:a aac "${outputPath}"`;
 
   const totalTime = 0;
   let currentTime = 0;

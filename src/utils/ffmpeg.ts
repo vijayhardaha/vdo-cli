@@ -41,7 +41,7 @@ export async function convertVideo(
 
   const ffmpegPreset = presetMap[preset.toLowerCase()] || 'fast';
 
-  const command = `ffmpeg -i "${inputPath}" -c:v libx264 -preset ${ffmpegPreset} -c:a aac "${outputPath}"`;
+  const command = `ffmpeg -y -i "${inputPath}" -c:v libx264 -preset ${ffmpegPreset} -c:a aac "${outputPath}"`;
 
   let totalTime = 0;
   let currentTime = 0;
@@ -86,7 +86,7 @@ export async function compressVideo(
   preset = 'medium',
   onProgress: ((percentage: number, currentTime: number, totalTime: number) => void) | null = null
 ): Promise<void> {
-  const command = `ffmpeg -i "${inputPath}" -c:v libx264 -crf ${crf} -preset ${preset} -c:a copy "${outputPath}"`;
+  const command = `ffmpeg -y -i "${inputPath}" -c:v libx264 -crf ${crf} -preset ${preset} -c:a copy "${outputPath}"`;
 
   let totalTime = 0;
   let currentTime = 0;
@@ -158,7 +158,7 @@ export async function speedUpVideo(
   }
 
   const videoFilter = `-vf "setpts=${1 / rate}*PTS"`;
-  const command = `ffmpeg -i "${inputPath}" ${videoFilter} ${audioFilter} -c:v libx264 -c:a aac "${outputPath}"`;
+  const command = `ffmpeg -y -i "${inputPath}" ${videoFilter} ${audioFilter} -c:v libx264 -c:a aac "${outputPath}"`;
 
   let totalTime = 0;
   let currentTime = 0;
@@ -210,7 +210,7 @@ export async function extractAudio(
   const ffmpegFormat = formatMap[format.toLowerCase()];
   const ffmpegCodec = codecMap[format.toLowerCase()];
 
-  const command = `ffmpeg -i "${inputPath}" -vn -acodec ${ffmpegCodec} -b:a ${bitrate} -f ${ffmpegFormat} "${outputPath}"`;
+  const command = `ffmpeg -y -i "${inputPath}" -vn -acodec ${ffmpegCodec} -b:a ${bitrate} -f ${ffmpegFormat} "${outputPath}"`;
 
   let totalTime = 0;
   let currentTime = 0;

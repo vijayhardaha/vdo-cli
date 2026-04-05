@@ -135,7 +135,7 @@ export async function splitVideoReencode(
     const paddedIndex = String(i + 1).padStart(3, '0');
     const outputPath = `${outputDir}/${baseName}_${paddedIndex}.mp4`;
 
-    const command = `ffmpeg -ss "${startStr}" -i "${inputPath}" -to "${endStr}" -c:v ${videoCodec} -crf ${crf} -c:a aac "${outputPath}"`;
+    const command = `ffmpeg -y -ss "${startStr}" -i "${inputPath}" -to "${endStr}" -c:v ${videoCodec} -crf ${crf} -c:a aac "${outputPath}"`;
 
     let currentTime = 0;
 
@@ -198,7 +198,7 @@ export async function splitVideoStreamCopy(
     const paddedIndex = String(i + 1).padStart(3, '0');
     const outputPath = `${outputDir}/${baseName}_${paddedIndex}.mp4`;
 
-    const command = `ffmpeg -ss "${startStr}" -i "${inputPath}" -to "${endStr}" -c copy "${outputPath}"`;
+    const command = `ffmpeg -y -ss "${startStr}" -i "${inputPath}" -to "${endStr}" -c copy "${outputPath}"`;
 
     await runCommand(command);
 

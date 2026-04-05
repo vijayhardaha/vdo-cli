@@ -71,7 +71,7 @@ export async function compactVideo(
 
   const pass1Cmd = `ffmpeg -y -i "${inputPath}" -c:v ${videoCodec} -b:v ${targetBitrate}k -pass 1 -preset ${preset} -an -f null "${pass1Log}"`;
 
-  const pass2Cmd = `ffmpeg -i "${inputPath}" -c:v ${videoCodec} -b:v ${targetBitrate}k -pass 2 -preset ${preset} -c:a aac -b:a ${audioBitrate} "${outputPath}"`;
+  const pass2Cmd = `ffmpeg -y -i "${inputPath}" -c:v ${videoCodec} -b:v ${targetBitrate}k -pass 2 -preset ${preset} -c:a aac -b:a ${audioBitrate} "${outputPath}"`;
 
   const totalTime = 0;
   let currentTime = 0;
@@ -125,7 +125,7 @@ export async function compactVideoCRF(
   onProgress?: (progress: number) => void
 ): Promise<void> {
   const videoCodec = hevc ? 'libx265' : 'libx264';
-  const command = `ffmpeg -i "${inputPath}" -c:v ${videoCodec} -crf ${crf} -preset ${preset} -c:a aac -b:a ${audioBitrate} "${outputPath}"`;
+  const command = `ffmpeg -y -i "${inputPath}" -c:v ${videoCodec} -crf ${crf} -preset ${preset} -c:a aac -b:a ${audioBitrate} "${outputPath}"`;
 
   const totalTime = 0;
   let currentTime = 0;
