@@ -174,14 +174,14 @@ if (isAuthenticated) {
 ESM imports with `moduleResolution: bundler`:
 
 ```ts
-import { runCommand } from "./dependencies.js";
-import { log } from "./log.js";
+import { runCommand } from "./dependencies";
+import { log } from "./log";
 ```
 
 ### TypeScript
 
 - Strict mode, no `any` without `// eslint-disable` comment
-- Use type imports: `import type { Foo } from './types.js'`
+- Use type imports: `import type { Foo } from './types'`
 - Error handling pattern: `error instanceof Error ? error.message : String(error)`
 
 ### Command Actions
