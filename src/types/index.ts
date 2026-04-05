@@ -59,7 +59,7 @@ export interface DownloadOptions {
  */
 export interface ConvertOptions {
   output?: string;
-  to?: VideoFormat;
+  format?: VideoFormat;
   preset?: Preset;
 }
 

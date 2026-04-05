@@ -43,7 +43,7 @@ export async function convertAction(input: string, options: ConvertOptions): Pro
       process.exit(1);
     }
 
-    const format = options.to || 'mp4';
+    const format = options.format || 'mp4';
     try {
       validateFormat(format, ALLOWED_FORMATS);
     } catch (error) {
