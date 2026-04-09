@@ -62,14 +62,14 @@ export async function downloadVideo(
   format: string = 'mp4',
   onProgress: ((percentage: number, size: number, unit: string) => void) | null = null
 ): Promise<void> {
-  const mergeFormat: string = format.toLowerCase() || 'mp4';
+  const mergeFormat = format.toLowerCase() || 'mp4';
 
   let command: string;
   /* check: if downloading audio only */
   if (format === 'mp3') {
     command = `yt-dlp --extract-audio --audio-format mp3 --audio-quality 0 --output "${outputPath}" --format bestaudio/best "${url}"`;
   } else {
-    command = `yt-dlp -S vcodec:h264,lang,quality,res,fps,hdr:12,acodec:aac --merge-output-format "${mergeFormat}" mp4 --output "${outputPath}" "${url}"`;
+    command = `yt-dlp -S vcodec:h264,acodec:aac,quality -f b --merge-output-format ${mergeFormat} --output "${outputPath}" "${url}"`;
   }
 
   const outputHandler = (data: string, _type: 'stdout' | 'stderr') => {
