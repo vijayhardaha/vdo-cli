@@ -62,24 +62,14 @@ export async function downloadVideo(
   format: string = 'mp4',
   onProgress: ((percentage: number, size: number, unit: string) => void) | null = null
 ): Promise<void> {
-  /* Format selectors for different output formats */
-  const formatMap: Record<string, string> = {
-    mp4: 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/bestvideo[ext=mp4]/best',
-    mkv: 'bestvideo[ext=mkv]+bestaudio[ext=mka]/bestvideo[ext=mkv]/best',
-    webm: 'bestvideo[ext=webm]+bestaudio[ext=webm]/bestvideo[ext=webm]/best',
-    avi: 'bestvideo[ext=avi]+bestaudio[ext=avi]/bestvideo[ext=avi]/best',
-    mov: 'bestvideo[ext=mov]+bestaudio[ext=m4a]/bestvideo[ext=mov]/best',
-    mp3: 'bestaudio/best',
-  };
-
-  const formatSelector = formatMap[format.toLowerCase()] || formatMap.mp4;
+  const mergeFormat: string = format.toLowerCase() || 'mp4';
 
   let command: string;
   /* check: if downloading audio only */
   if (format === 'mp3') {
-    command = `yt-dlp --extract-audio --audio-format mp3 --output "${outputPath}" --format "${formatSelector}" "${url}"`;
+    command = `yt-dlp --extract-audio --audio-format mp3 --audio-quality 0 --output "${outputPath}" --format bestaudio/best "${url}"`;
   } else {
-    command = `yt-dlp --output "${outputPath}" --format "${formatSelector}" "${url}"`;
+    command = `yt-dlp -S vcodec:h264,lang,quality,res,fps,hdr:12,acodec:aac --merge-output-format "${mergeFormat}" mp4 --output "${outputPath}" "${url}"`;
   }
 
   const outputHandler = (data: string, _type: 'stdout' | 'stderr') => {
