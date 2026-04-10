@@ -8,7 +8,7 @@ import { speedUpVideo } from '@/utils/ffmpeg';
 import { loading } from '@/utils/icons';
 import { log } from '@/utils/log';
 import { resolveOutputFile } from '@/utils/output';
-import { createProgressBar } from '@/utils/progress';
+import { createProgressBar, createProgressCallback } from '@/utils/progress';
 import { validateFileExists, validateSpeedRate } from '@/utils/validations';
 
 /**
@@ -45,12 +45,7 @@ export async function speedupAction(input: string, options: SpeedupOptions): Pro
     log.succeed(`Speed adjustment started | Rate: ${rate}x`);
 
     const progressBar = createProgressBar(`${loading} Processing | ${rate}x`);
-
-    const progressCallback = (percentage: number) => {
-      if (progressBar && percentage > 0) {
-        progressBar.update(percentage);
-      }
-    };
+    const progressCallback = createProgressCallback(progressBar);
 
     progressBar.start(100, 0);
 

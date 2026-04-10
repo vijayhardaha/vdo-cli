@@ -8,7 +8,7 @@ import { convertVideo } from '@/utils/ffmpeg';
 import { loading } from '@/utils/icons';
 import { log } from '@/utils/log';
 import { resolveOutputFile } from '@/utils/output';
-import { createProgressBar } from '@/utils/progress';
+import { createProgressBar, createProgressCallback } from '@/utils/progress';
 import { validateFileExists, validateFormat, validatePreset } from '@/utils/validations';
 
 /* Allowed video formats for conversion (webm not supported - requires VP9/Opus codec) */
@@ -58,12 +58,7 @@ export async function convertAction(input: string, options: ConvertOptions): Pro
     log.succeed(`Conversion started | Format: ${format.toUpperCase()} | Preset: ${preset}`);
 
     const progressBar = createProgressBar(`${loading} Converting | ${format.toUpperCase()} | ${preset}`);
-
-    const progressCallback = (percentage: number) => {
-      if (progressBar && percentage > 0) {
-        progressBar.update(percentage);
-      }
-    };
+    const progressCallback = createProgressCallback(progressBar);
 
     progressBar.start(100, 0);
 

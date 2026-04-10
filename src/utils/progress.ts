@@ -9,6 +9,21 @@ import type { ProgressInfo } from '@/types/index';
  * @param {string} [unit='%'] - Unit to display after size values (default: '%' for percentage-based)
  * @returns {cliProgress.SingleBar} New cli-progress SingleBar instance configured with classic shades preset
  */
+/**
+ * Create a progress callback for updating and rendering a progress bar
+ *
+ * @param {cliProgress.SingleBar} progressBar - The progress bar to update
+ * @returns {(percentage: number) => void} Callback function that updates and renders the progress bar
+ */
+export function createProgressCallback(progressBar: cliProgress.SingleBar): (percentage: number) => void {
+  return (percentage: number) => {
+    if (progressBar && percentage > 0) {
+      progressBar.update(percentage);
+      progressBar.render();
+    }
+  };
+}
+
 export function createProgressBar(message = 'Processing', unit = '%'): cliProgress.SingleBar {
   const format =
     unit === '%' ? `${message} [{bar}] {percentage}%` : `${message} [{bar}] {percentage}% | {value}/{total} ${unit}`;

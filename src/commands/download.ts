@@ -9,7 +9,7 @@ import { ensureDependencies } from '@/utils/dependencies';
 import { convertVideo } from '@/utils/ffmpeg';
 import { loading } from '@/utils/icons';
 import { log } from '@/utils/log';
-import { createProgressBar, formatFileSize } from '@/utils/progress';
+import { createProgressBar, createProgressCallback, formatFileSize } from '@/utils/progress';
 import { checkAndPromptOverwrite } from '@/utils/prompt';
 import { parseSplitValue } from '@/utils/split';
 import { validateUrl, validateFormat } from '@/utils/validations';
@@ -73,6 +73,7 @@ export async function downloadAction(url: string, options: DownloadOptions): Pro
     const progressCallback = (percentage: number, _size: number, _unit: string) => {
       const current = Math.round((percentage / 100) * total);
       progressBar.update(current, { total: roundedTotal });
+      progressBar.render();
     };
 
     progressBar.start(roundedTotal, 0);
@@ -86,6 +87,7 @@ export async function downloadAction(url: string, options: DownloadOptions): Pro
     }
 
     progressBar.update(roundedTotal, { total: roundedTotal });
+    progressBar.render();
     progressBar.stop();
 
     log.succeed('Download completed successfully!');
@@ -129,13 +131,9 @@ async function handleConvert(downloadedFile: string, format: string): Promise<st
     await rename(downloadedFile, tempFile);
 
     const progressBar = createProgressBar(`${loading} Converting | ${format.toUpperCase()}`);
-    progressBar.start(100, 0);
+    const progressCallback = createProgressCallback(progressBar);
 
-    const progressCallback = (percentage: number) => {
-      if (percentage > 0) {
-        progressBar.update(percentage);
-      }
-    };
+    progressBar.start(100, 0);
 
     try {
       await convertVideo(tempFile, finalFile, format, DEFAULT_CONVERT_PRESET, progressCallback);

@@ -15,7 +15,7 @@ import { getVideoDuration } from '@/utils/ffmpeg';
 import { loading } from '@/utils/icons';
 import { log } from '@/utils/log';
 import { resolveOutputFile } from '@/utils/output';
-import { createProgressBar } from '@/utils/progress';
+import { createProgressBar, createProgressCallback } from '@/utils/progress';
 import { validateFileExists } from '@/utils/validations';
 
 /* Discord file size limit in MB (with buffer) */
@@ -61,12 +61,7 @@ export async function compactAction(input: string, options: CompactOptions): Pro
       log.succeed(`Compact started | Target: Discord (${DISCORD_SIZE_MB}MB) | Codec: ${codecStr}`);
 
       const progressBar = createProgressBar(`${loading} Compacting | Discord ${DISCORD_SIZE_MB}MB | ${preset}`);
-
-      const progressCallback = (percentage: number) => {
-        if (progressBar && percentage > 0) {
-          progressBar.update(percentage);
-        }
-      };
+      const progressCallback = createProgressCallback(progressBar);
 
       progressBar.start(100, 0);
 
@@ -95,11 +90,7 @@ export async function compactAction(input: string, options: CompactOptions): Pro
 
       const progressBar = createProgressBar(`${loading} Compacting | ${targetMB}MB | ${preset}`);
 
-      const progressCallback = (percentage: number) => {
-        if (progressBar && percentage > 0) {
-          progressBar.update(percentage);
-        }
-      };
+      const progressCallback = createProgressCallback(progressBar);
 
       progressBar.start(100, 0);
 
@@ -125,12 +116,7 @@ export async function compactAction(input: string, options: CompactOptions): Pro
       log.succeed(`Compact started | Quality: ${options.quality} (CRF: ${crf}) | Codec: ${codecStr}`);
 
       const progressBar = createProgressBar(`${loading} Compacting | Quality: ${options.quality} | ${preset}`);
-
-      const progressCallback = (percentage: number) => {
-        if (progressBar && percentage > 0) {
-          progressBar.update(percentage);
-        }
-      };
+      const progressCallback = createProgressCallback(progressBar);
 
       progressBar.start(100, 0);
 
@@ -160,12 +146,7 @@ export async function compactAction(input: string, options: CompactOptions): Pro
       );
 
       const progressBar = createProgressBar(`${loading} Compacting | ${options.percent}% reduction | ${preset}`);
-
-      const progressCallback = (percentage: number) => {
-        if (progressBar && percentage > 0) {
-          progressBar.update(percentage);
-        }
-      };
+      const progressCallback = createProgressCallback(progressBar);
 
       progressBar.start(100, 0);
 
@@ -188,12 +169,7 @@ export async function compactAction(input: string, options: CompactOptions): Pro
     log.succeed(`Compact started | Quality: medium (CRF: ${crf})`);
 
     const progressBar = createProgressBar(`${loading} Compacting | Quality: medium | ${preset}`);
-
-    const progressCallback = (percentage: number) => {
-      if (progressBar && percentage > 0) {
-        progressBar.update(percentage);
-      }
-    };
+    const progressCallback = createProgressCallback(progressBar);
 
     progressBar.start(100, 0);
 
