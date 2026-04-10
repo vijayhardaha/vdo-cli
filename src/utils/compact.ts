@@ -79,11 +79,11 @@ export async function compactVideo(
 
   const pass2Cmd = `ffmpeg -y -i "${inputPath}" -c:v ${videoCodec} -b:v ${targetBitrate}k -pass 2 -preset ${preset} -c:a aac -b:a ${audioBitrate} "${outputPath}"`;
 
-  const totalTime = 0;
+  const totalTime = await getVideoDuration(inputPath);
   let currentTime = 0;
 
-  const progressCallback = (line: string) => {
-    const progress: ProgressInfo | null = parseFFmpegProgress(line);
+  const progressCallback = (data: string, _type: 'stdout' | 'stderr') => {
+    const progress: ProgressInfo | null = parseFFmpegProgress(data);
     if (progress?.type === 'time' && progress.value !== undefined) {
       if (totalTime > 0) {
         currentTime = progress.value;
@@ -138,11 +138,11 @@ export async function compactVideoCRF(
   const videoCodec = hevc ? 'libx265' : 'libx264';
   const command = `ffmpeg -y -i "${inputPath}" -c:v ${videoCodec} -crf ${crf} -preset ${preset} -c:a aac -b:a ${audioBitrate} "${outputPath}"`;
 
-  const totalTime = 0;
+  const totalTime = await getVideoDuration(inputPath);
   let currentTime = 0;
 
-  const progressCallback = (line: string) => {
-    const progress: ProgressInfo | null = parseFFmpegProgress(line);
+  const progressCallback = (data: string, _type: 'stdout' | 'stderr') => {
+    const progress: ProgressInfo | null = parseFFmpegProgress(data);
     if (progress?.type === 'time' && progress.value !== undefined) {
       if (totalTime > 0) {
         currentTime = progress.value;
@@ -168,4 +168,16 @@ export async function compactVideoCRF(
  */
 export function getCRFForQuality(quality: string): number {
   return QUALITY_CRF[quality] ?? 23;
+}
+
+/**
+ * Get video duration in seconds using ffprobe
+ *
+ * @param {string} inputPath - Path to input video
+ * @returns {Promise<number>} Duration in seconds
+ */
+export async function getVideoDuration(inputPath: string): Promise<number> {
+  const command = `ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "${inputPath}"`;
+  const result = await runCommand(command);
+  return parseFloat(result.stdout) || 0;
 }
