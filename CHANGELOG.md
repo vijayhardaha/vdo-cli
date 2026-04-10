@@ -5,6 +5,38 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.3] - 2026-04-10
+
+### Added
+
+- **Progress Callback Utility**: Created `createProgressCallback()` to reduce boilerplate in command actions
+  - Centralizes progress bar update and render logic
+  - Used across compact, compress, convert, speedup, and download commands
+
+- **Video Duration Detection**: Added `getVideoDuration()` utility using ffprobe
+  - Replaces hardcoded `totalTime=0` with actual video duration
+  - Enables accurate percentage-based progress tracking for encoding operations
+
+### Changed
+
+- **yt-dlp Download Options**: Improved download quality and format handling
+  - Added `--audio-quality 0` for mp3 downloads
+  - Added `-S vcodec:h264,lang,quality,res,fps,hdr:12,acodec:aac` for video downloads
+  - Added `--merge-output-format` parameter for format compatibility
+  - Simplified format selection logic
+
+- **Progress Reporting**: Added `progressBar.render()` calls after updates
+  - Ensures consistent progress bar display in slice, split, audio, and download commands
+
+- **Progress Callback Signature**: Updated ffmpeg progress callbacks to handle stdout/stderr streams
+  - Changed from `(line: string)` to `(data: string, type: 'stdout' | 'stderr')`
+
+### Testing
+
+- Added tests for `createProgressCallback()` function
+- Added output resolver mocks to command tests
+- Updated compact tests to expect ffprobe call for duration detection
+
 ## [1.0.2] - 2026-04-06
 
 ### Added
