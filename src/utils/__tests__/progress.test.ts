@@ -1,11 +1,18 @@
+import cliProgress from 'cli-progress';
 import { describe, it, expect, vi } from 'vitest';
 
-import { parseFFmpegProgress, parseYtDlpProgress, kbToMB, createProgressBar } from '@/utils/progress';
+import {
+  parseFFmpegProgress,
+  parseYtDlpProgress,
+  kbToMB,
+  createProgressBar,
+  createProgressCallback,
+} from '@/utils/progress';
 
 vi.mock('cli-progress', () => ({
   default: {
     SingleBar: vi.fn().mockImplementation(function () {
-      return { start: vi.fn(), stop: vi.fn(), update: vi.fn() };
+      return { start: vi.fn(), stop: vi.fn(), update: vi.fn(), render: vi.fn() };
     }),
     Presets: { shades_classic: {} },
   },
@@ -13,6 +20,68 @@ vi.mock('cli-progress', () => ({
 
 // Tests for Progress utilities
 describe('Progress', () => {
+  // Tests for createProgressCallback
+  describe('createProgressCallback', () => {
+    // Should return a function
+    it('should return a function', async () => {
+      const mockBar = { start: vi.fn(), stop: vi.fn(), update: vi.fn(), render: vi.fn() };
+      const callback = createProgressCallback(mockBar as unknown as cliProgress.SingleBar);
+
+      // Expect callback is a function
+      expect(typeof callback).toBe('function');
+    });
+
+    // Should call update and render when percentage > 0
+    it('should call update and render when percentage > 0', async () => {
+      const mockBar = { start: vi.fn(), stop: vi.fn(), update: vi.fn(), render: vi.fn() };
+      const callback = createProgressCallback(mockBar as unknown as cliProgress.SingleBar);
+
+      callback(50);
+
+      // Expect update was called with percentage
+      expect(mockBar.update).toHaveBeenCalledWith(50);
+
+      // Expect render was called
+      expect(mockBar.render).toHaveBeenCalled();
+    });
+
+    // Should not call update when percentage is 0
+    it('should not call update when percentage is 0', async () => {
+      const mockBar = { start: vi.fn(), stop: vi.fn(), update: vi.fn(), render: vi.fn() };
+      const callback = createProgressCallback(mockBar as unknown as cliProgress.SingleBar);
+
+      callback(0);
+
+      // Expect update was not called
+      expect(mockBar.update).not.toHaveBeenCalled();
+
+      // Expect render was not called
+      expect(mockBar.render).not.toHaveBeenCalled();
+    });
+
+    // Should not call update when percentage is negative
+    it('should not call update when percentage is negative', async () => {
+      const mockBar = { start: vi.fn(), stop: vi.fn(), update: vi.fn(), render: vi.fn() };
+      const callback = createProgressCallback(mockBar as unknown as cliProgress.SingleBar);
+
+      callback(-10);
+
+      // Expect update was not called
+      expect(mockBar.update).not.toHaveBeenCalled();
+
+      // Expect render was not called
+      expect(mockBar.render).not.toHaveBeenCalled();
+    });
+
+    // Should not call update when progressBar is null/undefined
+    it('should not call update when progressBar is null/undefined', async () => {
+      const callback = createProgressCallback(null as unknown as cliProgress.SingleBar);
+
+      // Should not throw
+      expect(() => callback(50)).not.toThrow();
+    });
+  });
+
   // Tests for createProgressBar
   describe('createProgressBar', () => {
     // Should return a SingleBar instance

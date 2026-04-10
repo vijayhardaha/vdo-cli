@@ -4,16 +4,19 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { setupSpeedup, speedupAction } from '@/commands/speedup';
 
 vi.mock('../../utils/dependencies', () => {
-  const mockCheckDependencies = vi.fn();
-  const mockEnsureDependencies = vi.fn(async () => {
-    const deps = await mockCheckDependencies();
-    if (!deps.ok) {
-      process.exit(1);
-    }
-    return true;
-  });
+  const mockCheckDependencies = vi.fn().mockResolvedValue({ ok: true, missing: [] });
+  const mockEnsureDependencies = vi.fn().mockResolvedValue(true);
   return { checkDependencies: mockCheckDependencies, ensureDependencies: mockEnsureDependencies, runCommand: vi.fn() };
 });
+
+vi.mock('../../utils/output', () => ({
+  resolveOutputFile: vi.fn((o) => {
+    const ext = o.input.split('.').pop() || 'mp4';
+    if (o.output) return o.output;
+    const base = o.input.replace(/\.[^.]+$/, '');
+    return `${base}${o.suffix || '_2x'}.${ext}`;
+  }),
+}));
 
 vi.mock('../../utils/ffmpeg', () => ({ speedUpVideo: vi.fn(), getVideoDuration: vi.fn(() => Promise.resolve(60)) }));
 
@@ -21,6 +24,7 @@ vi.mock('../../utils/validations', () => ({ validateFileExists: vi.fn(), validat
 
 vi.mock('../../utils/progress', () => ({
   createProgressBar: vi.fn(),
+  createProgressCallback: vi.fn().mockReturnValue(vi.fn()),
   formatFileSize: vi.fn(() => ({ value: 100, unit: 'MB' })),
 }));
 
@@ -149,12 +153,15 @@ describe('speedup command', () => {
       const { checkDependencies } = await import('../../utils/dependencies');
       const { validateFileExists, validateSpeedRate } = await import('../../utils/validations');
       const { speedUpVideo } = await import('../../utils/ffmpeg');
-      const { createProgressBar } = await import('../../utils/progress');
+      const { createProgressBar, createProgressCallback } = await import('../../utils/progress');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateFileExists).mockResolvedValue(undefined);
       vi.mocked(validateSpeedRate).mockReturnValue(undefined);
       vi.mocked(createProgressBar).mockReturnValue(mockProgressBar as never);
+      vi.mocked(createProgressCallback).mockImplementation((pb) => (percentage: number) => {
+        if (percentage > 0) pb.update(percentage);
+      });
       vi.mocked(speedUpVideo).mockImplementation(async (_i, _o, _r, onProgress) => {
         if (onProgress) onProgress(80, 48, 60);
       });

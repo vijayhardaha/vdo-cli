@@ -105,8 +105,8 @@ describe('compact utils', () => {
 
       await compactVideo('input.mp4', 'output.mp4', 1000, '128k', 'medium', false);
 
-      // Expect compactVideo runs two ffmpeg passes
-      expect(runCommand).toHaveBeenCalledTimes(2);
+      // Expect compactVideo runs ffprobe + two ffmpeg passes
+      expect(runCommand).toHaveBeenCalledTimes(3);
       // Expect pass 1 uses libx264 with pass 1 flag
       expect(runCommand).toHaveBeenCalledWith(
         'ffmpeg -y -i "input.mp4" -c:v libx264 -b:v 1000k -pass 1 -preset medium -an -f null "ffmpeg2pass-0.log"',
@@ -145,8 +145,9 @@ describe('compact utils', () => {
     // Should throw error on pass 2 failure
     it('should throw error on pass 2 failure', async () => {
       vi.mocked(runCommand)
-        .mockResolvedValueOnce({ stdout: '', stderr: 'frames: 100' })
-        .mockResolvedValueOnce({ stdout: '', stderr: 'error occurred' });
+        .mockResolvedValueOnce({ stdout: '10', stderr: '' }) // ffprobe returns duration
+        .mockResolvedValueOnce({ stdout: '', stderr: 'frames: 100' }) // pass 1
+        .mockResolvedValueOnce({ stdout: '', stderr: 'error occurred' }); // pass 2 fails
 
       // Expect error message indicates pass 2 failure
       await expect(compactVideo('input.mp4', 'output.mp4', 1000, '128k', 'medium', false)).rejects.toThrow(
@@ -163,8 +164,8 @@ describe('compact utils', () => {
 
       await compactVideoCRF('input.mp4', 'output.mp4', 23, 'medium', '128k', false);
 
-      // Expect compactVideoCRF uses libx264
-      expect(runCommand).toHaveBeenCalledTimes(1);
+      // Expect compactVideoCRF uses libx264 (ffprobe + ffmpeg)
+      expect(runCommand).toHaveBeenCalledTimes(2);
       expect(runCommand).toHaveBeenCalledWith(
         'ffmpeg -y -i "input.mp4" -c:v libx264 -crf 23 -preset medium -c:a aac -b:a 128k "output.mp4"',
         expect.any(Function)

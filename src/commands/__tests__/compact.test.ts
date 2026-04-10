@@ -10,8 +10,8 @@ import { checkAndPromptOverwrite } from '@/utils/prompt';
 import { validateFileExists } from '@/utils/validations';
 
 vi.mock('../../utils/dependencies', () => {
-  const mockCheckDependencies = vi.fn();
-  const mockEnsureDependencies = vi.fn(async () => {
+  const mockCheckDependencies = vi.fn().mockResolvedValue({ ok: true, missing: [] });
+  const mockEnsureDependencies = vi.fn().mockImplementation(async () => {
     const deps = await mockCheckDependencies();
     if (!deps.ok) {
       process.exit(1);
@@ -21,6 +21,15 @@ vi.mock('../../utils/dependencies', () => {
   return { checkDependencies: mockCheckDependencies, ensureDependencies: mockEnsureDependencies, runCommand: vi.fn() };
 });
 
+vi.mock('../../utils/output', () => ({
+  resolveOutputFile: vi.fn((o) => {
+    const ext = o.input.split('.').pop() || 'mp4';
+    if (o.output) return o.output;
+    const base = o.input.replace(/\.[^.]+$/, '');
+    return `${base}${o.suffix || '_compact'}.${ext}`;
+  }),
+}));
+
 vi.mock('../../utils/prompt', () => ({
   checkAndPromptOverwrite: vi.fn().mockResolvedValue(true),
   promptOverwrite: vi.fn().mockResolvedValue(true),
@@ -28,6 +37,7 @@ vi.mock('../../utils/prompt', () => ({
 
 vi.mock('../../utils/progress', () => ({
   createProgressBar: vi.fn(),
+  createProgressCallback: vi.fn().mockReturnValue(vi.fn()),
   formatFileSize: vi.fn(() => ({ value: 100, unit: 'MB' })),
 }));
 

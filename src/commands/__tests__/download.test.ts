@@ -4,8 +4,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { setupDownload, downloadAction } from '@/commands/download';
 
 vi.mock('../../utils/dependencies', () => {
-  const mockCheckDependencies = vi.fn();
-  const mockEnsureDependencies = vi.fn(async () => {
+  const mockCheckDependencies = vi.fn().mockResolvedValue({ ok: true, missing: [] });
+  const mockEnsureDependencies = vi.fn().mockImplementation(async () => {
     const deps = await mockCheckDependencies();
     if (!deps.ok) {
       process.exit(1);
@@ -23,6 +23,7 @@ vi.mock('../../utils/ytdlp', () => ({
 
 vi.mock('../../utils/progress', () => ({
   createProgressBar: vi.fn(),
+  createProgressCallback: vi.fn().mockReturnValue(vi.fn()),
   formatFileSize: vi.fn(() => ({ value: 100, unit: 'MB' })),
 }));
 
@@ -46,7 +47,7 @@ vi.mock('fs/promises', () => ({
 }));
 
 /* Mock progress bar */
-const mockProgressBar = { start: vi.fn(), stop: vi.fn(), update: vi.fn() };
+const mockProgressBar = { start: vi.fn(), stop: vi.fn(), update: vi.fn(), render: vi.fn() };
 
 // Tests for download command
 describe('download command', () => {

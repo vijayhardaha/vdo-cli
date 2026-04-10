@@ -4,16 +4,23 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { setupConvert, convertAction } from '@/commands/convert';
 
 vi.mock('../../utils/dependencies', () => {
-  const mockCheckDependencies = vi.fn();
-  const mockEnsureDependencies = vi.fn(async () => {
-    const deps = await mockCheckDependencies();
-    if (!deps.ok) {
-      process.exit(1);
-    }
-    return true;
-  });
+  const mockCheckDependencies = vi.fn().mockResolvedValue({ ok: true, missing: [] });
+  const mockEnsureDependencies = vi.fn().mockResolvedValue(true);
   return { checkDependencies: mockCheckDependencies, ensureDependencies: mockEnsureDependencies, runCommand: vi.fn() };
 });
+
+vi.mock('../../utils/output', () => ({
+  resolveOutputFile: vi.fn((o) => {
+    if (o.output) {
+      if (o.format && !o.output.endsWith(`.${o.format}`)) {
+        return `${o.output}.${o.format}`;
+      }
+      return o.output;
+    }
+    const base = o.input.replace(/\.[^.]+$/, '');
+    return `${base}_converted.${o.format || 'mp4'}`;
+  }),
+}));
 
 vi.mock('../../utils/ffmpeg', () => ({ convertVideo: vi.fn(), getVideoDuration: vi.fn(() => Promise.resolve(60)) }));
 
@@ -25,6 +32,7 @@ vi.mock('../../utils/validations', () => ({
 
 vi.mock('../../utils/progress', () => ({
   createProgressBar: vi.fn(),
+  createProgressCallback: vi.fn().mockReturnValue(vi.fn()),
   formatFileSize: vi.fn(() => ({ value: 100, unit: 'MB' })),
 }));
 
@@ -206,13 +214,16 @@ describe('convert command', () => {
       const { checkDependencies } = await import('../../utils/dependencies');
       const { validateFileExists, validateFormat, validatePreset } = await import('../../utils/validations');
       const { convertVideo } = await import('../../utils/ffmpeg');
-      const { createProgressBar } = await import('../../utils/progress');
+      const { createProgressBar, createProgressCallback } = await import('../../utils/progress');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateFileExists).mockResolvedValue(undefined);
       vi.mocked(validateFormat).mockReturnValue(undefined);
       vi.mocked(validatePreset).mockReturnValue(undefined);
       vi.mocked(createProgressBar).mockReturnValue(mockProgressBar as never);
+      vi.mocked(createProgressCallback).mockImplementation((pb) => (percentage: number) => {
+        if (percentage > 0) pb.update(percentage);
+      });
       vi.mocked(convertVideo).mockImplementation(async (_i, _o, _f, _p, onProgress) => {
         if (onProgress) onProgress(50, 30, 60);
       });
