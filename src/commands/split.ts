@@ -126,6 +126,7 @@ export async function splitAction(input: string, options: SplitOptions): Promise
           totalDuration,
           (progress: number, part: number) => {
             progressBar.update(Math.round(progress), { part, total: numParts });
+            progressBar.render();
           }
         );
       } else {
@@ -138,6 +139,7 @@ export async function splitAction(input: string, options: SplitOptions): Promise
           DEFAULT_CRF,
           (progress: number, part: number) => {
             progressBar.update(Math.round(progress), { part, total: numParts });
+            progressBar.render();
           }
         );
       }

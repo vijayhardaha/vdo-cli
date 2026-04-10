@@ -113,6 +113,7 @@ export async function sliceAction(input: string, options: SliceOptions): Promise
       try {
         await sliceMultipleSegments(input, dir, options.segments, !!options.fast, (progress, segment) => {
           progressBar.update(Math.round(progress), { segment });
+          progressBar.render();
         });
 
         progressBar.stop();
@@ -175,6 +176,7 @@ export async function sliceAction(input: string, options: SliceOptions): Promise
         const codec = options.codec === 'hevc' ? 'hevc' : 'h264';
         await sliceVideoReencode(input, outputFile, startFFmpeg, endFFmpeg, codec, DEFAULT_CRF, (progress) => {
           progressBar.update(progress);
+          progressBar.render();
         });
       } else {
         // Smart default: use stream copy (faster)

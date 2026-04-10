@@ -68,6 +68,7 @@ export async function audioAction(input: string, options: AudioOptions): Promise
       await extractAudio(input, outputFile, format, bitrate, (progress) => {
         if (progress > 0) {
           progressBar.update(progress);
+          progressBar.render();
         }
       });
     } catch (error) {
