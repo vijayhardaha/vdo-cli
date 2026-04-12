@@ -1,16 +1,18 @@
+/* eslint-disable jsdoc/require-description-complete-sentence */
 /**
- * ========================================================================.
+ * ========================================================================
  * Vite Configuration
- * ========================================================================.
+ * ========================================================================
  * Builds the CLI as a Node.js library (ESM format) for distribution.
  * Entry point: src/bin/vdo.ts → dist/vdo.js
  * Docs: https://vitejs.dev/config/
- * ========================================================================.
+ * ========================================================================
  */
+/* eslint-enable jsdoc/require-description-complete-sentence */
 
 import { builtinModules } from 'module';
 import { dirname, resolve } from 'node:path';
-import { fileURLToPath } from 'url';
+import { fileURLToPath } from 'node:url';
 
 import { defineConfig } from 'vite';
 
