@@ -5,6 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.4] - 2026-04-12
+
+### Added
+
+- **Cookie Authentication for Downloads**: Added `--cookies <browser>` option to download command
+  - Passes cookies to yt-dlp via `--cookies-from-browser` flag
+  - Supports browsers: chrome, firefox, edge, brave, etc.
+  - Enables downloading from sites requiring authentication
+
+### Changed
+
+- **JSDoc Improvements**: Enhanced JSDoc comments across utility files
+  - Added missing @throws declarations
+  - Fixed @param descriptions to be more descriptive
+  - Fixed tag group ordering and type annotations
+  - Improved consistency in documentation
+
+- **Config Files**: Updated ESLint configuration for JSDoc header blocks
+  - Added eslint-disable/enable comments around header decoration blocks
+  - Removed trailing dots from === decoration lines
+
+### Dependencies
+
+- Updated all npm dependencies to latest versions
+- Added eslint-plugin-jsdoc for improved JSDoc linting
+
 ## [1.0.3] - 2026-04-10
 
 ### Added
