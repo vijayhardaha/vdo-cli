@@ -54,6 +54,7 @@ export interface DownloadOptions {
   format?: DownloadFormat;
   convert?: boolean;
   split?: string;
+  cookies?: string;
 }
 
 /**

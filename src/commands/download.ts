@@ -79,7 +79,7 @@ export async function downloadAction(url: string, options: DownloadOptions): Pro
     progressBar.start(roundedTotal, 0);
 
     try {
-      await downloadVideo(url, outputFile, format, progressCallback);
+      await downloadVideo(url, outputFile, format, progressCallback, options.cookies);
     } catch (error) {
       progressBar.stop();
       log.fail(`Download failed: ${error instanceof Error ? error.message : String(error)}`);
@@ -198,5 +198,6 @@ export function setupDownload(program: Command): void {
     .option('--format <format>', 'Select format (mp4, mkv, webm, avi, mov, mp3)', 'mp4')
     .option('--convert', 'Convert the downloaded file using ffmpeg after download')
     .option('--split <value>', 'Split after download (ig|wa|fb|instagram|whatsapp|facebook or seconds)')
+    .option('--cookies <browser>', 'Load cookies from browser (chrome, firefox, edge, brave, etc.)')
     .action(downloadAction);
 }

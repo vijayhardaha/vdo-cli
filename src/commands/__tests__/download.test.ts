@@ -71,7 +71,7 @@ describe('download command', () => {
       expect(commands).toHaveLength(1);
       expect(commands[0]?.name()).toBe('download');
       expect(commands[0]?.aliases()).toContain('dl');
-      expect(commands[0]?.options).toHaveLength(4);
+      expect(commands[0]?.options).toHaveLength(5);
     });
 
     // Should have output option
@@ -108,6 +108,25 @@ describe('download command', () => {
       const splitOption = cmd?.options.find((opt) => opt.long === '--split');
 
       expect(splitOption).toBeDefined();
+    });
+
+    // Should have cookies option
+    it('should have cookies option', () => {
+      setupDownload(program);
+      const cmd = program.commands[0];
+      const cookiesOption = cmd?.options.find((opt) => opt.long === '--cookies');
+
+      expect(cookiesOption).toBeDefined();
+      expect(cookiesOption?.flags).toContain('--cookies <browser>');
+    });
+
+    // Should register download command with 5 options (including new cookies option)
+    it('should register download command with correct number of options', () => {
+      setupDownload(program);
+      const commands = program.commands;
+
+      expect(commands).toHaveLength(1);
+      expect(commands[0]?.options).toHaveLength(5);
     });
   });
 
@@ -354,6 +373,48 @@ describe('download command', () => {
 
       // Expect splitAction is called
       expect(vi.mocked(splitAction)).toHaveBeenCalled();
+    });
+
+    // Should should pass cookies option to downloadVideo
+    it('should pass cookies option to downloadVideo', async () => {
+      const { checkDependencies } = await import('../../utils/dependencies');
+      const { validateUrl, validateFormat } = await import('../../utils/validations');
+      const { downloadVideo, getVideoInfo } = await import('../../utils/ytdlp');
+      const { createProgressBar } = await import('../../utils/progress');
+
+      vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
+      vi.mocked(validateUrl).mockReturnValue(true);
+      vi.mocked(validateFormat).mockReturnValue(undefined);
+      vi.mocked(getVideoInfo).mockResolvedValue({ title: 'Test', video_id: '123', ext: 'mp4' });
+      vi.mocked(downloadVideo).mockResolvedValue(undefined);
+      vi.mocked(createProgressBar).mockReturnValue(mockProgressBar as never);
+
+      await downloadAction('https://example.com', { cookies: 'chrome' });
+
+      // Expect downloadVideo is called with cookies option
+      const callArgs = vi.mocked(downloadVideo).mock.calls[0];
+      expect(callArgs?.[4]).toBe('chrome');
+    });
+
+    // Should should not pass cookies when not provided
+    it('should not pass cookies when not provided', async () => {
+      const { checkDependencies } = await import('../../utils/dependencies');
+      const { validateUrl, validateFormat } = await import('../../utils/validations');
+      const { downloadVideo, getVideoInfo } = await import('../../utils/ytdlp');
+      const { createProgressBar } = await import('../../utils/progress');
+
+      vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
+      vi.mocked(validateUrl).mockReturnValue(true);
+      vi.mocked(validateFormat).mockReturnValue(undefined);
+      vi.mocked(getVideoInfo).mockResolvedValue({ title: 'Test', video_id: '123', ext: 'mp4' });
+      vi.mocked(downloadVideo).mockResolvedValue(undefined);
+      vi.mocked(createProgressBar).mockReturnValue(mockProgressBar as never);
+
+      await downloadAction('https://example.com', {});
+
+      // Expect downloadVideo is called with undefined cookies
+      const callArgs = vi.mocked(downloadVideo).mock.calls[0];
+      expect(callArgs?.[4]).toBeUndefined();
     });
 
     // Should should handle non-Error thrown values in outer catch

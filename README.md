@@ -91,6 +91,7 @@ vdo download <url> [options]
 - `--format <format>` - Select format (mp4, mkv, webm, avi, mov, mp3) (default: "mp4")
 - `--convert` - Convert the downloaded file using ffmpeg after download
 - `--split <value>` - Split after download (ig|wa|fb|instagram|whatsapp|facebook or seconds)
+- `--cookies <browser>` - Load cookies from browser (chrome, firefox, edge, brave, etc.) for authenticated downloads
 
 **Examples:**
 
@@ -118,6 +119,9 @@ vdo download https://youtube.com/watch?v=example --split 45
 
 # Download, convert, and split for WhatsApp (90s parts)
 vdo download https://youtube.com/watch?v=example --convert --split wa
+
+# Download with browser cookies for authenticated content
+vdo download https://example.com/video --cookies chrome
 ```
 
 **Aliases:** `dl`

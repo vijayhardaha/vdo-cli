@@ -233,6 +233,48 @@ describe('ytdlp utils', () => {
       // Expect download completes without error with null callback
       await expect(downloadVideo('https://example.com', 'out.mp4', 'mp4', null)).resolves.toBeUndefined();
     });
+
+    // Should include cookies-from-browser flag when cookies is provided
+    it('should include cookies-from-browser flag when cookies is provided', async () => {
+      const { runCommand } = await import('../dependencies');
+
+      vi.mocked(runCommand).mockResolvedValue({ stdout: '', stderr: '' });
+
+      await downloadVideo('https://example.com/video', 'output.mp4', 'mp4', null, 'chrome');
+
+      const cmd = vi.mocked(runCommand).mock.calls[0]?.[0];
+
+      // Expect command includes cookies-from-browser flag
+      expect(cmd).toContain('--cookies-from-browser chrome');
+    });
+
+    // Should not include cookies flag when cookies is not provided
+    it('should not include cookies flag when cookies is not provided', async () => {
+      const { runCommand } = await import('../dependencies');
+
+      vi.mocked(runCommand).mockResolvedValue({ stdout: '', stderr: '' });
+
+      await downloadVideo('https://example.com/video', 'output.mp4', 'mp4', null);
+
+      const cmd = vi.mocked(runCommand).mock.calls[0]?.[0];
+
+      // Expect command does not include cookies flag
+      expect(cmd).not.toContain('--cookies-from-browser');
+    });
+
+    // Should include cookies flag for mp3 downloads
+    it('should include cookies flag for mp3 downloads', async () => {
+      const { runCommand } = await import('../dependencies');
+
+      vi.mocked(runCommand).mockResolvedValue({ stdout: '', stderr: '' });
+
+      await downloadVideo('https://example.com/video', 'output.mp3', 'mp3', null, 'firefox');
+
+      const cmd = vi.mocked(runCommand).mock.calls[0]?.[0];
+
+      // Expect command includes cookies-from-browser for audio
+      expect(cmd).toContain('--cookies-from-browser firefox');
+    });
   });
 
   // Tests for getVideoInfo

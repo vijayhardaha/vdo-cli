@@ -53,6 +53,7 @@ export function generateFilename(videoInfo: VideoInfo, format: string): string {
  * @param {string} outputPath - Path for the output video file
  * @param {string} [format='mp4'] - Desired output format: 'mp4', 'mkv', or 'mp3' (default: 'mp4')
  * @param {((percentage: number, size: number, unit: string) => void) | null} [onProgress=null] - Optional callback function for download progress updates
+ * @param {string} [cookies] - Browser name to load cookies from (for authenticated downloads)
  * @returns {Promise<void>} Promise that resolves when download is complete
  * @throws {Error} If yt-dlp execution fails, URL is invalid, or network error occurs
  */
@@ -60,16 +61,19 @@ export async function downloadVideo(
   url: string,
   outputPath: string,
   format: string = 'mp4',
-  onProgress: ((percentage: number, size: number, unit: string) => void) | null = null
+  onProgress: ((percentage: number, size: number, unit: string) => void) | null = null,
+  cookies?: string
 ): Promise<void> {
   const mergeFormat = format.toLowerCase() || 'mp4';
+
+  const cookiesFlag = cookies ? `--cookies-from-browser ${cookies}` : '';
 
   let command: string;
   /* check: if downloading audio only */
   if (format === 'mp3') {
-    command = `yt-dlp --extract-audio --audio-format mp3 --audio-quality 0 --output "${outputPath}" --format bestaudio/best "${url}"`;
+    command = `yt-dlp ${cookiesFlag} --extract-audio --audio-format mp3 --audio-quality 0 --output "${outputPath}" --format bestaudio/best "${url}"`;
   } else {
-    command = `yt-dlp -S vcodec:h264,acodec:aac,quality -f b --merge-output-format ${mergeFormat} --output "${outputPath}" "${url}"`;
+    command = `yt-dlp ${cookiesFlag} -S vcodec:h264,acodec:aac,quality -f b --merge-output-format ${mergeFormat} --output "${outputPath}" "${url}"`;
   }
 
   const outputHandler = (data: string, _type: 'stdout' | 'stderr') => {

@@ -13,16 +13,16 @@
 
 ## Commands
 
-| Command            | Alias | Description            | Key Options                              |
-| ------------------ | ----- | ---------------------- | ---------------------------------------- |
-| `download <url>`   | `dl`  | Download from URL      | `-o`, `--format`, `--convert`, `--split` |
-| `convert <input>`  | `cvt` | Convert video format   | `--format`, `--preset`, `-o`             |
-| `compress <input>` | `cps` | Compress with CRF      | `--crf`, `--preset`, `-o`                |
-| `compact <input>`  | `cpt` | Compact to target size | `--target`, `--discord`, `--percent`     |
-| `slice <input>`    | `slc` | Slice/trim segment     | `--start`, `--end`, `--segments`         |
-| `split <input>`    | `spl` | Split into parts       | `--preset`, `--duration`                 |
-| `speedup <input>`  | `sup` | Change playback speed  | `--rate`, `-o`                           |
-| `audio <input>`    | `au`  | Extract audio          | `--format`, `--bitrate`, `-o`            |
+| Command            | Alias | Description            | Key Options                                           |
+| ------------------ | ----- | ---------------------- | ----------------------------------------------------- |
+| `download <url>`   | `dl`  | Download from URL      | `-o`, `--format`, `--convert`, `--split`, `--cookies` |
+| `convert <input>`  | `cvt` | Convert video format   | `--format`, `--preset`, `-o`                          |
+| `compress <input>` | `cps` | Compress with CRF      | `--crf`, `--preset`, `-o`                             |
+| `compact <input>`  | `cpt` | Compact to target size | `--target`, `--discord`, `--percent`                  |
+| `slice <input>`    | `slc` | Slice/trim segment     | `--start`, `--end`, `--segments`                      |
+| `split <input>`    | `spl` | Split into parts       | `--preset`, `--duration`                              |
+| `speedup <input>`  | `sup` | Change playback speed  | `--rate`, `-o`                                        |
+| `audio <input>`    | `au`  | Extract audio          | `--format`, `--bitrate`, `-o`                         |
 
 ### Download Command Options
 
@@ -30,6 +30,7 @@
 - `--output <file>` - Custom output filename
 - `--convert` - Convert downloaded file after download
 - `--split <value>` - Split after download (ig/wa/fb/instagram/whatsapp/facebook or seconds)
+- `--cookies <browser>` - Load cookies from browser (chrome/firefox/edge/brave/etc.) for authenticated downloads
 
 ## Architecture
 
