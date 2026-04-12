@@ -1,5 +1,5 @@
 /**
- * Progress information for ffmpeg or yt-dlp operations
+ * Progress information for ffmpeg or yt-dlp operations.
  */
 export interface ProgressInfo {
   type: 'time' | 'size' | 'fps' | 'download' | 'destination';
@@ -11,7 +11,7 @@ export interface ProgressInfo {
 }
 
 /**
- * Dependency check result
+ * Dependency check result.
  */
 export interface DependencyCheck {
   ok: boolean;
@@ -19,7 +19,7 @@ export interface DependencyCheck {
 }
 
 /**
- * Command execution result with stdout and stderr
+ * Command execution result with stdout and stderr.
  */
 export interface CommandResult {
   stdout: string;
@@ -27,27 +27,27 @@ export interface CommandResult {
 }
 
 /**
- * Supported video formats
+ * Supported video formats.
  */
 export type VideoFormat = 'mp4' | 'mkv' | 'avi' | 'mov' | 'webm' | 'flv';
 
 /**
- * Supported audio formats
+ * Supported audio formats.
  */
 export type AudioFormat = 'mp3' | 'wav' | 'aac';
 
 /**
- * Supported download formats
+ * Supported download formats.
  */
 export type DownloadFormat = 'mp4' | 'mkv' | 'mp3';
 
 /**
- * FFmpeg encoding presets
+ * FFmpeg encoding presets.
  */
 export type Preset = 'ultrafast' | 'fast' | 'medium' | 'slow' | 'high-quality';
 
 /**
- * Options for download command
+ * Options for download command.
  */
 export interface DownloadOptions {
   output?: string;
@@ -58,7 +58,7 @@ export interface DownloadOptions {
 }
 
 /**
- * Options for convert command
+ * Options for convert command.
  */
 export interface ConvertOptions {
   output?: string;
@@ -67,7 +67,7 @@ export interface ConvertOptions {
 }
 
 /**
- * Options for compress command
+ * Options for compress command.
  */
 export interface CompressOptions {
   output?: string;
@@ -76,7 +76,7 @@ export interface CompressOptions {
 }
 
 /**
- * Options for speedup command
+ * Options for speedup command.
  */
 export interface SpeedupOptions {
   output?: string;
@@ -84,7 +84,7 @@ export interface SpeedupOptions {
 }
 
 /**
- * Options for audio extraction command
+ * Options for audio extraction command.
  */
 export interface AudioOptions {
   output?: string;
@@ -93,12 +93,12 @@ export interface AudioOptions {
 }
 
 /**
- * Quality preset for compact command
+ * Quality preset for compact command.
  */
 export type CompactQuality = 'low' | 'medium' | 'high' | 'lossless';
 
 /**
- * Options for compact command
+ * Options for compact command.
  */
 export interface CompactOptions {
   output?: string;
@@ -112,7 +112,7 @@ export interface CompactOptions {
 }
 
 /**
- * Segment definition for slice command
+ * Segment definition for slice command.
  */
 export interface SliceSegment {
   start: string;
@@ -120,7 +120,7 @@ export interface SliceSegment {
 }
 
 /**
- * Options for slice command
+ * Options for slice command.
  */
 export interface SliceOptions {
   output?: string;
@@ -134,12 +134,12 @@ export interface SliceOptions {
 }
 
 /**
- * Platform preset for split command
+ * Platform preset for split command.
  */
 export type SplitPreset = 'instagram' | 'ig' | 'whatsapp' | 'wa' | 'facebook' | 'fb';
 
 /**
- * Options for split command
+ * Options for split command.
  */
 export interface SplitOptions {
   output?: string;

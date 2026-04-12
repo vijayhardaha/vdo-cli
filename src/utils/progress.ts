@@ -3,17 +3,19 @@ import cliProgress from 'cli-progress';
 import type { ProgressInfo } from '@/types/index';
 
 /**
- * Create a progress bar instance for displaying CLI progress
+ * Create a progress bar instance for displaying CLI progress.
  *
- * @param {string} [message='Processing'] - Message to display above the progress bar (default: 'Processing')
- * @param {string} [unit='%'] - Unit to display after size values (default: '%' for percentage-based)
- * @returns {cliProgress.SingleBar} New cli-progress SingleBar instance configured with classic shades preset
+ * @param {string} [message='Processing'] - Message to display above the progress bar (default: 'Processing').
+ * @param {string} [unit='%'] - Unit to display after size values (default: '%' for percentage-based).
+ *
+ * @returns {cliProgress.SingleBar} New cli-progress SingleBar instance configured with classic shades preset.
  */
 /**
- * Create a progress callback for updating and rendering a progress bar
+ * Create a progress callback for updating and rendering a progress bar.
  *
- * @param {cliProgress.SingleBar} progressBar - The progress bar to update
- * @returns {(percentage: number) => void} Callback function that updates and renders the progress bar
+ * @param {cliProgress.SingleBar} progressBar - The progress bar to update.
+ *
+ * @returns {(percentage: number) => void} Callback function that updates and renders the progress bar.
  */
 export function createProgressCallback(progressBar: cliProgress.SingleBar): (percentage: number) => void {
   return (percentage: number) => {
@@ -24,6 +26,14 @@ export function createProgressCallback(progressBar: cliProgress.SingleBar): (per
   };
 }
 
+/**
+ * Create a progress bar instance for displaying CLI progress.
+ *
+ * @param {string} message - Message to display above the progress bar (default: 'Processing').
+ * @param {string} unit - Unit to display after size values (default: '%' for percentage-based).
+ *
+ * @returns {cliProgress.SingleBar} New cli-progress SingleBar instance configured with classic shades preset.
+ */
 export function createProgressBar(message = 'Processing', unit = '%'): cliProgress.SingleBar {
   const format =
     unit === '%' ? `${message} [{bar}] {percentage}%` : `${message} [{bar}] {percentage}% | {value}/{total} ${unit}`;
@@ -34,10 +44,11 @@ export function createProgressBar(message = 'Processing', unit = '%'): cliProgre
 }
 
 /**
- * Parse ffmpeg output line to extract progress information
+ * Parse ffmpeg output line to extract progress information.
  *
- * @param {string} line - Single output line from ffmpeg stderr
- * @returns {ProgressInfo | null} ProgressInfo object with time, size, or fps data if matched; null if no progress found
+ * @param {string} line - Single output line from ffmpeg stderr.
+ *
+ * @returns {ProgressInfo | null} ProgressInfo object with time, size, or fps data if matched; null if no progress found.
  */
 export function parseFFmpegProgress(line: string): ProgressInfo | null {
   // Match time progress
@@ -68,10 +79,11 @@ export function parseFFmpegProgress(line: string): ProgressInfo | null {
 }
 
 /**
- * Parse yt-dlp output line to extract download progress information
+ * Parse yt-dlp output line to extract download progress information.
  *
- * @param {string} line - Single output line from yt-dlp stdout/stderr
- * @returns {ProgressInfo | null} ProgressInfo object with download percentage and size if matched; null if no progress found
+ * @param {string} line - Single output line from yt-dlp stdout/stderr.
+ *
+ * @returns {ProgressInfo | null} ProgressInfo object with download percentage and size if matched; null if no progress found.
  */
 export function parseYtDlpProgress(line: string): ProgressInfo | null {
   // Match percentage: [download]  45.3% of 100.00MiB
@@ -93,21 +105,22 @@ export function parseYtDlpProgress(line: string): ProgressInfo | null {
 }
 
 /**
- * Convert kilobytes to megabytes
+ * Convert kilobytes to megabytes.
  *
- * @param {number} kb - Size in kilobytes
- * @returns {number} Size in megabytes
+ * @param {number} kb - Size in kilobytes.
+ *
+ * @returns {number} Size in megabytes.
  */
 export function kbToMB(kb: number): number {
   return kb / 1024;
 }
 
 /**
- * Convert various size units to megabytes
+ * Convert bytes to appropriate unit and return value with unit string.
  *
- * @param {number} size - Numeric size value
- * @param {string} unit - Unit of measurement ('KiB', 'MiB', 'GiB', or other)
- * @returns {number} Size converted to megabytes
+ * @param {number} bytes - Size in bytes to convert.
+ *
+ * @returns {{ value: number; unit: string }} Object containing the converted value and unit string.
  */
 export function formatFileSize(bytes: number): { value: number; unit: string } {
   if (bytes < 1024) return { value: bytes, unit: 'B' };

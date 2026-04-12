@@ -21,10 +21,11 @@ const DEFAULT_CRF = 23;
  * Format seconds to smart filename string
  * - Removes unnecessary leading zeros
  * - Only includes hours if >= 1 hour
- * - Uses underscores as separators
+ * - Uses underscores as separators.
  *
- * @param {number} seconds - Duration in seconds
- * @returns {string} Smart formatted string (e.g., "10s", "1m_30s", "00h_10m_30s")
+ * @param {number} seconds - Duration in seconds.
+ *
+ * @returns {string} Smart formatted string (e.g., "10s", "1m_30s", "00h_10m_30s").
  */
 function formatSecondsToFilename(seconds: number): string {
   const hours = Math.floor(seconds / 3600);
@@ -41,10 +42,11 @@ function formatSecondsToFilename(seconds: number): string {
 }
 
 /**
- * Parse time string to seconds
+ * Parse time string to seconds.
  *
- * @param {string} timeStr - Time string (e.g., '10', '1:30', '00:01:30')
- * @returns {number} Duration in seconds
+ * @param {string} timeStr - Time string (e.g., '10', '1:30', '00:01:30').
+ *
+ * @returns {number} Duration in seconds.
  */
 function parseTimeToSeconds(timeStr: string): number {
   const hmsMatch = timeStr.match(/^(\d+):(\d{2}):(\d{2})(?:\.(\d+))?$/);
@@ -66,12 +68,14 @@ function parseTimeToSeconds(timeStr: string): number {
 }
 
 /**
- * Slice/trim video segment
+ * Slice/trim video segment.
  *
- * @param {string} input - Path to input video file
- * @param {SliceOptions} options - Slice options including start, end, fast, precise
+ * @param {string} input - Path to input video file.
+ * @param {SliceOptions} options - Slice options including start, end, fast, precise.
+ *
  * @returns {Promise<void>}
- * @throws {void} Exits with code 1 on error
+ *
+ * @throws {void} Exits with code 1 on error.
  */
 export async function sliceAction(input: string, options: SliceOptions): Promise<void> {
   try {
@@ -199,10 +203,11 @@ export async function sliceAction(input: string, options: SliceOptions): Promise
 }
 
 /**
- * Parse segments string to array
+ * Parse segments string to array.
  *
- * @param {string} segmentsStr - Segments string (e.g., "0-10,30-45")
- * @returns {SliceSegment[]} Array of segments
+ * @param {string} segmentsStr - Segments string (e.g., "0-10,30-45").
+ *
+ * @returns {SliceSegment[]} Array of segments.
  */
 function parseSegments(segmentsStr: string): SliceSegment[] {
   const segments: SliceSegment[] = [];
@@ -219,9 +224,10 @@ function parseSegments(segmentsStr: string): SliceSegment[] {
 }
 
 /**
- * Setup slice command with Commander.js
+ * Setup slice command with Commander.js.
  *
- * @param {Command} program - Commander program instance to register the command on
+ * @param {Command} program - Commander program instance to register the command on.
+ *
  * @returns {void}
  */
 export function setupSlice(program: Command): void {

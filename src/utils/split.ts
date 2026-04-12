@@ -3,7 +3,7 @@ import { runCommand } from '@/utils/dependencies';
 import { parseFFmpegProgress } from '@/utils/progress';
 
 /**
- * Platform preset durations in seconds
+ * Platform preset durations in seconds.
  */
 export const PRESET_DURATIONS: Record<SplitPreset, number> = {
   instagram: 60,
@@ -15,10 +15,11 @@ export const PRESET_DURATIONS: Record<SplitPreset, number> = {
 };
 
 /**
- * Parse duration string to seconds
+ * Parse duration string to seconds.
  *
- * @param {string} durationStr - Duration string (e.g., '60', '1:30', '00:01:30')
- * @returns {number} Duration in seconds
+ * @param {string} durationStr - Duration string (e.g., '60', '1:30', '00:01:30').
+ *
+ * @returns {number} Duration in seconds.
  */
 export function parseDuration(durationStr: string): number {
   // check: if in HH:MM:SS format
@@ -46,7 +47,7 @@ export function parseDuration(durationStr: string): number {
 const VALID_PRESETS: SplitPreset[] = ['instagram', 'ig', 'whatsapp', 'wa', 'facebook', 'fb'];
 
 /**
- * Result type for parseSplitValue
+ * Result type for parseSplitValue.
  */
 export interface ParseSplitValueResult {
   type: 'preset' | 'duration';
@@ -54,11 +55,13 @@ export interface ParseSplitValueResult {
 }
 
 /**
- * Parse split value string to preset or duration
+ * Parse split value string to preset or duration.
  *
- * @param {string} value - Split value (preset name or seconds)
- * @returns {ParseSplitValueResult} Parsed result with type and value
- * @throws {Error} If value is invalid
+ * @param {string} value - Split value (preset name or seconds).
+ *
+ * @returns {ParseSplitValueResult} Parsed result with type and value.
+ *
+ * @throws {Error} If value is invalid.
  */
 export function parseSplitValue(value: string): ParseSplitValueResult {
   const normalizedValue = value.toLowerCase();
@@ -76,37 +79,40 @@ export function parseSplitValue(value: string): ParseSplitValueResult {
 }
 
 /**
- * Calculate number of parts needed for a video
+ * Calculate number of parts needed for a video.
  *
- * @param {number} totalDuration - Total video duration in seconds
- * @param {number} partDuration - Max duration per part in seconds
- * @returns {number} Number of parts
+ * @param {number} totalDuration - Total video duration in seconds.
+ * @param {number} partDuration - Max duration per part in seconds.
+ *
+ * @returns {number} Number of parts.
  */
 export function calculateNumParts(totalDuration: number, partDuration: number): number {
   return Math.ceil(totalDuration / partDuration);
 }
 
 /**
- * Get duration for a preset
+ * Get duration for a preset.
  *
- * @param {SplitPreset} preset - Platform preset
- * @returns {number} Duration in seconds
+ * @param {SplitPreset} preset - Platform preset (e.g., 'instagram', 'whatsapp', 'facebook').
+ *
+ * @returns {number} Duration in seconds for the specified platform preset.
  */
 export function getPresetDuration(preset: SplitPreset): number {
   return PRESET_DURATIONS[preset];
 }
 
 /**
- * Split video into multiple parts using re-encoding
+ * Split video into multiple parts using re-encoding.
  *
- * @param {string} inputPath - Path to input video
- * @param {string[]} outputPaths - Pre-built array of output file paths
- * @param {number} partDuration - Max duration per part in seconds
- * @param {number} totalDuration - Total video duration in seconds
- * @param {string} codec - Video codec
- * @param {number} crf - CRF value
- * @param {(progress: number, part: number, total: number) => void} [onProgress] - Progress callback
- * @returns {Promise<string[]>} Array of output file paths
+ * @param {string} inputPath - Path to input video.
+ * @param {string[]} outputPaths - Pre-built array of output file paths.
+ * @param {number} partDuration - Max duration per part in seconds.
+ * @param {number} totalDuration - Total video duration in seconds.
+ * @param {string} codec - Video codec to use ('h264' or 'hevc').
+ * @param {number} crf - Constant Rate Factor for quality control (0-51).
+ * @param {(progress: number, part: number, total: number) => void} [onProgress] - Progress callback.
+ *
+ * @returns {Promise<string[]>} Array of output file paths.
  */
 export async function splitVideoReencode(
   inputPath: string,
@@ -159,14 +165,15 @@ export async function splitVideoReencode(
 }
 
 /**
- * Split video into multiple parts using stream copy (fast)
+ * Split video into multiple parts using stream copy (fast).
  *
- * @param {string} inputPath - Path to input video
- * @param {string[]} outputPaths - Pre-built array of output file paths
- * @param {number} partDuration - Max duration per part in seconds
- * @param {number} totalDuration - Total video duration in seconds
- * @param {(progress: number, part: number, total: number) => void} [onProgress] - Progress callback
- * @returns {Promise<string[]>} Array of output file paths
+ * @param {string} inputPath - Path to input video.
+ * @param {string[]} outputPaths - Pre-built array of output file paths.
+ * @param {number} partDuration - Max duration per part in seconds.
+ * @param {number} totalDuration - Total video duration in seconds.
+ * @param {(progress: number, part: number, total: number) => void} [onProgress] - Progress callback.
+ *
+ * @returns {Promise<string[]>} Array of output file paths.
  */
 export async function splitVideoStreamCopy(
   inputPath: string,
@@ -200,10 +207,11 @@ export async function splitVideoStreamCopy(
 }
 
 /**
- * Format seconds to HH:MM:SS string
+ * Format seconds to HH:MM:SS string.
  *
- * @param {number} seconds - Duration in seconds
- * @returns {string} Formatted time string
+ * @param {number} seconds - Duration in seconds.
+ *
+ * @returns {string} Formatted time string.
  */
 export function formatSeconds(seconds: number): string {
   const hours = Math.floor(seconds / 3600);

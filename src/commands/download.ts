@@ -21,12 +21,14 @@ const ALLOWED_FORMATS = ['mp4', 'mkv', 'webm', 'avi', 'mov', 'mp3'];
 const DEFAULT_CONVERT_PRESET = 'fast';
 
 /**
- * Download video from URL using yt-dlp
+ * Download video from URL using yt-dlp.
  *
- * @param {string} url - Video URL to download
- * @param {DownloadOptions} options - Download options including output and format
+ * @param {string} url - Video URL to download.
+ * @param {DownloadOptions} options - Download options including output and format.
+ *
  * @returns {Promise<void>}
- * @throws {void} Exits with code 1 on error
+ *
+ * @throws {void} Exits with code 1 on error.
  */
 export async function downloadAction(url: string, options: DownloadOptions): Promise<void> {
   try {
@@ -112,11 +114,12 @@ export async function downloadAction(url: string, options: DownloadOptions): Pro
 }
 
 /**
- * Handle --convert option: rename to temp, convert, rename to original
+ * Handle --convert option: rename to temp, convert, rename to original.
  *
- * @param {string} downloadedFile - Path to the downloaded file
- * @param {string} format - Target format for conversion
- * @returns {Promise<string>} Path to the converted file
+ * @param {string} downloadedFile - Path to the downloaded file.
+ * @param {string} format - Target format for conversion.
+ *
+ * @returns {Promise<string>} Path to the converted file.
  */
 async function handleConvert(downloadedFile: string, format: string): Promise<string> {
   const dir = dirname(downloadedFile);
@@ -156,10 +159,11 @@ async function handleConvert(downloadedFile: string, format: string): Promise<st
 }
 
 /**
- * Handle --split option: parse value and call splitAction
+ * Handle --split option: parse value and call splitAction.
  *
- * @param {string} inputFile - Path to the file to split
- * @param {string} splitValue - Split value (preset or seconds)
+ * @param {string} inputFile - Path to the file to split.
+ * @param {string} splitValue - Split value (preset or seconds).
+ *
  * @returns {Promise<void>}
  */
 async function handleSplit(inputFile: string, splitValue: string): Promise<void> {
@@ -184,9 +188,10 @@ async function handleSplit(inputFile: string, splitValue: string): Promise<void>
 }
 
 /**
- * Setup download command with Commander.js
+ * Setup download command with Commander.js.
  *
- * @param {Command} program - Commander program instance to register the command on
+ * @param {Command} program - Commander program instance to register the command on.
+ *
  * @returns {void}
  */
 export function setupDownload(program: Command): void {

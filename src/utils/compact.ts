@@ -4,17 +4,18 @@ import { parseFFmpegProgress } from '@/utils/progress';
 import { checkAndPromptOverwrite } from '@/utils/prompt';
 
 /**
- * Quality preset CRF values
+ * Quality preset CRF values.
  */
 const QUALITY_CRF: Record<string, number> = { low: 28, medium: 23, high: 18, lossless: 0 };
 
 /**
- * Calculate target bitrate for two-pass encoding
+ * Calculate target bitrate for two-pass encoding.
  *
- * @param {number} targetSizeMB - Target size in megabytes
- * @param {number} durationSeconds - Video duration in seconds
- * @param {string} audioBitrate - Audio bitrate (e.g., '128k')
- * @returns {number} - Video bitrate in kbps
+ * @param {number} targetSizeMB - Target size in megabytes.
+ * @param {number} durationSeconds - Video duration in seconds.
+ * @param {string} audioBitrate - Audio bitrate (e.g., '128k').
+ *
+ * @returns {number} - Video bitrate in kbps.
  */
 export function calculateTargetBitrate(targetSizeMB: number, durationSeconds: number, audioBitrate: string): number {
   const audioKbps = parseInt(audioBitrate.replace('k', ''), 10);
@@ -24,10 +25,13 @@ export function calculateTargetBitrate(targetSizeMB: number, durationSeconds: nu
 }
 
 /**
- * Parse size string (e.g., '25MB', '1GB') to megabytes
+ * Parse size string (e.g., '25MB', '1GB') to megabytes.
  *
- * @param {string} sizeStr - Size string to parse
- * @returns {number} - Size in megabytes
+ * @param {string} sizeStr - Size string to parse.
+ *
+ * @returns {number} - Size in megabytes.
+ *
+ * @throws {Error} If the size string format is invalid.
  */
 export function parseSizeToMB(sizeStr: string): number {
   const match = sizeStr.match(/^([\d.]+)\s*(MB|GB|KB)?$/i);
@@ -47,15 +51,16 @@ export function parseSizeToMB(sizeStr: string): number {
 }
 
 /**
- * Compact video to target size using two-pass encoding
+ * Compact video to target size using two-pass encoding.
  *
- * @param {string} inputPath - Path to input video
- * @param {string} outputPath - Path to output video
- * @param {number} targetBitrate - Target video bitrate in kbps
- * @param {string} audioBitrate - Audio bitrate (e.g., '128k')
- * @param {string} preset - Encoding preset
- * @param {boolean} hevc - Use HEVC codec instead of H.264
- * @param {(progress: number) => void} [onProgress] - Progress callback
+ * @param {string} inputPath - Path to input video.
+ * @param {string} outputPath - Path to output video.
+ * @param {number} targetBitrate - Target video bitrate in kbps.
+ * @param {string} audioBitrate - Audio bitrate (e.g., '128k').
+ * @param {string} preset - Encoding preset.
+ * @param {boolean} hevc - Use HEVC codec instead of H.264.
+ * @param {(progress: number) => void} [onProgress] - Progress callback.
+ *
  * @returns {Promise<void>}
  */
 export async function compactVideo(
@@ -110,15 +115,16 @@ export async function compactVideo(
 }
 
 /**
- * Compact video using CRF (single-pass, faster)
+ * Compact video using CRF (single-pass, faster).
  *
- * @param {string} inputPath - Path to input video
- * @param {string} outputPath - Path to output video
- * @param {number} crf - Constant Rate Factor (0-51)
- * @param {string} preset - Encoding preset
- * @param {string} audioBitrate - Audio bitrate
- * @param {boolean} hevc - Use HEVC codec
- * @param {(progress: number) => void} [onProgress] - Progress callback
+ * @param {string} inputPath - Path to input video.
+ * @param {string} outputPath - Path to output video.
+ * @param {number} crf - Constant Rate Factor (0-51).
+ * @param {string} preset - Encoding preset (e.g., 'ultrafast', 'medium', 'slow').
+ * @param {string} audioBitrate - Audio bitrate in kbps (e.g., '128k').
+ * @param {boolean} hevc - Whether to use HEVC codec instead of H.264.
+ * @param {(progress: number) => void} [onProgress] - Progress callback.
+ *
  * @returns {Promise<void>}
  */
 export async function compactVideoCRF(
@@ -161,20 +167,22 @@ export async function compactVideoCRF(
 }
 
 /**
- * Get CRF value for quality preset
+ * Get CRF value for quality preset.
  *
- * @param {string} quality - Quality preset name
- * @returns {number} - CRF value
+ * @param {string} quality - Quality preset name (e.g., 'low', 'medium', 'high', 'lossless').
+ *
+ * @returns {number} - CRF value corresponding to the quality preset.
  */
 export function getCRFForQuality(quality: string): number {
   return QUALITY_CRF[quality] ?? 23;
 }
 
 /**
- * Get video duration in seconds using ffprobe
+ * Get video duration in seconds using ffprobe.
  *
- * @param {string} inputPath - Path to input video
- * @returns {Promise<number>} Duration in seconds
+ * @param {string} inputPath - Path to input video.
+ *
+ * @returns {Promise<number>} Duration in seconds.
  */
 export async function getVideoDuration(inputPath: string): Promise<number> {
   const command = `ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "${inputPath}"`;

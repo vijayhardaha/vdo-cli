@@ -3,13 +3,14 @@ import { runCommand } from '@/utils/dependencies';
 import { parseFFmpegProgress } from '@/utils/progress';
 
 /**
- * Slice video segment using stream copy (fast, may not be frame-accurate)
+ * Slice video segment using stream copy (fast, may not be frame-accurate).
  *
- * @param {string} inputPath - Path to input video
- * @param {string} outputPath - Path to output video
- * @param {string} start - Start time (e.g., '00:00:10')
- * @param {string} end - End time (e.g., '00:00:30')
- * @param {(progress: number) => void} [onProgress] - Progress callback
+ * @param {string} inputPath - Path to input video.
+ * @param {string} outputPath - Path to output video.
+ * @param {string} start - Start time (e.g., '00:00:10').
+ * @param {string} end - End time (e.g., '00:00:30').
+ * @param {(progress: number) => void} [onProgress] - Progress callback.
+ *
  * @returns {Promise<void>}
  */
 export async function sliceVideoStreamCopy(
@@ -44,15 +45,16 @@ export async function sliceVideoStreamCopy(
 }
 
 /**
- * Slice video segment with re-encoding (frame-accurate, slower)
+ * Slice video segment with re-encoding (frame-accurate, slower).
  *
- * @param {string} inputPath - Path to input video
- * @param {string} outputPath - Path to output video
- * @param {string} start - Start time
- * @param {string} end - End time
- * @param {string} codec - Video codec ('h264' or 'hevc')
- * @param {number} crf - CRF value for encoding
- * @param {(progress: number) => void} [onProgress] - Progress callback
+ * @param {string} inputPath - Path to input video.
+ * @param {string} outputPath - Path to output video.
+ * @param {string} start - Start time.
+ * @param {string} end - End time.
+ * @param {string} codec - Video codec ('h264' or 'hevc').
+ * @param {number} crf - CRF value for encoding.
+ * @param {(progress: number) => void} [onProgress] - Progress callback.
+ *
  * @returns {Promise<void>}
  */
 export async function sliceVideoReencode(
@@ -90,14 +92,15 @@ export async function sliceVideoReencode(
 }
 
 /**
- * Slice multiple segments from video
+ * Slice multiple segments from video.
  *
- * @param {string} inputPath - Path to input video
- * @param {string} outputDir - Directory for output files
- * @param {SliceSegment[]} segments - Array of segments to extract
- * @param {boolean} fast - Use stream copy instead of re-encoding
- * @param {(progress: number, segment: number) => void} [onProgress] - Progress callback
- * @returns {Promise<string[]>} - Array of output file paths
+ * @param {string} inputPath - Path to input video.
+ * @param {string} outputDir - Directory for output files.
+ * @param {SliceSegment[]} segments - Array of segments to extract.
+ * @param {boolean} fast - Use stream copy instead of re-encoding.
+ * @param {(progress: number, segment: number) => void} [onProgress] - Progress callback.
+ *
+ * @returns {Promise<string[]>} - Array of output file paths.
  */
 export async function sliceMultipleSegments(
   inputPath: string,
@@ -133,10 +136,11 @@ export async function sliceMultipleSegments(
 }
 
 /**
- * Parse time string to ffmpeg format
+ * Parse time string to ffmpeg format.
  *
- * @param {string} timeStr - Time string (e.g., '10', '1:30', '00:01:30')
- * @returns {string} - Formatted time for ffmpeg
+ * @param {string} timeStr - Time string (e.g., '10', '1:30', '00:01:30').
+ *
+ * @returns {string} - Formatted time for ffmpeg.
  */
 export function formatTimeForFFmpeg(timeStr: string): string {
   // check: if already in proper format (HH:MM:SS or HH:MM:SS.ms)

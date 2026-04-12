@@ -11,11 +11,13 @@ export interface VideoInfo {
 }
 
 /**
- * Get video information from URL using yt-dlp
+ * Get video information from URL using yt-dlp.
  *
- * @param {string} url - Video URL to fetch information from
- * @returns {Promise<VideoInfo>} Promise containing video title, video_id, and extension
- * @throws {Error} If yt-dlp execution fails or JSON parsing fails
+ * @param {string} url - Video URL to fetch information from.
+ *
+ * @returns {Promise<VideoInfo>} Promise containing video title, video_id, and extension.
+ *
+ * @throws {Error} If yt-dlp execution fails or JSON parsing fails.
  */
 export async function getVideoInfo(url: string): Promise<VideoInfo> {
   const command = `yt-dlp --dump-json --no-download "${url}"`;
@@ -35,11 +37,12 @@ export async function getVideoInfo(url: string): Promise<VideoInfo> {
 }
 
 /**
- * Generate a proper filename for the downloaded video
+ * Generate a proper filename for the downloaded video.
  *
- * @param {VideoInfo} videoInfo - Video information containing title and video_id
- * @param {string} format - Desired output format
- * @returns {string} Generated filename
+ * @param {VideoInfo} videoInfo - Video information containing title and video_id.
+ * @param {string} format - Desired output format.
+ *
+ * @returns {string} Generated filename.
  */
 export function generateFilename(videoInfo: VideoInfo, format: string): string {
   const ext = format === 'mp3' ? 'mp3' : format;
@@ -47,15 +50,17 @@ export function generateFilename(videoInfo: VideoInfo, format: string): string {
 }
 
 /**
- * Download video from URL using yt-dlp
+ * Download video from URL using yt-dlp.
  *
- * @param {string} url - Video URL to download (must be HTTP or HTTPS)
- * @param {string} outputPath - Path for the output video file
- * @param {string} [format='mp4'] - Desired output format: 'mp4', 'mkv', or 'mp3' (default: 'mp4')
- * @param {((percentage: number, size: number, unit: string) => void) | null} [onProgress=null] - Optional callback function for download progress updates
- * @param {string} [cookies] - Browser name to load cookies from (for authenticated downloads)
- * @returns {Promise<void>} Promise that resolves when download is complete
- * @throws {Error} If yt-dlp execution fails, URL is invalid, or network error occurs
+ * @param {string} url - Video URL to download (must be HTTP or HTTPS).
+ * @param {string} outputPath - Path for the output video file.
+ * @param {string} [format] - Desired output format: 'mp4', 'mkv', or 'mp3' (default: 'mp4').
+ * @param {((percentage: number, size: number, unit: string) => void) | null} [onProgress] - Optional callback function for download progress updates.
+ * @param {string} [cookies] - Browser name to load cookies from (for authenticated downloads).
+ *
+ * @returns {Promise<void>} Promise that resolves when download is complete.
+ *
+ * @throws {Error} If yt-dlp execution fails, URL is invalid, or network error occurs.
  */
 export async function downloadVideo(
   url: string,

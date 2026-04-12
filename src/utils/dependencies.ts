@@ -5,10 +5,11 @@ import type { DependencyCheck, CommandResult } from '@/types/index';
 import { log } from '@/utils/log';
 
 /**
- * Check if a command exists in the system PATH
+ * Check if a command exists in the system PATH.
  *
- * @param {string} command - Command name to check (e.g., 'ffmpeg', 'yt-dlp')
- * @returns {Promise<boolean>} - True if command exists, false otherwise
+ * @param {string} command - Command name to check (e.g., 'ffmpeg', 'yt-dlp').
+ *
+ * @returns {Promise<boolean>} - True if command exists, false otherwise.
  */
 export function checkCommand(command: string): Promise<boolean> {
   return new Promise((resolve) => {
@@ -19,9 +20,9 @@ export function checkCommand(command: string): Promise<boolean> {
 }
 
 /**
- * Check if required dependencies (ffmpeg and yt-dlp) are installed
+ * Check if required dependencies (ffmpeg and yt-dlp) are installed.
  *
- * @returns {Promise<DependencyCheck>} - Object with ok status and array of missing dependencies
+ * @returns {Promise<DependencyCheck>} - Object with ok status and array of missing dependencies.
  */
 export async function checkDependencies(): Promise<DependencyCheck> {
   const missing: string[] = [];
@@ -40,12 +41,14 @@ export async function checkDependencies(): Promise<DependencyCheck> {
 }
 
 /**
- * Run a shell command and capture stdout/stderr output
+ * Run a shell command and capture stdout/stderr output.
  *
- * @param {string} command - Shell command to execute
- * @param {((data: string, type: 'stdout' | 'stderr') => void) | null} [onOutput=null] - Optional callback function for real-time output handling (receives data chunks and type)
- * @returns {Promise<CommandResult>} - Object containing stdout and stderr strings
- * @throws {Error} If command exits with non-zero code or process error occurs
+ * @param {string} command - Shell command to execute.
+ * @param {((data: string, type: 'stdout' | 'stderr') => void) | null} [onOutput] - Optional callback function for real-time output handling (receives data chunks and type).
+ *
+ * @returns {Promise<CommandResult>} - Object containing stdout and stderr strings.
+ *
+ * @throws {Error} If command exits with non-zero code or process error occurs.
  */
 export function runCommand(
   command: string,
@@ -85,10 +88,11 @@ export function runCommand(
 }
 
 /**
- * Get the appropriate install command based on the OS platform
+ * Get the appropriate install command based on the OS platform.
  *
- * @param {string[]} missing - Array of missing dependency names
- * @returns {string} - Platform-specific install command
+ * @param {string[]} missing - Array of missing dependency names.
+ *
+ * @returns {string} - Platform-specific install command.
  */
 export function getInstallCommand(missing: string[]): string {
   const platform = os.platform();
@@ -114,10 +118,11 @@ export function getInstallCommand(missing: string[]): string {
 }
 
 /**
- * Ensure dependencies are available, exit with error if missing
+ * Ensure dependencies are available, exit with error if missing.
  *
- * @returns {Promise<boolean>} true if all dependencies are available
- * @throws {void} Exits with code 1 if dependencies are missing
+ * @returns {Promise<boolean>} True if all dependencies are available.
+ *
+ * @throws {void} Exits with code 1 if dependencies are missing.
  */
 export async function ensureDependencies(): Promise<boolean> {
   const deps = await checkDependencies();

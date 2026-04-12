@@ -15,12 +15,14 @@ import { validateFileExists, validatePreset, validateCRF } from '@/utils/validat
 const ALLOWED_PRESETS = ['ultrafast', 'fast', 'medium', 'slow'];
 
 /**
- * Compress video to reduce file size using ffmpeg with CRF
+ * Compress video to reduce file size using ffmpeg with CRF.
  *
- * @param {string} input - Path to input video file
- * @param {CompressOptions} options - Compression options including output, CRF, and preset
+ * @param {string} input - Path to input video file.
+ * @param {CompressOptions} options - Compression options including output, CRF, and preset.
+ *
  * @returns {Promise<void>}
- * @throws {void} Exits with code 1 on error
+ *
+ * @throws {void} Exits with code 1 on error.
  */
 export async function compressAction(input: string, options: CompressOptions): Promise<void> {
   try {
@@ -78,9 +80,10 @@ export async function compressAction(input: string, options: CompressOptions): P
 }
 
 /**
- * Setup compress command with Commander.js
+ * Setup compress command with Commander.js.
  *
- * @param {Command} program - Commander program instance to register the command on
+ * @param {Command} program - Commander program instance to register the command on.
+ *
  * @returns {void}
  */
 export function setupCompress(program: Command): void {

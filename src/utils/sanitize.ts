@@ -4,11 +4,12 @@ const INVALID_CHARS_WINDOWS = ['<', '>', ':', '"', '/', '\\', '|', '?', '*'];
 const INVALID_CHARS_UNIX = [':'];
 
 /**
- * Sanitize filename by removing invalid characters
+ * Sanitize filename by removing invalid characters.
  *
- * @param {string} name - Original filename
- * @param {number} [maxLength=200] - Maximum filename length
- * @returns {string} Sanitized filename
+ * @param {string} name - Original filename.
+ * @param {number} [maxLength] - Maximum filename length.
+ *
+ * @returns {string} Sanitized filename.
  */
 export function sanitizeFilename(name: string, maxLength = 200): string {
   /* check: if Windows platform, use Windows invalid chars */
@@ -49,10 +50,11 @@ export function sanitizeFilename(name: string, maxLength = 200): string {
 }
 
 /**
- * Convert text to URL-friendly slug
+ * Convert text to URL-friendly slug.
  *
- * @param {string} text - Text to slugify
- * @returns {string} Slugified text
+ * @param {string} text - Text to slugify.
+ *
+ * @returns {string} Slugified text.
  */
 export function slugify(text: string): string {
   return text

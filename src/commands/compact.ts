@@ -25,12 +25,14 @@ const DISCORD_SIZE_MB = 24.5;
 const DEFAULT_AUDIO_BITRATE = '128k';
 
 /**
- * Compact video to target size using two-pass encoding
+ * Compact video to target size using two-pass encoding.
  *
- * @param {string} input - Path to input video file
- * @param {CompactOptions} options - Compact options including target size, quality, preset
+ * @param {string} input - Path to input video file.
+ * @param {CompactOptions} options - Compact options including target size, quality, preset.
+ *
  * @returns {Promise<void>}
- * @throws {void} Exits with code 1 on error
+ *
+ * @throws {void} Exits with code 1 on error.
  */
 export async function compactAction(input: string, options: CompactOptions): Promise<void> {
   try {
@@ -191,9 +193,10 @@ export async function compactAction(input: string, options: CompactOptions): Pro
 }
 
 /**
- * Setup compact command with Commander.js
+ * Setup compact command with Commander.js.
  *
- * @param {Command} program - Commander program instance to register the command on
+ * @param {Command} program - Commander program instance to register the command on.
+ *
  * @returns {void}
  */
 export function setupCompact(program: Command): void {

@@ -3,10 +3,11 @@ import * as readline from 'node:readline';
 import { log } from '@/utils/log';
 
 /**
- * Prompt user for confirmation
+ * Prompt user for confirmation.
  *
- * @param {string} message - The message to display
- * @returns {Promise<boolean>} - true if user confirms (Y), false if user declines (n)
+ * @param {string} message - The message to display.
+ *
+ * @returns {Promise<boolean>} - True if user confirms (Y), false if user declines (n).
  */
 export async function promptOverwrite(message: string): Promise<boolean> {
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
@@ -24,10 +25,11 @@ export async function promptOverwrite(message: string): Promise<boolean> {
 }
 
 /**
- * Check if any output files exist and prompt for overwrite
+ * Check if any output files exist and prompt for overwrite.
  *
- * @param {string[]} outputPaths - Array of output file paths to check
- * @returns {Promise<boolean>} - true if should proceed, false if should abort
+ * @param {string[]} outputPaths - Array of output file paths to check.
+ *
+ * @returns {Promise<boolean>} - True if should proceed, false if should abort.
  */
 export async function checkAndPromptOverwrite(outputPaths: string[]): Promise<boolean> {
   const fs = await import('fs/promises');

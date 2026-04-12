@@ -3,10 +3,11 @@ import { parseFFmpegProgress } from '@/utils/progress';
 import { checkAndPromptOverwrite } from '@/utils/prompt';
 
 /**
- * Get video duration using ffprobe
+ * Get video duration using ffprobe.
  *
- * @param {string} inputPath - Path to the input video file
- * @returns {Promise<number>} Video duration in seconds
+ * @param {string} inputPath - Path to the input video file.
+ *
+ * @returns {Promise<number>} Video duration in seconds.
  */
 export async function getVideoDuration(inputPath: string): Promise<number> {
   const command = `ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "${inputPath}"`;
@@ -15,15 +16,17 @@ export async function getVideoDuration(inputPath: string): Promise<number> {
 }
 
 /**
- * Convert video to different format using ffmpeg
+ * Convert video to different format using ffmpeg.
  *
- * @param {string} inputPath - Path to the input video file
- * @param {string} outputPath - Path for the output video file
- * @param {string} [format='mp4'] - Target video format (default: 'mp4')
- * @param {string} [preset='fast'] - Encoding preset for quality/speed trade-off (default: 'fast')
- * @param {((percentage: number, currentTime: number, totalTime: number) => void) | null} [onProgress=null] - Optional callback function for progress updates
- * @returns {Promise<void>} Promise that resolves when conversion is complete
- * @throws {Error} If ffmpeg execution fails or input file is invalid
+ * @param {string} inputPath - Path to the input video file.
+ * @param {string} outputPath - Path for the output video file.
+ * @param {string} _format - Target video format (default: 'mp4').
+ * @param {string} preset - Encoding preset for quality/speed trade-off (default: 'fast').
+ * @param {((percentage: number, currentTime: number, totalTime: number) => void) | null} onProgress - Optional callback function for progress updates.
+ *
+ * @returns {Promise<void>} Promise that resolves when conversion is complete.
+ *
+ * @throws {Error} If ffmpeg execution fails or input file is invalid.
  */
 export async function convertVideo(
   inputPath: string,
@@ -75,15 +78,17 @@ export async function convertVideo(
 }
 
 /**
- * Compress video using ffmpeg with CRF (Constant Rate Factor)
+ * Compress video using ffmpeg with CRF (Constant Rate Factor).
  *
- * @param {string} inputPath - Path to the input video file
- * @param {string} outputPath - Path for the output video file
- * @param {number} [crf=28] - Compression quality factor, 0-51 (lower = better quality, default: 28)
- * @param {string} [preset='medium'] - Encoding preset for quality/speed trade-off (default: 'medium')
- * @param {((percentage: number, currentTime: number, totalTime: number) => void) | null} [onProgress=null] - Optional callback function for progress updates
- * @returns {Promise<void>} Promise that resolves when compression is complete
- * @throws {Error} If ffmpeg execution fails or input file is invalid
+ * @param {string} inputPath - Path to the input video file.
+ * @param {string} outputPath - Path for the output video file.
+ * @param {number} crf - Compression quality factor, 0-51 (lower = better quality, default: 28).
+ * @param {string} preset - Encoding preset for quality/speed trade-off (default: 'medium').
+ * @param {((percentage: number, currentTime: number, totalTime: number) => void) | null} onProgress - Optional callback function for progress updates.
+ *
+ * @returns {Promise<void>} Promise that resolves when compression is complete.
+ *
+ * @throws {Error} If ffmpeg execution fails or input file is invalid.
  */
 export async function compressVideo(
   inputPath: string,
@@ -125,14 +130,16 @@ export async function compressVideo(
 }
 
 /**
- * Speed up or slow down video playback using ffmpeg
+ * Speed up or slow down video playback using ffmpeg.
  *
- * @param {string} inputPath - Path to the input video file
- * @param {string} outputPath - Path for the output video file
- * @param {number} [rate=2] - Playback speed rate (1.0 = normal, 2.0 = 2x faster, 0.5 = 2x slower)
- * @param {((percentage: number, currentTime: number, totalTime: number) => void) | null} [onProgress=null] - Optional callback function for progress updates
- * @returns {Promise<void>} Promise that resolves when speed adjustment is complete
- * @throws {Error} If ffmpeg execution fails or input file is invalid
+ * @param {string} inputPath - Path to the input video file.
+ * @param {string} outputPath - Path for the output video file.
+ * @param {number} rate - Playback speed rate (1.0 = normal, 2.0 = 2x faster, 0.5 = 2x slower).
+ * @param {((percentage: number, currentTime: number, totalTime: number) => void) | null} onProgress - Optional callback function for progress updates.
+ *
+ * @returns {Promise<void>} Promise that resolves when speed adjustment is complete.
+ *
+ * @throws {Error} If ffmpeg execution fails or input file is invalid.
  */
 export async function speedUpVideo(
   inputPath: string,
@@ -203,15 +210,17 @@ export async function speedUpVideo(
 }
 
 /**
- * Extract audio track from video using ffmpeg
+ * Extract audio track from video using ffmpeg.
  *
- * @param {string} inputPath - Path to the input video file
- * @param {string} outputPath - Path for the output audio file
- * @param {string} [format='mp3'] - Audio format: 'mp3', 'wav', or 'aac' (default: 'mp3')
- * @param {string} [bitrate='192k'] - Audio bitrate (default: '192k')
- * @param {(percentage: number) => void} [onProgress] - Progress callback
- * @returns {Promise<void>} Promise that resolves when audio extraction is complete
- * @throws {Error} If ffmpeg execution fails or input file is invalid
+ * @param {string} inputPath - Path to the input video file.
+ * @param {string} outputPath - Path for the output audio file.
+ * @param {string} format - Audio format: 'mp3', 'wav', or 'aac' (default: 'mp3').
+ * @param {string} bitrate - Audio bitrate (default: '192k').
+ * @param {(percentage: number) => void} onProgress - Progress callback.
+ *
+ * @returns {Promise<void>} Promise that resolves when audio extraction is complete.
+ *
+ * @throws {Error} If ffmpeg execution fails or input file is invalid.
  */
 export async function extractAudio(
   inputPath: string,

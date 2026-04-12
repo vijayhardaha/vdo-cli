@@ -14,12 +14,14 @@ import { validateFileExists, validateFormat, validateBitrate } from '@/utils/val
 const ALLOWED_FORMATS = ['mp3', 'wav', 'aac'];
 
 /**
- * Extract audio track from video using ffmpeg
+ * Extract audio track from video using ffmpeg.
  *
- * @param {string} input - Path to input video file
- * @param {AudioOptions} options - Audio extraction options including output, format, and bitrate
+ * @param {string} input - Path to input video file.
+ * @param {AudioOptions} options - Audio extraction options including output, format, and bitrate.
+ *
  * @returns {Promise<void>}
- * @throws {void} Exits with code 1 on error
+ *
+ * @throws {void} Exits with code 1 on error.
  */
 export async function audioAction(input: string, options: AudioOptions): Promise<void> {
   try {
@@ -88,9 +90,10 @@ export async function audioAction(input: string, options: AudioOptions): Promise
 }
 
 /**
- * Setup audio command with Commander.js
+ * Setup audio command with Commander.js.
  *
- * @param {Command} program - Commander program instance to register the command on
+ * @param {Command} program - Commander program instance to register the command on.
+ *
  * @returns {void}
  */
 export function setupAudio(program: Command): void {

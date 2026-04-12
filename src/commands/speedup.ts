@@ -12,12 +12,14 @@ import { createProgressBar, createProgressCallback } from '@/utils/progress';
 import { validateFileExists, validateSpeedRate } from '@/utils/validations';
 
 /**
- * Speed up or slow down video playback using ffmpeg
+ * Speed up or slow down video playback using ffmpeg.
  *
- * @param {string} input - Path to input video file
- * @param {SpeedupOptions} options - Speed adjustment options including output and rate
+ * @param {string} input - Path to input video file.
+ * @param {SpeedupOptions} options - Speed adjustment options including output and rate.
+ *
  * @returns {Promise<void>}
- * @throws {void} Exits with code 1 on error
+ *
+ * @throws {void} Exits with code 1 on error.
  */
 export async function speedupAction(input: string, options: SpeedupOptions): Promise<void> {
   try {
@@ -67,9 +69,10 @@ export async function speedupAction(input: string, options: SpeedupOptions): Pro
 }
 
 /**
- * Setup speedup command with Commander.js
+ * Setup speedup command with Commander.js.
  *
- * @param {Command} program - Commander program instance to register the command on
+ * @param {Command} program - Commander program instance to register the command on.
+ *
  * @returns {void}
  */
 export function setupSpeedup(program: Command): void {

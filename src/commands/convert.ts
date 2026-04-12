@@ -17,12 +17,14 @@ const ALLOWED_FORMATS = ['mp4', 'mkv', 'avi', 'mov', 'flv'];
 const ALLOWED_PRESETS = ['ultrafast', 'fast', 'medium', 'slow', 'high-quality'];
 
 /**
- * Convert video to different format using ffmpeg
+ * Convert video to different format using ffmpeg.
  *
- * @param {string} input - Path to input video file
- * @param {ConvertOptions} options - Conversion options including output, format, and preset
+ * @param {string} input - Path to input video file.
+ * @param {ConvertOptions} options - Conversion options including output, format, and preset.
+ *
  * @returns {Promise<void>}
- * @throws {void} Exits with code 1 on error
+ *
+ * @throws {void} Exits with code 1 on error.
  */
 export async function convertAction(input: string, options: ConvertOptions): Promise<void> {
   try {
@@ -80,9 +82,10 @@ export async function convertAction(input: string, options: ConvertOptions): Pro
 }
 
 /**
- * Setup convert command with Commander.js
+ * Setup convert command with Commander.js.
  *
- * @param {Command} program - Commander program instance to register the command on
+ * @param {Command} program - Commander program instance to register the command on.
+ *
  * @returns {void}
  */
 export function setupConvert(program: Command): void {

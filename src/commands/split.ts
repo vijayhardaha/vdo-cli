@@ -19,11 +19,12 @@ import {
 import { validateFileExists } from '@/utils/validations';
 
 /**
- * Generate output file paths for split operation
+ * Generate output file paths for split operation.
  *
- * @param {string} input - Input video file path
- * @param {number} numParts - Number of parts to split into
- * @returns {string[]} Array of output file paths
+ * @param {string} input - Input video file path.
+ * @param {number} numParts - Number of parts to split into.
+ *
+ * @returns {string[]} Array of output file paths.
  */
 function generateSplitOutputPaths(input: string, numParts: number): string[] {
   const dir = dirname(input);
@@ -45,12 +46,14 @@ const DEFAULT_CODEC: 'h264' | 'hevc' = 'h264';
 const DEFAULT_CRF = 23;
 
 /**
- * Split video into multiple parts
+ * Split video into multiple parts.
  *
- * @param {string} input - Path to input video file
- * @param {SplitOptions} options - Split options including preset, duration, mode
+ * @param {string} input - Path to input video file.
+ * @param {SplitOptions} options - Split options including preset, duration, mode.
+ *
  * @returns {Promise<void>}
- * @throws {void} Exits with code 1 on error
+ *
+ * @throws {void} Exits with code 1 on error.
  */
 export async function splitAction(input: string, options: SplitOptions): Promise<void> {
   try {
@@ -161,9 +164,10 @@ export async function splitAction(input: string, options: SplitOptions): Promise
 }
 
 /**
- * Setup split command with Commander.js
+ * Setup split command with Commander.js.
  *
- * @param {Command} program - Commander program instance to register the command on
+ * @param {Command} program - Commander program instance to register the command on.
+ *
  * @returns {void}
  */
 export function setupSplit(program: Command): void {
