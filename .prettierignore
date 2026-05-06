@@ -36,9 +36,14 @@ dist/
 # ----------------------------------------------------------------------
 .cache/
 .eslintcache
+.gulp/
+.parcel-cache/
+.rollup.cache/
 .stylelintcache
 .turbo/
 .vite/
+.vitest/
+.webpack/
 
 # ----------------------------------------------------------------------
 # Testing & Coverage
@@ -52,7 +57,13 @@ test-results/
 vitest-results/
 
 # ----------------------------------------------------------------------
-# Configuration & Ide
+# Temporary Files
+# ----------------------------------------------------------------------
+.tmp/
+tmp/
+
+# ----------------------------------------------------------------------
+# Editor & Ide
 # ----------------------------------------------------------------------
 .idea/
 .vscode-insiders/
@@ -65,21 +76,40 @@ vitest-results/
 .wrangler/
 
 # ----------------------------------------------------------------------
+# Public & Static Assets
+# ----------------------------------------------------------------------
+# Committed CSS assets, vendor stylesheets, theme CSS (WordPress).
+assets/
+public/
+static/
+
+# ----------------------------------------------------------------------
 # Ai Coding Tools
 # ----------------------------------------------------------------------
+.agent/
+.agents/
 .claude/
 .codex/
+.cline/
+.copilot/
+.deepseek/
 .droid/
+.fallow/
+.gemini/
 .kilo/
+.kilocode/
+.mistral/
 .opencode/
 .qoder/
+.qwen/
 .vibe/
 
 # ----------------------------------------------------------------------
-# Temporary Files
+# Environment & Secrets
 # ----------------------------------------------------------------------
-.tmp/
-tmp/
+.env
+.env.*
+*.pem
 
 # ----------------------------------------------------------------------
 # Package Manager Lockfiles
@@ -92,23 +122,23 @@ pnpm-lock.yaml
 yarn.lock
 
 # ----------------------------------------------------------------------
-# Common Auto-Generated YAML
-# ----------------------------------------------------------------------
-# These are typically generated or CI-related - not meant to be formatted.
-.gitlab/
-._circleci/
-*.kubeconfig
-.gitlab-ci.yml
-docker-compose.yml
-azure-pipelines.yml
-docker-compose.yaml
-bitbucket-pipelines.yml
-
-# ----------------------------------------------------------------------
 # Generated & Typings Files
 # ----------------------------------------------------------------------
 *.tsbuildinfo
 next-env.d.ts
+
+# ----------------------------------------------------------------------
+# Common Auto-Generated YAML
+# ----------------------------------------------------------------------
+# These are typically generated or CI-related - not meant to be formatted.
+._circleci/
+.gitlab/
+.gitlab-ci.yml
+azure-pipelines.yml
+bitbucket-pipelines.yml
+docker-compose.yaml
+docker-compose.yml
+*.kubeconfig
 
 # ----------------------------------------------------------------------
 # Minified & Generated Files
@@ -117,13 +147,6 @@ next-env.d.ts
 *.min.css
 *.min.js
 *.min.map
-
-# ----------------------------------------------------------------------
-# Environment & Secrets
-# ----------------------------------------------------------------------
-.env
-.env.*
-*.pem
 
 # ----------------------------------------------------------------------
 # Logs
