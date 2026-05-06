@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.5] - 2026-05-07
+
+### Added
+
+- Cookie support for video info fetching in download command
+  - Passes cookies to yt-dlp via `--cookies-from-browser` flag
+  - Enables authenticated video info retrieval
+
+### Changed
+
+- Updated tooling configs (eslint, prettier, vite, vitest)
+- Removed git workflow section from AGENTS.md
+
+### Fixed
+
+- Split command uses `-t` instead of `-to` for accurate segment boundaries
+
+### Removed
+
+- Deprecated instruction files (CLAUDE.md, copilot-instructions.md)
+
+### Dependencies
+
+- Updated npm dependencies to latest versions
+
 ## [1.0.4] - 2026-04-12
 
 ### Added
