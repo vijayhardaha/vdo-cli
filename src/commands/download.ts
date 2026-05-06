@@ -50,7 +50,7 @@ export async function downloadAction(url: string, options: DownloadOptions): Pro
 
     log.loading('Getting video information...');
 
-    const videoInfo = await getVideoInfo(url);
+    const videoInfo = await getVideoInfo(url, options.cookies);
     log.succeed('Video information retrieved');
 
     let outputFile: string;

@@ -14,13 +14,16 @@ export interface VideoInfo {
  * Get video information from URL using yt-dlp.
  *
  * @param {string} url - Video URL to fetch information from.
+ * @param {string} [cookies] - Browser name to load cookies from (for authenticated downloads).
  *
  * @returns {Promise<VideoInfo>} Promise containing video title, video_id, and extension.
  *
  * @throws {Error} If yt-dlp execution fails or JSON parsing fails.
  */
-export async function getVideoInfo(url: string): Promise<VideoInfo> {
-  const command = `yt-dlp --dump-json --no-download "${url}"`;
+export async function getVideoInfo(url: string, cookies?: string): Promise<VideoInfo> {
+  const cookiesFlag = cookies ? `--cookies-from-browser ${cookies}` : '';
+
+  const command = `yt-dlp ${cookiesFlag} --dump-json --no-download "${url}"`.trim();
   const result = await runCommand(command);
 
   try {

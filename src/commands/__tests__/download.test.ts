@@ -174,6 +174,9 @@ describe('download command', () => {
 
       await downloadAction('https://example.com/video', {});
 
+      // Expect getVideoInfo is called
+      expect(getVideoInfo).toHaveBeenCalledWith('https://example.com/video', undefined);
+
       // Expect downloadVideo is called
       expect(downloadVideo).toHaveBeenCalled();
     });
@@ -391,6 +394,9 @@ describe('download command', () => {
 
       await downloadAction('https://example.com', { cookies: 'chrome' });
 
+      // Expect getVideoInfo is called with cookies
+      expect(getVideoInfo).toHaveBeenCalledWith('https://example.com', 'chrome');
+
       // Expect downloadVideo is called with cookies option
       const callArgs = vi.mocked(downloadVideo).mock.calls[0];
       expect(callArgs?.[4]).toBe('chrome');
@@ -411,6 +417,9 @@ describe('download command', () => {
       vi.mocked(createProgressBar).mockReturnValue(mockProgressBar as never);
 
       await downloadAction('https://example.com', {});
+
+      // Expect getVideoInfo is called without cookies
+      expect(getVideoInfo).toHaveBeenCalledWith('https://example.com', undefined);
 
       // Expect downloadVideo is called with undefined cookies
       const callArgs = vi.mocked(downloadVideo).mock.calls[0];

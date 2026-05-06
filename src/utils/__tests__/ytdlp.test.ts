@@ -376,6 +376,38 @@ describe('ytdlp utils', () => {
       // Expect error is thrown for invalid JSON
       await expect(getVideoInfo('https://example.com')).rejects.toThrow('Failed to parse video information');
     });
+
+    // Should include cookies-from-browser flag in getVideoInfo command when cookies is provided
+    it('should include cookies-from-browser flag in getVideoInfo command when cookies is provided', async () => {
+      const { runCommand } = await import('../dependencies');
+
+      const videoData = { title: 'Test', id: 'abc', ext: 'mp4' };
+
+      vi.mocked(runCommand).mockResolvedValue({ stdout: JSON.stringify(videoData), stderr: '' });
+
+      await getVideoInfo('https://example.com', 'chrome');
+
+      const cmd = vi.mocked(runCommand).mock.calls[0]?.[0];
+
+      // Expect command includes cookies flag
+      expect(cmd).toContain('--cookies-from-browser chrome');
+    });
+
+    // Should not include cookies flag in getVideoInfo when not provided
+    it('should not include cookies flag in getVideoInfo when not provided', async () => {
+      const { runCommand } = await import('../dependencies');
+
+      const videoData = { title: 'Test', id: 'abc', ext: 'mp4' };
+
+      vi.mocked(runCommand).mockResolvedValue({ stdout: JSON.stringify(videoData), stderr: '' });
+
+      await getVideoInfo('https://example.com');
+
+      const cmd = vi.mocked(runCommand).mock.calls[0]?.[0];
+
+      // Expect command does not include cookies flag
+      expect(cmd).not.toContain('--cookies-from-browser');
+    });
   });
 
   // Tests for generateFilename
