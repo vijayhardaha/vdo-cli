@@ -218,7 +218,7 @@ describe('split utils', () => {
 
       // Expect splitVideoReencode uses libx265 for hevc codec
       expect(runCommand).toHaveBeenCalledWith(
-        'ffmpeg -y -ss "00:00:00" -i "input.mp4" -to "00:01:00" -c:v libx265 -crf 20 -c:a aac "/output/video_001.mp4"',
+        'ffmpeg -y -ss "00:00:00" -i "input.mp4" -t "00:01:00" -c:v libx265 -crf 20 -c:a aac "/output/video_001.mp4"',
         expect.any(Function)
       );
     });

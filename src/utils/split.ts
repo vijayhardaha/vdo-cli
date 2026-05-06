@@ -129,13 +129,13 @@ export async function splitVideoReencode(
   for (let i = 0; i < numParts; i++) {
     const startSec = i * partDuration;
     const endSec = Math.min((i + 1) * partDuration, totalDuration);
-
+    const duration = endSec - startSec;
+    const durationStr = formatSeconds(duration);
     const startStr = formatSeconds(startSec);
-    const endStr = formatSeconds(endSec);
 
     const outputPath = outputPaths[i];
 
-    const command = `ffmpeg -y -ss "${startStr}" -i "${inputPath}" -to "${endStr}" -c:v ${videoCodec} -crf ${crf} -c:a aac "${outputPath}"`;
+    const command = `ffmpeg -y -ss "${startStr}" -i "${inputPath}" -t "${durationStr}" -c:v ${videoCodec} -crf ${crf} -c:a aac "${outputPath}"`;
 
     let currentTime = 0;
 
@@ -188,12 +188,13 @@ export async function splitVideoStreamCopy(
     const startSec = i * partDuration;
     const endSec = Math.min((i + 1) * partDuration, totalDuration);
 
+    const duration = endSec - startSec;
+    const durationStr = formatSeconds(duration);
     const startStr = formatSeconds(startSec);
-    const endStr = formatSeconds(endSec);
 
     const outputPath = outputPaths[i];
 
-    const command = `ffmpeg -y -ss "${startStr}" -i "${inputPath}" -to "${endStr}" -c copy "${outputPath}"`;
+    const command = `ffmpeg -y -ss "${startStr}" -i "${inputPath}" -t "${durationStr}" -c copy "${outputPath}"`;
 
     await runCommand(command);
 
