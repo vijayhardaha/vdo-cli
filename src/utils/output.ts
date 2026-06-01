@@ -1,6 +1,31 @@
 import { dirname, basename, extname, join } from 'path';
 
 /**
+ * Get file extension from path.
+ *
+ * @param {string} filePath - File path to extract extension from.
+ *
+ * @returns {string} Lowercase file extension without the dot, or empty string if no extension.
+ */
+export function getFileExtension(filePath: string): string {
+  return extname(filePath).slice(1).toLowerCase();
+}
+
+/**
+ * Generate output filename based on input path and desired format.
+ *
+ * @param {string} inputPath - Original input file path.
+ * @param {string} format - Desired output format (extension).
+ *
+ * @returns {string} Generated output file path with new format extension in same directory.
+ */
+export function generateOutputFilename(inputPath: string, format: string): string {
+  const dir = dirname(inputPath);
+  const name = basename(inputPath, extname(inputPath));
+  return join(dir, `${name}.${format.toLowerCase()}`);
+}
+
+/**
  * Resolve output file path based on input file and optional format.
  *
  * If output is provided:

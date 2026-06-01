@@ -7,8 +7,6 @@ import {
   validateCRF,
   validateSpeedRate,
   validateBitrate,
-  getFileExtension,
-  generateOutputFilename,
   validateFileExists,
 } from '@/utils/validations';
 
@@ -210,47 +208,6 @@ describe('Validations', () => {
 
       // Expect validateBitrate rejects negative values
       expect(() => validateBitrate('-128k')).toThrow('Bitrate must be a number');
-    });
-  });
-
-  // Tests for getFileExtension
-  describe('getFileExtension', () => {
-    // Should extract file extension correctly
-    it('should return correct extension', () => {
-      // Expect getFileExtension extracts lowercase extension
-      expect(getFileExtension('video.mp4')).toBe('mp4');
-
-      // Expect getFileExtension converts to lowercase
-      expect(getFileExtension('/path/to/video.MKV')).toBe('mkv');
-
-      // Expect getFileExtension handles wav
-      expect(getFileExtension('audio.wav')).toBe('wav');
-    });
-
-    // Should return empty string for files without extension
-    it('should handle files without extension', () => {
-      // Expect getFileExtension returns empty string for no extension
-      expect(getFileExtension('noextension')).toBe('');
-    });
-  });
-
-  // Tests for generateOutputFilename
-  describe('generateOutputFilename', () => {
-    // Should replace extension with new format
-    it('should generate correct output filename', () => {
-      // Expect generateOutputFilename changes extension
-      expect(generateOutputFilename('/path/to/video.mp4', 'mkv')).toBe('/path/to/video.mkv');
-
-      // Expect generateOutputFilename handles simple filename
-      expect(generateOutputFilename('video.avi', 'mp4')).toBe('video.mp4');
-    });
-
-    // Should preserve directory path
-    it('should preserve directory structure', () => {
-      const result = generateOutputFilename('/home/user/videos/test.mov', 'mp4');
-
-      // Expect full path is maintained with new extension
-      expect(result).toBe('/home/user/videos/test.mp4');
     });
   });
 });

@@ -1,5 +1,4 @@
 import { access } from 'fs/promises';
-import { extname, dirname, basename, join } from 'path';
 
 /**
  * Validate if a file exists.
@@ -102,29 +101,4 @@ export function validateBitrate(bitrate: string): void {
   if (!bitrateRegex.test(bitrate)) {
     throw new Error('Bitrate must be a number optionally followed by k, K, m, or M (e.g., 192k, 128M)');
   }
-}
-
-/**
- * Get file extension from path.
- *
- * @param {string} filePath - File path to extract extension from.
- *
- * @returns {string} Lowercase file extension without the dot, or empty string if no extension.
- */
-export function getFileExtension(filePath: string): string {
-  return extname(filePath).slice(1).toLowerCase();
-}
-
-/**
- * Generate output filename based on input path and desired format.
- *
- * @param {string} inputPath - Original input file path.
- * @param {string} format - Desired output format (extension).
- *
- * @returns {string} Generated output file path with new format extension in same directory.
- */
-export function generateOutputFilename(inputPath: string, format: string): string {
-  const dir = dirname(inputPath);
-  const name = basename(inputPath, extname(inputPath));
-  return join(dir, `${name}.${format.toLowerCase()}`);
 }
