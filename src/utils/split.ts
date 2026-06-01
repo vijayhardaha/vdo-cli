@@ -77,6 +77,20 @@ export function getPresetDuration(preset: SplitPreset): number {
 }
 
 /**
+ * Format seconds to HH:MM:SS string.
+ *
+ * @param {number} seconds - Duration in seconds.
+ *
+ * @returns {string} Formatted time string.
+ */
+export function formatSeconds(seconds: number): string {
+  const hours = Math.floor(seconds / 3600);
+  const mins = Math.floor((seconds % 3600) / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+}
+
+/**
  * Split video into multiple parts using re-encoding.
  *
  * @param {string} inputPath - Path to input video.
@@ -180,18 +194,4 @@ export async function splitVideoStreamCopy(
   }
 
   return outputPaths;
-}
-
-/**
- * Format seconds to HH:MM:SS string.
- *
- * @param {number} seconds - Duration in seconds.
- *
- * @returns {string} Formatted time string.
- */
-export function formatSeconds(seconds: number): string {
-  const hours = Math.floor(seconds / 3600);
-  const mins = Math.floor((seconds % 3600) / 60);
-  const secs = Math.floor(seconds % 60);
-  return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }

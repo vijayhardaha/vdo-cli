@@ -44,35 +44,6 @@ export function createProgressBar(message = 'Processing', unit = '%'): cliProgre
 }
 
 /**
- * Create a progress callback that parses ffmpeg stderr lines and computes percentage.
- *
- * @param {number} totalTime - Total duration in seconds.
- * @param {(percentage: number, currentTime: number, totalTime: number) => void} [onProgress] - Callback receiving percentage (0-100), current time, and total time.
- *
- * @returns {(data: string, type: 'stdout' | 'stderr') => void} - Callback compatible with runCommand's output handler.
- */
-export function createFFmpegProgressCallback(
-  totalTime: number,
-  onProgress?: (percentage: number, currentTime: number, totalTime: number) => void
-): (data: string, type: 'stdout' | 'stderr') => void {
-  let currentTime = 0;
-
-  return (data: string, type: 'stdout' | 'stderr') => {
-    if (type !== 'stderr') return;
-    const progress = parseFFmpegProgress(data);
-    if (progress?.type === 'time' && progress.value !== undefined) {
-      if (totalTime > 0) {
-        currentTime = progress.value;
-        if (onProgress && currentTime > 0) {
-          const percentage = Math.min(100, Math.round((currentTime / totalTime) * 100));
-          onProgress(percentage, currentTime, totalTime);
-        }
-      }
-    }
-  };
-}
-
-/**
  * Parse ffmpeg output line to extract progress information.
  *
  * @param {string} line - Single output line from ffmpeg stderr.
@@ -146,4 +117,33 @@ export function formatFileSize(bytes: number): { value: number; unit: string } {
   if (bytes < 1024 * 1024 * 1024) return { value: bytes / (1024 * 1024), unit: 'MB' };
   if (bytes < 1024 * 1024 * 1024 * 1024) return { value: bytes / (1024 * 1024 * 1024), unit: 'GB' };
   return { value: bytes / (1024 * 1024 * 1024 * 1024), unit: 'TB' };
+}
+
+/**
+ * Create a progress callback that parses ffmpeg stderr lines and computes percentage.
+ *
+ * @param {number} totalTime - Total duration in seconds.
+ * @param {(percentage: number, currentTime: number, totalTime: number) => void} [onProgress] - Callback receiving percentage (0-100), current time, and total time.
+ *
+ * @returns {(data: string, type: 'stdout' | 'stderr') => void} - Callback compatible with runCommand's output handler.
+ */
+export function createFFmpegProgressCallback(
+  totalTime: number,
+  onProgress?: (percentage: number, currentTime: number, totalTime: number) => void
+): (data: string, type: 'stdout' | 'stderr') => void {
+  let currentTime = 0;
+
+  return (data: string, type: 'stdout' | 'stderr') => {
+    if (type !== 'stderr') return;
+    const progress = parseFFmpegProgress(data);
+    if (progress?.type === 'time' && progress.value !== undefined) {
+      if (totalTime > 0) {
+        currentTime = progress.value;
+        if (onProgress && currentTime > 0) {
+          const percentage = Math.min(100, Math.round((currentTime / totalTime) * 100));
+          onProgress(percentage, currentTime, totalTime);
+        }
+      }
+    }
+  };
 }
