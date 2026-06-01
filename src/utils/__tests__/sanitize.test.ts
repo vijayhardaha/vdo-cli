@@ -64,12 +64,12 @@ describe('sanitize utils', () => {
       expect(result).not.toContain('end');
     });
 
-    // Should filter out control characters
-    it('should filter control characters', () => {
+    // Should replace control characters with dashes
+    it('should replace control characters with dashes', () => {
       const result = sanitizeFilename('test\u0000video');
 
-      // Expect control characters are removed
-      expect(result).toBe('testvideo');
+      // Expect control characters become dashes
+      expect(result).toBe('test-video');
     });
 
     // Should remove trailing dots and spaces on Windows

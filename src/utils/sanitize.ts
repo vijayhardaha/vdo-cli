@@ -1,10 +1,5 @@
-/* Invalid filename characters for Windows */
-const INVALID_CHARS_WINDOWS = ['<', '>', ':', '"', '/', '\\', '|', '?', '*'];
-/* Invalid filename characters for Unix */
-const INVALID_CHARS_UNIX = [':'];
-
 /**
- * Sanitize filename by removing invalid characters.
+ * Sanitize filename to safe characters.
  *
  * @param {string} name - Original filename.
  * @param {number} [maxLength] - Maximum filename length.
@@ -12,25 +7,16 @@ const INVALID_CHARS_UNIX = [':'];
  * @returns {string} Sanitized filename.
  */
 export function sanitizeFilename(name: string, maxLength = 200): string {
-  /* check: if Windows platform, use Windows invalid chars */
-  const invalidChars = process.platform === 'win32' ? INVALID_CHARS_WINDOWS : INVALID_CHARS_UNIX;
-
   let safe = name.trim();
 
-  for (const char of invalidChars) {
-    safe = safe.replaceAll(char, '');
-  }
+  // Replace anything not A-Z, a-z, 0-9, dash, or underscore with dash
+  safe = safe.replace(/[^A-Za-z0-9_-]/g, '-');
 
-  safe = Array.from(safe)
-    .filter((char) => char.charCodeAt(0) >= 32)
-    .join('');
+  // Collapse multiple consecutive dashes
+  safe = safe.replace(/-+/g, '-');
 
-  /* check: if Windows, remove trailing dots/spaces */
-  if (process.platform === 'win32') {
-    safe = safe.replace(/[. ]+$/, '');
-  }
-
-  safe = safe.replace(/[\s_]+/g, '-');
+  // Trim leading/trailing dashes
+  safe = safe.replace(/^-+|-+$/g, '');
 
   /* check: if filename exceeds max length, truncate at punctuation */
   if (safe.length > maxLength) {
