@@ -6,7 +6,7 @@ import type { ConvertOptions } from '@/types/index';
 import { ensureDependencies } from '@/utils/dependencies';
 import { convertVideo } from '@/utils/ffmpeg';
 import { loading } from '@/utils/icons';
-import { log } from '@/utils/log';
+import { log, handleError } from '@/utils/log';
 import { resolveOutputFile } from '@/utils/output';
 import { createProgressBar, createProgressCallback } from '@/utils/progress';
 import { validateFileExists, validateFormat, validatePreset } from '@/utils/validations';
@@ -35,24 +35,21 @@ export async function convertAction(input: string, options: ConvertOptions): Pro
     try {
       await validateFileExists(input);
     } catch (error) {
-      log.fail(error instanceof Error ? error.message : String(error));
-      process.exit(1);
+      handleError(error);
     }
 
     const format = options.format || 'mp4';
     try {
       validateFormat(format, ALLOWED_FORMATS);
     } catch (error) {
-      log.fail(error instanceof Error ? error.message : String(error));
-      process.exit(1);
+      handleError(error);
     }
 
     const preset = options.preset || 'fast';
     try {
       validatePreset(preset, ALLOWED_PRESETS);
     } catch (error) {
-      log.fail(error instanceof Error ? error.message : String(error));
-      process.exit(1);
+      handleError(error);
     }
 
     const outputFile = resolveOutputFile({ input, output: options.output, format, suffix: '_converted' });
@@ -68,16 +65,14 @@ export async function convertAction(input: string, options: ConvertOptions): Pro
       await convertVideo(input, outputFile, format, preset, progressCallback);
     } catch (error) {
       progressBar.stop();
-      log.fail(`Conversion failed: ${error instanceof Error ? error.message : String(error)}`);
-      process.exit(1);
+      handleError(error, 'Conversion failed: ');
     }
 
     progressBar.stop();
     log.succeed('Conversion completed successfully!');
     log.info(`Output: ${resolve(outputFile)}`);
   } catch (error) {
-    log.fail(error instanceof Error ? error.message : String(error));
-    process.exit(1);
+    handleError(error);
   }
 }
 

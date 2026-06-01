@@ -6,7 +6,7 @@ import type { SpeedupOptions } from '@/types/index';
 import { ensureDependencies } from '@/utils/dependencies';
 import { speedUpVideo } from '@/utils/ffmpeg';
 import { loading } from '@/utils/icons';
-import { log } from '@/utils/log';
+import { log, handleError } from '@/utils/log';
 import { resolveOutputFile } from '@/utils/output';
 import { createProgressBar, createProgressCallback } from '@/utils/progress';
 import { validateFileExists, validateSpeedRate } from '@/utils/validations';
@@ -30,16 +30,14 @@ export async function speedupAction(input: string, options: SpeedupOptions): Pro
     try {
       await validateFileExists(input);
     } catch (error) {
-      log.fail(error instanceof Error ? error.message : String(error));
-      process.exit(1);
+      handleError(error);
     }
 
     const rate = options.rate || 2;
     try {
       validateSpeedRate(rate);
     } catch (error) {
-      log.fail(error instanceof Error ? error.message : String(error));
-      process.exit(1);
+      handleError(error);
     }
 
     const outputFile = resolveOutputFile({ input, output: options.output, suffix: `_${rate}x` });
@@ -55,16 +53,14 @@ export async function speedupAction(input: string, options: SpeedupOptions): Pro
       await speedUpVideo(input, outputFile, rate, progressCallback);
     } catch (error) {
       progressBar.stop();
-      log.fail(`Speed adjustment failed: ${error instanceof Error ? error.message : String(error)}`);
-      process.exit(1);
+      handleError(error, 'Speed adjustment failed: ');
     }
 
     progressBar.stop();
     log.succeed('Speed adjustment completed successfully!');
     log.info(`Output: ${resolve(outputFile)}`);
   } catch (error) {
-    log.fail(error instanceof Error ? error.message : String(error));
-    process.exit(1);
+    handleError(error);
   }
 }
 

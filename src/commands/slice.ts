@@ -5,11 +5,17 @@ import type { Command } from 'commander';
 import type { SliceOptions, SliceSegment } from '@/types/index';
 import { ensureDependencies } from '@/utils/dependencies';
 import { loading } from '@/utils/icons';
-import { log } from '@/utils/log';
+import { log, handleError } from '@/utils/log';
 import { resolveOutputFile } from '@/utils/output';
 import { createProgressBar } from '@/utils/progress';
 import { checkAndPromptOverwrite } from '@/utils/prompt';
-import { sliceVideoStreamCopy, sliceVideoReencode, sliceMultipleSegments, formatTimeForFFmpeg } from '@/utils/slice';
+import {
+  parseTimeToSeconds,
+  sliceVideoStreamCopy,
+  sliceVideoReencode,
+  sliceMultipleSegments,
+  formatTimeForFFmpeg,
+} from '@/utils/slice';
 import { validateFileExists } from '@/utils/validations';
 
 /* Default codec for re-encoding */
@@ -42,32 +48,6 @@ function formatSecondsToFilename(seconds: number): string {
 }
 
 /**
- * Parse time string to seconds.
- *
- * @param {string} timeStr - Time string (e.g., '10', '1:30', '00:01:30').
- *
- * @returns {number} Duration in seconds.
- */
-function parseTimeToSeconds(timeStr: string): number {
-  const hmsMatch = timeStr.match(/^(\d+):(\d{2}):(\d{2})(?:\.(\d+))?$/);
-  if (hmsMatch) {
-    const hours = parseInt(hmsMatch[1], 10);
-    const mins = parseInt(hmsMatch[2], 10);
-    const secs = parseInt(hmsMatch[3], 10);
-    return hours * 3600 + mins * 60 + secs;
-  }
-
-  const msMatch = timeStr.match(/^(\d+):(\d{2})(?:\.(\d+))?$/);
-  if (msMatch) {
-    const mins = parseInt(msMatch[1], 10);
-    const secs = parseInt(msMatch[2], 10);
-    return mins * 60 + secs;
-  }
-
-  return parseFloat(timeStr);
-}
-
-/**
  * Slice/trim video segment.
  *
  * @param {string} input - Path to input video file.
@@ -86,8 +66,7 @@ export async function sliceAction(input: string, options: SliceOptions): Promise
     try {
       await validateFileExists(input);
     } catch (error) {
-      log.fail(error instanceof Error ? error.message : String(error));
-      process.exit(1);
+      handleError(error);
     }
 
     // check: if segments array is provided
@@ -127,8 +106,7 @@ export async function sliceAction(input: string, options: SliceOptions): Promise
         }
       } catch (error) {
         progressBar.stop();
-        log.fail(`Slicing failed: ${error instanceof Error ? error.message : String(error)}`);
-        process.exit(1);
+        handleError(error, 'Slicing failed: ');
       }
       return;
     }
@@ -189,16 +167,14 @@ export async function sliceAction(input: string, options: SliceOptions): Promise
         });
       }
     } catch (error) {
-      log.fail(`Slicing failed: ${error instanceof Error ? error.message : String(error)}`);
-      process.exit(1);
+      handleError(error, 'Slicing failed: ');
     }
 
     progressBar.stop();
     log.succeed('Slicing completed successfully!');
     log.info(`Output: ${resolve(outputFile)}`);
   } catch (error) {
-    log.fail(error instanceof Error ? error.message : String(error));
-    process.exit(1);
+    handleError(error);
   }
 }
 

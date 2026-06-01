@@ -6,7 +6,7 @@ import type { SplitOptions, SplitPreset } from '@/types/index';
 import { ensureDependencies } from '@/utils/dependencies';
 import { getVideoDuration } from '@/utils/ffmpeg';
 import { loading } from '@/utils/icons';
-import { log } from '@/utils/log';
+import { log, handleError } from '@/utils/log';
 import { createProgressBar } from '@/utils/progress';
 import { checkAndPromptOverwrite } from '@/utils/prompt';
 import {
@@ -64,8 +64,7 @@ export async function splitAction(input: string, options: SplitOptions): Promise
     try {
       await validateFileExists(input);
     } catch (error) {
-      log.fail(error instanceof Error ? error.message : String(error));
-      process.exit(1);
+      handleError(error);
     }
 
     // Validation: must have either preset or duration, but not both
@@ -154,12 +153,10 @@ export async function splitAction(input: string, options: SplitOptions): Promise
       }
     } catch (error) {
       progressBar.stop();
-      log.fail(`Split failed: ${error instanceof Error ? error.message : String(error)}`);
-      process.exit(1);
+      handleError(error, 'Split failed: ');
     }
   } catch (error) {
-    log.fail(error instanceof Error ? error.message : String(error));
-    process.exit(1);
+    handleError(error);
   }
 }
 

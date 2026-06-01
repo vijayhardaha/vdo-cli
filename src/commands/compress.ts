@@ -6,7 +6,7 @@ import type { CompressOptions } from '@/types/index';
 import { ensureDependencies } from '@/utils/dependencies';
 import { compressVideo } from '@/utils/ffmpeg';
 import { loading } from '@/utils/icons';
-import { log } from '@/utils/log';
+import { log, handleError } from '@/utils/log';
 import { resolveOutputFile } from '@/utils/output';
 import { createProgressBar, createProgressCallback } from '@/utils/progress';
 import { validateFileExists, validatePreset, validateCRF } from '@/utils/validations';
@@ -33,24 +33,21 @@ export async function compressAction(input: string, options: CompressOptions): P
     try {
       await validateFileExists(input);
     } catch (error) {
-      log.fail(error instanceof Error ? error.message : String(error));
-      process.exit(1);
+      handleError(error);
     }
 
     const crf = options.crf || 28;
     try {
       validateCRF(crf);
     } catch (error) {
-      log.fail(error instanceof Error ? error.message : String(error));
-      process.exit(1);
+      handleError(error);
     }
 
     const preset = options.preset || 'medium';
     try {
       validatePreset(preset, ALLOWED_PRESETS);
     } catch (error) {
-      log.fail(error instanceof Error ? error.message : String(error));
-      process.exit(1);
+      handleError(error);
     }
 
     const outputFile = resolveOutputFile({ input, output: options.output, suffix: '_compressed' });
@@ -66,16 +63,14 @@ export async function compressAction(input: string, options: CompressOptions): P
       await compressVideo(input, outputFile, crf, preset, progressCallback);
     } catch (error) {
       progressBar.stop();
-      log.fail(`Compression failed: ${error instanceof Error ? error.message : String(error)}`);
-      process.exit(1);
+      handleError(error, 'Compression failed: ');
     }
 
     progressBar.stop();
     log.succeed('Compression completed successfully!');
     log.info(`Output: ${resolve(outputFile)}`);
   } catch (error) {
-    log.fail(error instanceof Error ? error.message : String(error));
-    process.exit(1);
+    handleError(error);
   }
 }
 

@@ -6,7 +6,7 @@ import type { AudioOptions } from '@/types/index';
 import { ensureDependencies } from '@/utils/dependencies';
 import { extractAudio } from '@/utils/ffmpeg';
 import { loading } from '@/utils/icons';
-import { log } from '@/utils/log';
+import { log, handleError } from '@/utils/log';
 import { createProgressBar } from '@/utils/progress';
 import { validateFileExists, validateFormat, validateBitrate } from '@/utils/validations';
 
@@ -32,24 +32,21 @@ export async function audioAction(input: string, options: AudioOptions): Promise
     try {
       await validateFileExists(input);
     } catch (error) {
-      log.fail(error instanceof Error ? error.message : String(error));
-      process.exit(1);
+      handleError(error);
     }
 
     const format = options.format || 'mp3';
     try {
       validateFormat(format, ALLOWED_FORMATS);
     } catch (error) {
-      log.fail(error instanceof Error ? error.message : String(error));
-      process.exit(1);
+      handleError(error);
     }
 
     const bitrate = options.bitrate || '192k';
     try {
       validateBitrate(bitrate);
     } catch (error) {
-      log.fail(error instanceof Error ? error.message : String(error));
-      process.exit(1);
+      handleError(error);
     }
 
     let outputFile = options.output;
@@ -75,8 +72,7 @@ export async function audioAction(input: string, options: AudioOptions): Promise
       });
     } catch (error) {
       progressBar.stop();
-      log.fail(`Audio extraction failed: ${error instanceof Error ? error.message : String(error)}`);
-      process.exit(1);
+      handleError(error, 'Audio extraction failed: ');
     }
 
     progressBar.stop();
@@ -84,8 +80,7 @@ export async function audioAction(input: string, options: AudioOptions): Promise
     log.succeed('Audio extraction completed!');
     log.info(`Output: ${resolve(outputFile)}`);
   } catch (error) {
-    log.fail(error instanceof Error ? error.message : String(error));
-    process.exit(1);
+    handleError(error);
   }
 }
 

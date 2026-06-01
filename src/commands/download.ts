@@ -8,7 +8,7 @@ import type { DownloadOptions, SplitOptions } from '@/types/index';
 import { ensureDependencies } from '@/utils/dependencies';
 import { convertVideo } from '@/utils/ffmpeg';
 import { loading } from '@/utils/icons';
-import { log } from '@/utils/log';
+import { log, handleError } from '@/utils/log';
 import { createProgressBar, createProgressCallback, formatFileSize } from '@/utils/progress';
 import { checkAndPromptOverwrite } from '@/utils/prompt';
 import { parseSplitValue } from '@/utils/split';
@@ -44,8 +44,7 @@ export async function downloadAction(url: string, options: DownloadOptions): Pro
     try {
       validateFormat(format, ALLOWED_FORMATS);
     } catch (error) {
-      log.fail(error instanceof Error ? error.message : String(error));
-      process.exit(1);
+      handleError(error);
     }
 
     log.loading('Getting video information...');
@@ -84,8 +83,7 @@ export async function downloadAction(url: string, options: DownloadOptions): Pro
       await downloadVideo(url, outputFile, format, progressCallback, options.cookies);
     } catch (error) {
       progressBar.stop();
-      log.fail(`Download failed: ${error instanceof Error ? error.message : String(error)}`);
-      process.exit(1);
+      handleError(error, 'Download failed: ');
     }
 
     progressBar.update(roundedTotal, { total: roundedTotal });
@@ -108,8 +106,7 @@ export async function downloadAction(url: string, options: DownloadOptions): Pro
       log.info(`Output: ${resolve(finalOutput)}`);
     }
   } catch (error) {
-    log.fail(error instanceof Error ? error.message : String(error));
-    process.exit(1);
+    handleError(error);
   }
 }
 
@@ -153,8 +150,7 @@ async function handleConvert(downloadedFile: string, format: string): Promise<st
 
     return finalFile;
   } catch (error) {
-    log.fail(`Conversion failed: ${error instanceof Error ? error.message : String(error)}`);
-    process.exit(1);
+    handleError(error, 'Conversion failed: ');
   }
 }
 
@@ -180,8 +176,7 @@ async function handleSplit(inputFile: string, splitValue: string): Promise<void>
       splitOptions.duration = String(parsed.value);
     }
   } catch (error) {
-    log.fail(error instanceof Error ? error.message : String(error));
-    process.exit(1);
+    handleError(error);
   }
 
   await splitAction(inputFile, splitOptions);
