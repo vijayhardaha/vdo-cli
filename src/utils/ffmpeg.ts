@@ -90,6 +90,47 @@ export async function compressVideo(
 }
 
 /**
+ * Build an ffmpeg atempo audio filter chain for rates outside the single-filter range.
+ *
+ * @param {number} rate - Target playback speed rate.
+ * @param {(a: number, b: number) => number} limit - Math.min for speedup, Math.max for slowdown.
+ * @param {number} bound - Upper bound (2) for speedup or lower bound (0.5) for slowdown.
+ *
+ * @returns {string[]} Array of atempo filter strings to chain.
+ */
+function buildAtempoChain(rate: number, limit: (a: number, b: number) => number, bound: number): string[] {
+  const chains: string[] = [];
+  let remaining = rate;
+  const isSpeedUp = rate > 1;
+  while (isSpeedUp ? remaining > 1 : remaining < 1) {
+    const factor = limit(bound, remaining);
+    chains.push(`atempo=${factor}`);
+    remaining /= factor;
+  }
+  return chains;
+}
+
+/**
+ * Build audio filter string for speed adjustment.
+ *
+ * @param {number} rate - Target playback speed rate.
+ *
+ * @returns {string} Audio filter argument (e.g., '-af "atempo=2.0"') or empty string for normal range.
+ */
+function buildAudioFilter(rate: number): string {
+  if (rate >= 0.5 && rate <= 2.0) {
+    return `-af "atempo=${rate}"`;
+  }
+  if (rate > 2.0) {
+    return `-af "${buildAtempoChain(rate, Math.min, 2).join(',')}"`;
+  }
+  if (rate < 0.5) {
+    return `-af "${buildAtempoChain(rate, Math.max, 0.5).join(',')}"`;
+  }
+  return '';
+}
+
+/**
  * Speed up or slow down video playback using ffmpeg.
  *
  * @param {string} inputPath - Path to the input video file.
@@ -107,41 +148,13 @@ export async function speedUpVideo(
   rate = 2,
   onProgress?: (percentage: number, currentTime: number, totalTime: number) => void
 ): Promise<void> {
-  // For audio, use atempo filter (limited to 0.5-2.0 per filter chain)
-  // For video, use setpts filter
-
-  let audioFilter = '';
-  if (rate >= 0.5 && rate <= 2.0) {
-    audioFilter = `-af "atempo=${rate}"`;
-  } else if (rate > 2.0) {
-    // Chain multiple atempo filters for rates > 2
-    const chains: string[] = [];
-    let remaining = rate;
-    while (remaining > 1) {
-      const factor = Math.min(2, remaining);
-      chains.push(`atempo=${factor}`);
-      remaining /= factor;
-    }
-    audioFilter = `-af "${chains.join(',')}"`;
-  } else if (rate < 0.5) {
-    // Chain multiple atempo filters for rates < 0.5
-    const chains: string[] = [];
-    let remaining = rate;
-    while (remaining < 1) {
-      const factor = Math.max(0.5, remaining);
-      chains.push(`atempo=${factor}`);
-      remaining /= factor;
-    }
-    audioFilter = `-af "${chains.join(',')}"`;
-  }
-
-  const videoFilter = `-vf "setpts=${1 / rate}*PTS"`;
-
   const shouldProceed = await checkAndPromptOverwrite([outputPath]);
   if (!shouldProceed) {
     process.exit(0);
   }
 
+  const audioFilter = buildAudioFilter(rate);
+  const videoFilter = `-vf "setpts=${1 / rate}*PTS"`;
   const command = `ffmpeg -y -i "${inputPath}" ${videoFilter} ${audioFilter} -c:v libx264 -c:a aac "${outputPath}"`;
 
   const totalTime = await getVideoDuration(inputPath);

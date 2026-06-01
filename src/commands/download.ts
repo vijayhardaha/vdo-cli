@@ -15,11 +15,74 @@ import type { ParseSplitValueResult } from '@/utils/split';
 import { parseSplitValue, getPresetDuration, calculateNumParts } from '@/utils/split';
 import { validateUrl, validateFormat } from '@/utils/validations';
 import { downloadVideo, getVideoInfo, generateFilename } from '@/utils/ytdlp';
+import type { VideoInfo } from '@/utils/ytdlp';
 
 /* Allowed video/audio formats for download */
 const ALLOWED_FORMATS = ['mp4', 'mkv', 'webm', 'avi', 'mov', 'mp3'];
 /* Default convert preset */
 const DEFAULT_CONVERT_PRESET = 'fast';
+
+/**
+ * Validate URL and format, fetch video info, and resolve output path.
+ *
+ * @param {string} url - Video URL to validate and download.
+ * @param {DownloadOptions} options - Download options including format and cookies.
+ *
+ * @returns {Promise<{ format: string; outputFile: string; videoInfo: VideoInfo }>} Resolved download target.
+ */
+async function resolveDownloadTarget(
+  url: string,
+  options: DownloadOptions
+): Promise<{ format: string; outputFile: string; videoInfo: VideoInfo }> {
+  if (!validateUrl(url)) {
+    log.fail('Invalid URL format. Please provide a valid HTTP/HTTPS URL.');
+    process.exit(1);
+  }
+
+  const format = options.format || 'mp4';
+  try {
+    validateFormat(format, ALLOWED_FORMATS);
+  } catch (error) {
+    handleError(error);
+  }
+
+  log.loading('Getting video information...');
+  const videoInfo = await getVideoInfo(url, options.cookies);
+  log.succeed('Video information retrieved');
+
+  let outputFile: string;
+  if (options.output) {
+    const outputExt = extname(options.output).slice(1);
+    outputFile = outputExt === format ? options.output : `${options.output}.${format}`;
+  } else {
+    outputFile = generateFilename(videoInfo, format);
+  }
+
+  return { format, outputFile, videoInfo };
+}
+
+/**
+ * Handle --convert and --split post-download options.
+ *
+ * @param {string} outputFile - Path to the downloaded file.
+ * @param {string} format - Format used for download.
+ * @param {DownloadOptions} options - Download options including convert and split.
+ *
+ * @returns {Promise<void>}
+ */
+async function handlePostDownload(outputFile: string, format: string, options: DownloadOptions): Promise<void> {
+  let finalOutput = outputFile;
+
+  if (options.convert) {
+    finalOutput = await handleConvert(outputFile, format);
+  }
+
+  if (options.split) {
+    await handleSplit(finalOutput, options.split);
+  } else {
+    log.info(`Output: ${resolve(finalOutput)}`);
+  }
+}
 
 /**
  * Download video from URL using yt-dlp.
@@ -35,33 +98,7 @@ async function downloadAction(url: string, options: DownloadOptions): Promise<vo
   try {
     await ensureDependencies();
 
-    // check: if URL is valid
-    if (!validateUrl(url)) {
-      log.fail('Invalid URL format. Please provide a valid HTTP/HTTPS URL.');
-      process.exit(1);
-    }
-
-    const format = options.format || 'mp4';
-    try {
-      validateFormat(format, ALLOWED_FORMATS);
-    } catch (error) {
-      handleError(error);
-    }
-
-    log.loading('Getting video information...');
-
-    const videoInfo = await getVideoInfo(url, options.cookies);
-    log.succeed('Video information retrieved');
-
-    let outputFile: string;
-    // check: if output path is provided
-    if (options.output) {
-      const outputExt = extname(options.output).slice(1);
-      // check: if output extension matches requested format
-      outputFile = outputExt === format ? options.output : `${options.output}.${format}`;
-    } else {
-      outputFile = generateFilename(videoInfo, format);
-    }
+    const { format, outputFile, videoInfo } = await resolveDownloadTarget(url, options);
 
     const shouldProceed = await checkAndPromptOverwrite([outputFile]);
     if (!shouldProceed) {
@@ -93,19 +130,7 @@ async function downloadAction(url: string, options: DownloadOptions): Promise<vo
 
     log.succeed('Download completed successfully!');
 
-    let finalOutput = outputFile;
-
-    // check: if --convert option is provided
-    if (options.convert) {
-      finalOutput = await handleConvert(outputFile, format);
-    }
-
-    // check: if --split option is provided
-    if (options.split) {
-      await handleSplit(finalOutput, options.split);
-    } else {
-      log.info(`Output: ${resolve(finalOutput)}`);
-    }
+    await handlePostDownload(outputFile, format, options);
   } catch (error) {
     handleError(error);
   }
