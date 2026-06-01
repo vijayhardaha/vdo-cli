@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-import { sanitizeFilename, slugify } from '@/utils/sanitize';
+import { sanitizeFilename } from '@/utils/sanitize';
 
 // Tests for sanitize utilities
 describe('sanitize utils', () => {
@@ -94,49 +94,6 @@ describe('sanitize utils', () => {
 
       // Expect truncation at exact maxLength
       expect(result.length).toBe(100);
-    });
-  });
-
-  // Tests for slugify
-  describe('slugify', () => {
-    // Should convert input to lowercase
-    it('should convert to lowercase', () => {
-      const result = slugify('TEST Video');
-
-      // Expect result is all lowercase
-      expect(result).toBe('test-video');
-    });
-
-    // Should trim leading and trailing whitespace
-    it('should trim whitespace', () => {
-      const result = slugify('  test video  ');
-
-      // Expect whitespace is removed
-      expect(result).toBe('test-video');
-    });
-
-    // Should replace spaces and underscores with hyphens
-    it('should replace spaces and underscores with hyphens', () => {
-      const result = slugify('test_video-name');
-
-      // Expect mixed separators become hyphens
-      expect(result).toBe('test-video-name');
-    });
-
-    // Should remove non-word characters except hyphens
-    it('should remove non-word characters except hyphens', () => {
-      const result = slugify('test@#$%video');
-
-      // Expect special chars are stripped, hyphens preserved
-      expect(result).toBe('testvideo');
-    });
-
-    // Should remove leading and trailing hyphens
-    it('should remove leading and trailing hyphens', () => {
-      const result = slugify('---test video---');
-
-      // Expect hyphens at edges are trimmed
-      expect(result).toBe('test-video');
     });
   });
 });

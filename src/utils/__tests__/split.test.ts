@@ -4,11 +4,9 @@ import { runCommand } from '@/utils/dependencies';
 import {
   calculateNumParts,
   getPresetDuration,
-  formatSeconds,
   splitVideoReencode,
   splitVideoStreamCopy,
   parseSplitValue,
-  PRESET_DURATIONS,
 } from '@/utils/split';
 
 vi.mock('../dependencies', () => ({ runCommand: vi.fn() }));
@@ -69,53 +67,6 @@ describe('split utils', () => {
 
       // Expect getPresetDuration handles alias 'fb'
       expect(getPresetDuration('fb')).toBe(120);
-    });
-  });
-
-  // Tests for PRESET_DURATIONS
-  describe('PRESET_DURATIONS', () => {
-    // Should have all required presets
-    it('should have all required presets', () => {
-      // Expect PRESET_DURATIONS contains instagram and ig
-      expect(PRESET_DURATIONS.instagram).toBe(60);
-
-      expect(PRESET_DURATIONS.ig).toBe(60);
-
-      // Expect PRESET_DURATIONS contains whatsapp and wa
-      expect(PRESET_DURATIONS.whatsapp).toBe(90);
-
-      expect(PRESET_DURATIONS.wa).toBe(90);
-
-      // Expect PRESET_DURATIONS contains facebook and fb
-      expect(PRESET_DURATIONS.facebook).toBe(120);
-
-      expect(PRESET_DURATIONS.fb).toBe(120);
-    });
-  });
-
-  // Tests for formatSeconds
-  describe('formatSeconds', () => {
-    // Should format seconds correctly
-    it('should format seconds correctly', () => {
-      // Expect formatSeconds converts seconds to HH:MM:SS format
-      expect(formatSeconds(0)).toBe('00:00:00');
-
-      // Expect formatSeconds handles minute values
-      expect(formatSeconds(60)).toBe('00:01:00');
-
-      expect(formatSeconds(90)).toBe('00:01:30');
-
-      // Expect formatSeconds handles hour values
-      expect(formatSeconds(3661)).toBe('01:01:01');
-    });
-
-    // Should pad single digits
-    it('should pad single digits', () => {
-      // Expect formatSeconds pads single digit values with zeros
-      expect(formatSeconds(5)).toBe('00:00:05');
-
-      // Expect formatSeconds handles larger values with padding
-      expect(formatSeconds(65)).toBe('00:01:05');
     });
   });
 

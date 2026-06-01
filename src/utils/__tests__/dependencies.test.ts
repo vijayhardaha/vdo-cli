@@ -1,10 +1,7 @@
-import os from 'node:os';
-
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-import { checkCommand, checkDependencies, runCommand, getInstallCommand } from '@/utils/dependencies';
+import { runCommand } from '@/utils/dependencies';
 
-type ExecCallback = (err: Error | null) => void;
 type MockFn = ReturnType<typeof vi.fn>;
 
 vi.mock('child_process', () => ({ exec: vi.fn(), spawn: vi.fn() }));
@@ -13,95 +10,6 @@ vi.mock('child_process', () => ({ exec: vi.fn(), spawn: vi.fn() }));
 describe('dependencies', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-  });
-
-  // Tests for checkCommand function
-  describe('checkCommand', () => {
-    // Should return true when command exists
-    it('should return true when command exists', async () => {
-      const cp = await import('child_process');
-
-      (cp.exec as unknown as MockFn).mockImplementation((_cmd: string, cb: ExecCallback) => {
-        cb(null);
-      });
-
-      const result = await checkCommand('ffmpeg');
-      expect(result).toBe(true);
-    });
-
-    // Should return false when command does not exist
-    it('should return false when command does not exist', async () => {
-      const cp = await import('child_process');
-
-      (cp.exec as unknown as MockFn).mockImplementation((_cmd: string, cb: ExecCallback) => {
-        cb(new Error('not found'));
-      });
-
-      const result = await checkCommand('nonexistent-command');
-      expect(result).toBe(false);
-    });
-  });
-
-  // Tests for checkDependencies function
-  describe('checkDependencies', () => {
-    // Should return ok=true when all dependencies are present
-    it('should return ok=true when all dependencies are present', async () => {
-      const cp = await import('child_process');
-
-      (cp.exec as unknown as MockFn).mockImplementation((_cmd: string, cb: ExecCallback) => {
-        cb(null);
-      });
-
-      const result = await checkDependencies();
-
-      expect(result.ok).toBe(true);
-      expect(result.missing).toHaveLength(0);
-    });
-
-    // Should return ok=false with missing ffmpeg
-    it('should return ok=false with missing ffmpeg', async () => {
-      const cp = await import('child_process');
-
-      (cp.exec as unknown as MockFn).mockImplementation((cmd: string, cb: ExecCallback) => {
-        if (cmd.includes('ffmpeg')) cb(new Error('not found'));
-        else cb(null);
-      });
-
-      const result = await checkDependencies();
-
-      expect(result.ok).toBe(false);
-      expect(result.missing).toContain('ffmpeg');
-    });
-
-    // Should return ok=false with missing yt-dlp
-    it('should return ok=false with missing yt-dlp', async () => {
-      const cp = await import('child_process');
-
-      (cp.exec as unknown as MockFn).mockImplementation((cmd: string, cb: ExecCallback) => {
-        if (cmd.includes('yt-dlp')) cb(new Error('not found'));
-        else cb(null);
-      });
-
-      const result = await checkDependencies();
-
-      expect(result.ok).toBe(false);
-      expect(result.missing).toContain('yt-dlp');
-    });
-
-    // Should return both missing when neither installed
-    it('should return both missing when neither installed', async () => {
-      const cp = await import('child_process');
-
-      (cp.exec as unknown as MockFn).mockImplementation((_cmd: string, cb: ExecCallback) => {
-        cb(new Error('not found'));
-      });
-
-      const result = await checkDependencies();
-
-      expect(result.ok).toBe(false);
-      expect(result.missing).toContain('ffmpeg');
-      expect(result.missing).toContain('yt-dlp');
-    });
   });
 
   // Tests for runCommand function
@@ -210,54 +118,6 @@ describe('dependencies', () => {
       const result = await runCommand('cmd', null);
 
       expect(result.stdout).toBe('data');
-    });
-  });
-
-  // Tests for getInstallCommand function
-  describe('getInstallCommand', () => {
-    // Should return brew install command on macOS
-    it('should return brew install command on macOS', () => {
-      vi.spyOn(os, 'platform').mockReturnValue('darwin');
-
-      const result = getInstallCommand(['ffmpeg', 'yt-dlp']);
-
-      expect(result).toBe('brew install ffmpeg yt-dlp');
-    });
-
-    // Should return apt install command on Linux
-    it('should return apt install command on Linux', () => {
-      vi.spyOn(os, 'platform').mockReturnValue('linux');
-
-      const result = getInstallCommand(['ffmpeg', 'yt-dlp']);
-
-      expect(result).toBe('sudo apt install ffmpeg yt-dlp');
-    });
-
-    // Should return winget install command on Windows
-    it('should return winget install command on Windows', () => {
-      vi.spyOn(os, 'platform').mockReturnValue('win32');
-
-      const result = getInstallCommand(['ffmpeg', 'yt-dlp']);
-
-      expect(result).toBe('winget install ffmpeg yt-dlp');
-    });
-
-    // Should return manual install message on unknown platform
-    it('should return manual install message on unknown platform', () => {
-      vi.spyOn(os, 'platform').mockReturnValue('freebsd' as ReturnType<typeof os.platform>);
-
-      const result = getInstallCommand(['ffmpeg', 'yt-dlp']);
-
-      expect(result).toBe('install ffmpeg yt-dlp manually');
-    });
-
-    // Should handle single missing package
-    it('should handle single missing package', () => {
-      vi.spyOn(os, 'platform').mockReturnValue('darwin');
-
-      const result = getInstallCommand(['ffmpeg']);
-
-      expect(result).toBe('brew install ffmpeg');
     });
   });
 });

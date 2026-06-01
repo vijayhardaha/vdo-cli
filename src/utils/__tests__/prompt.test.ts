@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-import { promptOverwrite, checkAndPromptOverwrite } from '@/utils/prompt';
+import { checkAndPromptOverwrite } from '@/utils/prompt';
 
 vi.mock('../log', () => ({ log: { info: vi.fn() } }));
 
@@ -19,51 +19,6 @@ describe('prompt utils', () => {
     mockQuestion.mockImplementation((_query: string, callback: (answer: string) => void) => {
       // default: simulate empty response after a tick
       setTimeout(() => callback(''), 0);
-    });
-  });
-
-  // Tests for promptOverwrite
-  describe('promptOverwrite', () => {
-    // Should return true for empty response (default yes)
-    it('should return true for empty response', async () => {
-      const result = await promptOverwrite('Overwrite?');
-      expect(result).toBe(true);
-    });
-
-    // Should return true for 'y' response
-    it('should return true for y response', async () => {
-      mockQuestion.mockImplementation((_query: string, callback: (answer: string) => void) => {
-        setTimeout(() => callback('y'), 0);
-      });
-      const result = await promptOverwrite('Overwrite?');
-      expect(result).toBe(true);
-    });
-
-    // Should return true for 'yes' response
-    it('should return true for yes response', async () => {
-      mockQuestion.mockImplementation((_query: string, callback: (answer: string) => void) => {
-        setTimeout(() => callback('yes'), 0);
-      });
-      const result = await promptOverwrite('Overwrite?');
-      expect(result).toBe(true);
-    });
-
-    // Should return false for 'n' response
-    it('should return false for n response', async () => {
-      mockQuestion.mockImplementation((_query: string, callback: (answer: string) => void) => {
-        setTimeout(() => callback('n'), 0);
-      });
-      const result = await promptOverwrite('Overwrite?');
-      expect(result).toBe(false);
-    });
-
-    // Should handle uppercase responses
-    it('should handle uppercase responses', async () => {
-      mockQuestion.mockImplementation((_query: string, callback: (answer: string) => void) => {
-        setTimeout(() => callback('Y'), 0);
-      });
-      const result = await promptOverwrite('Overwrite?');
-      expect(result).toBe(true);
     });
   });
 

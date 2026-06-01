@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 
-import { resolveOutputFile, getFileExtension, generateOutputFilename } from '@/utils/output';
+import { resolveOutputFile } from '@/utils/output';
 
 // Tests for resolveOutputFile utility
 describe('resolveOutputFile', () => {
@@ -79,46 +79,5 @@ describe('resolveOutputFile', () => {
     const result = resolveOutputFile({ input: 'video.mp4', output: 'output', format: 'mov', suffix: '_converted' });
 
     expect(result).toBe('output.mov');
-  });
-
-  // Tests for getFileExtension
-  describe('getFileExtension', () => {
-    // Should extract file extension correctly
-    it('should return correct extension', () => {
-      // Expect getFileExtension extracts lowercase extension
-      expect(getFileExtension('video.mp4')).toBe('mp4');
-
-      // Expect getFileExtension converts to lowercase
-      expect(getFileExtension('/path/to/video.MKV')).toBe('mkv');
-
-      // Expect getFileExtension handles wav
-      expect(getFileExtension('audio.wav')).toBe('wav');
-    });
-
-    // Should return empty string for files without extension
-    it('should handle files without extension', () => {
-      // Expect getFileExtension returns empty string for no extension
-      expect(getFileExtension('noextension')).toBe('');
-    });
-  });
-
-  // Tests for generateOutputFilename
-  describe('generateOutputFilename', () => {
-    // Should replace extension with new format
-    it('should generate correct output filename', () => {
-      // Expect generateOutputFilename changes extension
-      expect(generateOutputFilename('/path/to/video.mp4', 'mkv')).toBe('/path/to/video.mkv');
-
-      // Expect generateOutputFilename handles simple filename
-      expect(generateOutputFilename('video.avi', 'mp4')).toBe('video.mp4');
-    });
-
-    // Should preserve directory path
-    it('should preserve directory structure', () => {
-      const result = generateOutputFilename('/home/user/videos/test.mov', 'mp4');
-
-      // Expect full path is maintained with new extension
-      expect(result).toBe('/home/user/videos/test.mp4');
-    });
   });
 });
