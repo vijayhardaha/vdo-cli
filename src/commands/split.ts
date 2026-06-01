@@ -41,6 +41,97 @@ const DEFAULT_CODEC: 'h264' | 'hevc' = 'h264';
 const DEFAULT_CRF = 23;
 
 /**
+ * Resolve part duration from options, validating inputs.
+ *
+ * @param {SplitOptions} options - Split options.
+ *
+ * @returns {number} Part duration in seconds.
+ */
+function resolvePartDuration(options: SplitOptions): number {
+  if (options.preset && options.duration) {
+    log.fail('Cannot use both --preset and --duration. Please choose one.');
+    process.exit(1);
+  }
+
+  if (!options.preset && !options.duration) {
+    log.fail('Please provide either --preset or --duration option.');
+    process.exit(1);
+  }
+
+  if (options.preset) {
+    return getPresetDuration(options.preset as SplitPreset);
+  }
+
+  const duration = parseTimeToSeconds(options.duration!);
+  if (duration <= 0) {
+    log.fail('Duration must be greater than 0.');
+    process.exit(1);
+  }
+
+  return duration;
+}
+
+/**
+ * Execute split with progress bar.
+ *
+ * @param {string} input - Input file path.
+ * @param {string[]} outputPaths - Output file paths.
+ * @param {number} partDuration - Duration per part.
+ * @param {number} totalDuration - Total video duration.
+ * @param {SplitOptions} options - Split options.
+ *
+ * @returns {Promise<void>}
+ */
+async function executeSplit(
+  input: string,
+  outputPaths: string[],
+  partDuration: number,
+  totalDuration: number,
+  options: SplitOptions
+): Promise<void> {
+  const numParts = outputPaths.length;
+  const codec = options.codec === 'hevc' ? 'hevc' : 'h264';
+  const mode = options.fast ? 'fast' : 'precise';
+
+  log.succeed(`Split started | ${numParts} parts | Max: ${partDuration}s | Mode: ${mode}`);
+
+  const progressBar = createProgressBar(`${loading} Splitting | ${numParts} parts`);
+
+  progressBar.start(100, 0);
+
+  try {
+    if (options.fast) {
+      await splitVideoStreamCopy(input, outputPaths, partDuration, totalDuration, (progress, part) => {
+        progressBar.update(Math.round(progress), { part, total: numParts });
+        progressBar.render();
+      });
+    } else {
+      await splitVideoReencode(
+        input,
+        outputPaths,
+        partDuration,
+        totalDuration,
+        codec,
+        DEFAULT_CRF,
+        (progress, part) => {
+          progressBar.update(Math.round(progress), { part, total: numParts });
+          progressBar.render();
+        }
+      );
+    }
+
+    progressBar.stop();
+    log.succeed('Split completed successfully!');
+    for (const outputPath of outputPaths) {
+      log.info(`Output: ${resolve(outputPath)}`);
+    }
+  } catch (error) {
+    progressBar.stop();
+    handleError(error, 'Split failed: ');
+  }
+}
+
+/**
  * Split video into multiple parts.
  *
  * @param {string} input - Path to input video file.
@@ -62,32 +153,7 @@ export async function splitAction(input: string, options: SplitOptions): Promise
       handleError(error);
     }
 
-    // Validation: must have either preset or duration, but not both
-    if (options.preset && options.duration) {
-      log.fail('Cannot use both --preset and --duration. Please choose one.');
-      process.exit(1);
-    }
-
-    // Validation: must have at least one
-    if (!options.preset && !options.duration) {
-      log.fail('Please provide either --preset or --duration option.');
-      process.exit(1);
-    }
-
-    // Determine part duration
-    let partDuration: number;
-
-    if (options.preset) {
-      partDuration = getPresetDuration(options.preset as SplitPreset);
-    } else {
-      partDuration = parseTimeToSeconds(options.duration!);
-      if (partDuration <= 0) {
-        log.fail('Duration must be greater than 0.');
-        process.exit(1);
-      }
-    }
-
-    // Get video duration
+    const partDuration = resolvePartDuration(options);
     const totalDuration = await getVideoDuration(input);
     const numParts = calculateNumParts(totalDuration, partDuration);
 
@@ -97,10 +163,6 @@ export async function splitAction(input: string, options: SplitOptions): Promise
       return;
     }
 
-    const codec = options.codec === 'hevc' ? 'hevc' : 'h264';
-    const mode = options.fast ? 'fast' : 'precise';
-
-    // Build list of output paths for overwrite check
     const outputPaths = generateSplitOutputPaths(input, numParts);
 
     const shouldProceed = await checkAndPromptOverwrite(outputPaths);
@@ -108,48 +170,7 @@ export async function splitAction(input: string, options: SplitOptions): Promise
       process.exit(0);
     }
 
-    log.succeed(`Split started | ${numParts} parts | Max: ${partDuration}s | Mode: ${mode}`);
-
-    const progressBar = createProgressBar(`${loading} Splitting | ${numParts} parts`);
-
-    progressBar.start(100, 0);
-
-    try {
-      if (options.fast) {
-        await splitVideoStreamCopy(
-          input,
-          outputPaths,
-          partDuration,
-          totalDuration,
-          (progress: number, part: number) => {
-            progressBar.update(Math.round(progress), { part, total: numParts });
-            progressBar.render();
-          }
-        );
-      } else {
-        await splitVideoReencode(
-          input,
-          outputPaths,
-          partDuration,
-          totalDuration,
-          codec,
-          DEFAULT_CRF,
-          (progress: number, part: number) => {
-            progressBar.update(Math.round(progress), { part, total: numParts });
-            progressBar.render();
-          }
-        );
-      }
-
-      progressBar.stop();
-      log.succeed('Split completed successfully!');
-      for (const outputPath of outputPaths) {
-        log.info(`Output: ${resolve(outputPath)}`);
-      }
-    } catch (error) {
-      progressBar.stop();
-      handleError(error, 'Split failed: ');
-    }
+    await executeSplit(input, outputPaths, partDuration, totalDuration, options);
   } catch (error) {
     handleError(error);
   }

@@ -24,6 +24,11 @@ const DISCORD_SIZE_MB = 24.5;
 /* Default audio bitrate */
 const DEFAULT_AUDIO_BITRATE = '128k';
 
+/* Compact mode identifier */
+type CompactMode =
+  | { type: 'two-pass'; targetBitrate: number; label: string }
+  | { type: 'crf'; crf: number; label: string };
+
 /**
  * Run a compact operation with progress bar and error handling.
  *
@@ -56,6 +61,52 @@ async function runCompact(
 }
 
 /**
+ * Resolve compact mode and label from options.
+ *
+ * @param {string} input - Input file path.
+ * @param {CompactOptions} options - Compact options.
+ * @param {object} config - Shared config.
+ * @param {string} config.audioBitrate - Audio bitrate.
+ * @param {string} config.preset - Encoding preset.
+ *
+ * @returns {Promise<CompactMode>} Resolved compact mode.
+ */
+async function resolveCompactMode(
+  input: string,
+  options: CompactOptions,
+  config: { audioBitrate: string; preset: string }
+): Promise<CompactMode> {
+  const { audioBitrate, preset } = config;
+
+  if (options.discord) {
+    const duration = await getVideoDuration(input);
+    const targetBitrate = calculateTargetBitrate(DISCORD_SIZE_MB, duration, audioBitrate);
+    return { type: 'two-pass', targetBitrate, label: `Compacting | Discord ${DISCORD_SIZE_MB}MB | ${preset}` };
+  }
+
+  if (options.target) {
+    const targetMB = parseSizeToMB(options.target);
+    const duration = await getVideoDuration(input);
+    const targetBitrate = calculateTargetBitrate(targetMB, duration, audioBitrate);
+    return { type: 'two-pass', targetBitrate, label: `Compacting | ${targetMB}MB | ${preset}` };
+  }
+
+  if (options.quality) {
+    const crf = getCRFForQuality(options.quality);
+    return { type: 'crf', crf, label: `Compacting | Quality: ${options.quality} | ${preset}` };
+  }
+
+  if (options.percent && options.percent > 0 && options.percent < 100) {
+    const duration = await getVideoDuration(input);
+    const targetMB = Math.round(duration * 0.5 * options.percent) / 100;
+    const targetBitrate = calculateTargetBitrate(targetMB, duration, audioBitrate);
+    return { type: 'two-pass', targetBitrate, label: `Compacting | ${options.percent}% reduction | ${preset}` };
+  }
+
+  return { type: 'crf', crf: getCRFForQuality('medium'), label: `Compacting | Quality: medium | ${preset}` };
+}
+
+/**
  * Compact video to target size using two-pass encoding.
  *
  * @param {string} input - Path to input video file.
@@ -84,72 +135,16 @@ export async function compactAction(input: string, options: CompactOptions): Pro
     const suffix = hevc ? '_compact_hevc' : '_compact';
     const outputFile = resolveOutputFile({ input, output: options.output, suffix });
 
-    // check: if discord preset is requested
-    if (options.discord) {
-      const duration = await getVideoDuration(input);
-      const targetBitrate = calculateTargetBitrate(DISCORD_SIZE_MB, duration, audioBitrate);
-      const codecStr = hevc ? 'HEVC' : 'H.264';
+    const mode = await resolveCompactMode(input, options, { audioBitrate, preset });
 
-      log.succeed(`Compact started | Target: Discord (${DISCORD_SIZE_MB}MB) | Codec: ${codecStr}`);
+    log.succeed(`Compact started | ${mode.label}`);
 
-      await runCompact(outputFile, `Compacting | Discord ${DISCORD_SIZE_MB}MB | ${preset}`, (onProgress) =>
-        compactVideo(input, outputFile, targetBitrate, audioBitrate, preset, hevc, onProgress)
-      );
-      return;
-    }
-
-    // check: if target size is provided (two-pass encoding)
-    if (options.target) {
-      const targetMB = parseSizeToMB(options.target);
-      const duration = await getVideoDuration(input);
-      const targetBitrate = calculateTargetBitrate(targetMB, duration, audioBitrate);
-      const codecStr = hevc ? 'HEVC' : 'H.264';
-
-      log.succeed(`Compact started | Target: ${targetMB}MB | Bitrate: ${targetBitrate}k | Codec: ${codecStr}`);
-
-      await runCompact(outputFile, `Compacting | ${targetMB}MB | ${preset}`, (onProgress) =>
-        compactVideo(input, outputFile, targetBitrate, audioBitrate, preset, hevc, onProgress)
-      );
-      return;
-    }
-
-    // check: if quality preset is provided (single-pass CRF)
-    if (options.quality) {
-      const crf = getCRFForQuality(options.quality);
-      const codecStr = hevc ? 'HEVC' : 'H.264';
-
-      log.succeed(`Compact started | Quality: ${options.quality} (CRF: ${crf}) | Codec: ${codecStr}`);
-
-      await runCompact(outputFile, `Compacting | Quality: ${options.quality} | ${preset}`, (onProgress) =>
-        compactVideoCRF(input, outputFile, crf, preset, audioBitrate, hevc, onProgress)
-      );
-      return;
-    }
-
-    // check: if percent reduction is requested
-    if (options.percent && options.percent > 0 && options.percent < 100) {
-      const duration = await getVideoDuration(input);
-      const targetMB = Math.round(duration * 0.5 * options.percent) / 100;
-      const targetBitrate = calculateTargetBitrate(targetMB, duration, audioBitrate);
-      const codecStr = hevc ? 'HEVC' : 'H.264';
-
-      log.succeed(
-        `Compact started | Reduce: ${options.percent}% | Target: ~${Math.round(targetMB)}MB | Codec: ${codecStr}`
-      );
-
-      await runCompact(outputFile, `Compacting | ${options.percent}% reduction | ${preset}`, (onProgress) =>
-        compactVideo(input, outputFile, targetBitrate, audioBitrate, preset, hevc, onProgress)
-      );
-      return;
-    }
-
-    // default: use medium quality if no options provided
-    const crf = getCRFForQuality('medium');
-    log.succeed(`Compact started | Quality: medium (CRF: ${crf})`);
-
-    await runCompact(outputFile, `Compacting | Quality: medium | ${preset}`, (onProgress) =>
-      compactVideoCRF(input, outputFile, crf, preset, audioBitrate, hevc, onProgress)
-    );
+    await runCompact(outputFile, mode.label, (onProgress) => {
+      if (mode.type === 'two-pass') {
+        return compactVideo(input, outputFile, mode.targetBitrate, audioBitrate, preset, hevc, onProgress);
+      }
+      return compactVideoCRF(input, outputFile, mode.crf, preset, audioBitrate, hevc, onProgress);
+    });
   } catch (error) {
     handleError(error);
   }
