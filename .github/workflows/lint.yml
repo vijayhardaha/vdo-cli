@@ -1,4 +1,4 @@
-name: CI
+name: Lint
 
 on:
   push:
@@ -10,7 +10,7 @@ on:
       - "vitest.config.ts"
       - "tsconfig.json"
       - "package.json"
-      - ".github/workflows/ci.yml"
+      - ".github/workflows/lint.yml"
   pull_request:
     branches:
       - master
