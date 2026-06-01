@@ -15,7 +15,7 @@ export const log = {
  * @param {unknown} error - The error to handle.
  * @param {string} [prefix] - Optional prefix (e.g., 'Compact failed: ').
  *
- * @returns {never}
+ * @returns {never} Never returns - exits the process.
  */
 export function handleError(error: unknown, prefix?: string): never {
   const msg = error instanceof Error ? error.message : String(error);
