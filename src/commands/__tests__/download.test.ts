@@ -34,9 +34,13 @@ vi.mock('../../utils/prompt', () => ({
   promptOverwrite: vi.fn().mockResolvedValue(true),
 }));
 
-vi.mock('../../utils/ffmpeg', () => ({ convertVideo: vi.fn() }));
+vi.mock('../../utils/ffmpeg', () => ({ convertVideo: vi.fn(), getVideoDuration: vi.fn() }));
 
-vi.mock('../../utils/split', () => ({ parseSplitValue: vi.fn() }));
+vi.mock('../../utils/split', () => ({
+  parseSplitValue: vi.fn(),
+  getPresetDuration: vi.fn(),
+  calculateNumParts: vi.fn(),
+}));
 
 vi.mock('../split', () => ({ splitAction: vi.fn(), parseSplitValue: vi.fn() }));
 
@@ -354,14 +358,15 @@ describe('download command', () => {
       expect(convertVideo).toHaveBeenCalled();
     });
 
-    // Should should call splitAction when split option is set
+    // Should call splitAction when split option is set and video is long enough
     it('should call splitAction when split option is set', async () => {
       const { checkDependencies } = await import('../../utils/dependencies');
       const { validateUrl, validateFormat } = await import('../../utils/validations');
       const { getVideoInfo } = await import('../../utils/ytdlp');
       const { downloadVideo } = await import('../../utils/ytdlp');
       const { createProgressBar } = await import('../../utils/progress');
-      const { parseSplitValue } = await import('../../utils/split');
+      const { parseSplitValue, getPresetDuration, calculateNumParts } = await import('../../utils/split');
+      const { getVideoDuration } = await import('../../utils/ffmpeg');
       const { splitAction } = await import('../split');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
@@ -371,11 +376,42 @@ describe('download command', () => {
       vi.mocked(downloadVideo).mockResolvedValue(undefined);
       vi.mocked(createProgressBar).mockReturnValue(mockProgressBar as never);
       vi.mocked(parseSplitValue).mockReturnValue({ type: 'preset', value: 'instagram' });
+      vi.mocked(getVideoDuration).mockResolvedValue(120);
+      vi.mocked(getPresetDuration).mockReturnValue(60);
+      vi.mocked(calculateNumParts).mockReturnValue(2);
 
       await downloadAction('https://example.com', { split: 'instagram' });
 
       // Expect splitAction is called
       expect(vi.mocked(splitAction)).toHaveBeenCalled();
+    });
+
+    // Should not call splitAction and show output when video is shorter than max part
+    it('should skip split and show output when video is too short', async () => {
+      const { checkDependencies } = await import('../../utils/dependencies');
+      const { validateUrl, validateFormat } = await import('../../utils/validations');
+      const { getVideoInfo } = await import('../../utils/ytdlp');
+      const { downloadVideo } = await import('../../utils/ytdlp');
+      const { createProgressBar } = await import('../../utils/progress');
+      const { parseSplitValue, getPresetDuration, calculateNumParts } = await import('../../utils/split');
+      const { getVideoDuration } = await import('../../utils/ffmpeg');
+      const { splitAction } = await import('../split');
+
+      vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
+      vi.mocked(validateUrl).mockReturnValue(true);
+      vi.mocked(validateFormat).mockReturnValue(undefined);
+      vi.mocked(getVideoInfo).mockResolvedValue({ title: 'Short', video_id: '456', ext: 'mp4' });
+      vi.mocked(downloadVideo).mockResolvedValue(undefined);
+      vi.mocked(createProgressBar).mockReturnValue(mockProgressBar as never);
+      vi.mocked(parseSplitValue).mockReturnValue({ type: 'preset', value: 'whatsapp' });
+      vi.mocked(getVideoDuration).mockResolvedValue(40);
+      vi.mocked(getPresetDuration).mockReturnValue(90);
+      vi.mocked(calculateNumParts).mockReturnValue(1);
+
+      await downloadAction('https://example.com', { split: 'wa' });
+
+      // Expect splitAction is NOT called
+      expect(vi.mocked(splitAction)).not.toHaveBeenCalled();
     });
 
     // Should should pass cookies option to downloadVideo

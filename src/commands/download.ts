@@ -4,14 +4,15 @@ import { resolve, dirname, basename, extname, join } from 'path';
 import type { Command } from 'commander';
 
 import { splitAction } from '@/commands/split';
-import type { DownloadOptions, SplitOptions } from '@/types/index';
+import type { DownloadOptions, SplitOptions, SplitPreset } from '@/types/index';
 import { ensureDependencies } from '@/utils/dependencies';
-import { convertVideo } from '@/utils/ffmpeg';
+import { convertVideo, getVideoDuration } from '@/utils/ffmpeg';
 import { loading } from '@/utils/icons';
 import { log, handleError } from '@/utils/log';
 import { createProgressBar, createProgressCallback, formatFileSize } from '@/utils/progress';
 import { checkAndPromptOverwrite } from '@/utils/prompt';
-import { parseSplitValue } from '@/utils/split';
+import type { ParseSplitValueResult } from '@/utils/split';
+import { parseSplitValue, getPresetDuration, calculateNumParts } from '@/utils/split';
 import { validateUrl, validateFormat } from '@/utils/validations';
 import { downloadVideo, getVideoInfo, generateFilename } from '@/utils/ytdlp';
 
@@ -163,20 +164,33 @@ async function handleConvert(downloadedFile: string, format: string): Promise<st
  * @returns {Promise<void>}
  */
 async function handleSplit(inputFile: string, splitValue: string): Promise<void> {
-  let splitOptions: SplitOptions;
+  let parsed: ParseSplitValueResult;
 
   try {
-    const parsed = parseSplitValue(splitValue);
-
-    splitOptions = { fast: true };
-
-    if (parsed.type === 'preset') {
-      splitOptions.preset = parsed.value as SplitOptions['preset'];
-    } else {
-      splitOptions.duration = String(parsed.value);
-    }
+    parsed = parseSplitValue(splitValue);
   } catch (error) {
     handleError(error);
+  }
+
+  const partDuration: number =
+    parsed!.type === 'preset' ? getPresetDuration(parsed!.value as SplitPreset) : Number(parsed!.value);
+
+  const totalDuration = await getVideoDuration(inputFile);
+  const numParts = calculateNumParts(totalDuration, partDuration);
+
+  if (numParts <= 1) {
+    log.info(`Video is ${Math.round(totalDuration)}s long, no splitting needed (max part: ${partDuration}s).`);
+    log.info('Use --duration to set a smaller max part size if needed.');
+    log.info(`Output: ${resolve(inputFile)}`);
+    return;
+  }
+
+  const splitOptions: SplitOptions = { fast: true };
+
+  if (parsed!.type === 'preset') {
+    splitOptions.preset = parsed!.value as SplitOptions['preset'];
+  } else {
+    splitOptions.duration = String(parsed!.value);
   }
 
   await splitAction(inputFile, splitOptions);
