@@ -34,19 +34,3 @@ export function sanitizeFilename(name: string, maxLength = 200): string {
 
   return safe.trim() || 'untitled';
 }
-
-/**
- * Convert text to URL-friendly slug.
- *
- * @param {string} text - Text to slugify.
- *
- * @returns {string} Slugified text.
- */
-export function slugify(text: string): string {
-  return text
-    .toLowerCase()
-    .trim()
-    .replace(/[^\w\s-]/g, '')
-    .replace(/[\s_-]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-}

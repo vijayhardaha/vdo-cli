@@ -23,7 +23,7 @@ const ALLOWED_FORMATS = ['mp3', 'wav', 'aac'];
  *
  * @throws {void} Exits with code 1 on error.
  */
-export async function audioAction(input: string, options: AudioOptions): Promise<void> {
+async function audioAction(input: string, options: AudioOptions): Promise<void> {
   try {
     log.loading('Preparing audio extraction...');
 

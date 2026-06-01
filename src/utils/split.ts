@@ -5,7 +5,7 @@ import { parseFFmpegProgress } from '@/utils/progress';
 /**
  * Platform preset durations in seconds.
  */
-export const PRESET_DURATIONS: Record<SplitPreset, number> = {
+const PRESET_DURATIONS: Record<SplitPreset, number> = {
   instagram: 60,
   ig: 60,
   whatsapp: 90,
@@ -83,11 +83,36 @@ export function getPresetDuration(preset: SplitPreset): number {
  *
  * @returns {string} Formatted time string.
  */
-export function formatSeconds(seconds: number): string {
+function formatSeconds(seconds: number): string {
   const hours = Math.floor(seconds / 3600);
   const mins = Math.floor((seconds % 3600) / 60);
   const secs = Math.floor(seconds % 60);
   return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+}
+
+/**
+ * Iterate over split parts, yielding pre-computed time/position info for each part.
+ *
+ * @param {string[]} outputPaths - Array of output file paths.
+ * @param {number} partDuration - Max duration per part in seconds.
+ * @param {number} totalDuration - Total video duration in seconds.
+ *
+ * @returns {Generator<{ startStr: string; durationStr: string; outputPath: string; i: number }>} Generator yielding per-part info.
+ *
+ * @yields {{ startStr: string; durationStr: string; outputPath: string; i: number }} Per-part time/position info.
+ */
+function* iterateSplitParts(
+  outputPaths: string[],
+  partDuration: number,
+  totalDuration: number
+): Generator<{ startStr: string; durationStr: string; outputPath: string; i: number }> {
+  const numParts = outputPaths.length;
+  for (let i = 0; i < numParts; i++) {
+    const startSec = i * partDuration;
+    const endSec = Math.min((i + 1) * partDuration, totalDuration);
+    const duration = endSec - startSec;
+    yield { startStr: formatSeconds(startSec), durationStr: formatSeconds(duration), outputPath: outputPaths[i], i };
+  }
 }
 
 /**
@@ -115,15 +140,7 @@ export async function splitVideoReencode(
   const videoCodec = codec === 'hevc' ? 'libx265' : 'libx264';
   const numParts = outputPaths.length;
 
-  for (let i = 0; i < numParts; i++) {
-    const startSec = i * partDuration;
-    const endSec = Math.min((i + 1) * partDuration, totalDuration);
-    const duration = endSec - startSec;
-    const durationStr = formatSeconds(duration);
-    const startStr = formatSeconds(startSec);
-
-    const outputPath = outputPaths[i];
-
+  for (const { startStr, durationStr, outputPath, i } of iterateSplitParts(outputPaths, partDuration, totalDuration)) {
     const command = `ffmpeg -y -ss "${startStr}" -i "${inputPath}" -t "${durationStr}" -c:v ${videoCodec} -crf ${crf} -c:a aac "${outputPath}"`;
 
     let currentTime = 0;
@@ -173,16 +190,7 @@ export async function splitVideoStreamCopy(
 ): Promise<string[]> {
   const numParts = outputPaths.length;
 
-  for (let i = 0; i < numParts; i++) {
-    const startSec = i * partDuration;
-    const endSec = Math.min((i + 1) * partDuration, totalDuration);
-
-    const duration = endSec - startSec;
-    const durationStr = formatSeconds(duration);
-    const startStr = formatSeconds(startSec);
-
-    const outputPath = outputPaths[i];
-
+  for (const { startStr, durationStr, outputPath, i } of iterateSplitParts(outputPaths, partDuration, totalDuration)) {
     const command = `ffmpeg -y -ss "${startStr}" -i "${inputPath}" -t "${durationStr}" -c copy "${outputPath}"`;
 
     await runCommand(command);

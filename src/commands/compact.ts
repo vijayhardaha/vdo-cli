@@ -116,7 +116,7 @@ async function resolveCompactMode(
  *
  * @throws {void} Exits with code 1 on error.
  */
-export async function compactAction(input: string, options: CompactOptions): Promise<void> {
+async function compactAction(input: string, options: CompactOptions): Promise<void> {
   try {
     log.loading('Preparing compact operation...');
 

@@ -9,7 +9,7 @@ import { log } from '@/utils/log';
  *
  * @returns {Promise<boolean>} - True if user confirms (Y), false if user declines (n).
  */
-export async function promptOverwrite(message: string): Promise<boolean> {
+async function promptOverwrite(message: string): Promise<boolean> {
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
 
   const response = await new Promise<string>((resolve) => {

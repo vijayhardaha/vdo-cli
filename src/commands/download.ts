@@ -31,7 +31,7 @@ const DEFAULT_CONVERT_PRESET = 'fast';
  *
  * @throws {void} Exits with code 1 on error.
  */
-export async function downloadAction(url: string, options: DownloadOptions): Promise<void> {
+async function downloadAction(url: string, options: DownloadOptions): Promise<void> {
   try {
     await ensureDependencies();
 

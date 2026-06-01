@@ -233,7 +233,7 @@ async function handleSingleSlice(input: string, options: SliceOptions): Promise<
  *
  * @throws {void} Exits with code 1 on error.
  */
-export async function sliceAction(input: string, options: SliceOptions): Promise<void> {
+async function sliceAction(input: string, options: SliceOptions): Promise<void> {
   try {
     log.loading('Preparing slice operation...');
 

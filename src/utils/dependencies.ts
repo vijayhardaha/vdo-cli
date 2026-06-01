@@ -11,7 +11,7 @@ import { log } from '@/utils/log';
  *
  * @returns {Promise<boolean>} - True if command exists, false otherwise.
  */
-export function checkCommand(command: string): Promise<boolean> {
+function checkCommand(command: string): Promise<boolean> {
   return new Promise((resolve) => {
     exec(`which ${command}`, (error) => {
       resolve(!error);
@@ -24,7 +24,7 @@ export function checkCommand(command: string): Promise<boolean> {
  *
  * @returns {Promise<DependencyCheck>} - Object with ok status and array of missing dependencies.
  */
-export async function checkDependencies(): Promise<DependencyCheck> {
+async function checkDependencies(): Promise<DependencyCheck> {
   const missing: string[] = [];
 
   const ffmpegInstalled = await checkCommand('ffmpeg');
@@ -94,7 +94,7 @@ export function runCommand(
  *
  * @returns {string} - Platform-specific install command.
  */
-export function getInstallCommand(missing: string[]): string {
+function getInstallCommand(missing: string[]): string {
   const platform = os.platform();
   const packages = missing.join(' ');
 

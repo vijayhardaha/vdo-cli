@@ -51,6 +51,22 @@ export function parseSizeToMB(sizeStr: string): number {
 }
 
 /**
+ * Prompt user for overwrite confirmation and resolve video codec string.
+ *
+ * @param {string} outputPath - Path to output video file.
+ * @param {boolean} hevc - Whether to use HEVC codec instead of H.264.
+ *
+ * @returns {Promise<string>} Resolved codec string ('libx265' for HEVC, 'libx264' for H.264).
+ */
+async function resolveCodecWithOverwriteCheck(outputPath: string, hevc: boolean): Promise<string> {
+  const shouldProceed = await checkAndPromptOverwrite([outputPath]);
+  if (!shouldProceed) {
+    process.exit(0);
+  }
+  return hevc ? 'libx265' : 'libx264';
+}
+
+/**
  * Compact video to target size using two-pass encoding.
  *
  * @param {string} inputPath - Path to input video.
@@ -72,12 +88,7 @@ export async function compactVideo(
   hevc: boolean,
   onProgress?: (progress: number) => void
 ): Promise<void> {
-  const shouldProceed = await checkAndPromptOverwrite([outputPath]);
-  if (!shouldProceed) {
-    process.exit(0);
-  }
-
-  const videoCodec = hevc ? 'libx265' : 'libx264';
+  const videoCodec = await resolveCodecWithOverwriteCheck(outputPath, hevc);
   const pass1Log = 'ffmpeg2pass-0.log';
 
   const pass1Cmd = `ffmpeg -y -i "${inputPath}" -c:v ${videoCodec} -b:v ${targetBitrate}k -pass 1 -preset ${preset} -an -f null "${pass1Log}"`;
@@ -124,12 +135,7 @@ export async function compactVideoCRF(
   hevc: boolean,
   onProgress?: (progress: number) => void
 ): Promise<void> {
-  const shouldProceed = await checkAndPromptOverwrite([outputPath]);
-  if (!shouldProceed) {
-    process.exit(0);
-  }
-
-  const videoCodec = hevc ? 'libx265' : 'libx264';
+  const videoCodec = await resolveCodecWithOverwriteCheck(outputPath, hevc);
   const command = `ffmpeg -y -i "${inputPath}" -c:v ${videoCodec} -crf ${crf} -preset ${preset} -c:a aac -b:a ${audioBitrate} "${outputPath}"`;
 
   const totalTime = await getVideoDuration(inputPath);
