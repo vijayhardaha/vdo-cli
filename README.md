@@ -124,6 +124,8 @@ vdo download https://youtube.com/watch?v=example --convert --split wa
 vdo download https://example.com/video --cookies chrome
 ```
 
+> **Note:** Generated filenames are automatically sanitized — only `A-Z`, `a-z`, `0-9`, `-`, and `_` are kept. All other characters are replaced with dashes, and multiple consecutive dashes are collapsed into one.
+
 **Aliases:** `dl`
 
 ---
@@ -140,7 +142,7 @@ vdo convert <input> [options]
 
 - `-o, --output <file>` - Output file name
 - `--format <format>` - Target format (mp4, mkv, avi, mov, flv) (default: "mp4")
-- `--preset <preset>` - Encoding preset (fast, high-quality, custom) (default: "fast")
+- `--preset <preset>` - Encoding preset (ultrafast, fast, medium, slow, high-quality) (default: "fast")
 
 **Examples:**
 
@@ -559,17 +561,19 @@ vdo/
 │   │   ├── split.ts            # Split command
 │   │   └── audio.ts            # Audio extraction command
 │   ├── utils/
-│   │   ├── dependencies.ts     # Dependency checking utilities
-│   │   ├── validations.ts      # Input validation utilities
-│   │   ├── icons.ts            # Nerd icons
-│   │   ├── log.ts              # Logging utility
+│   │   ├── compact.ts          # Compact/two-pass encoding
+│   │   ├── dependencies.ts     # Dependency checking
 │   │   ├── ffmpeg.ts           # FFmpeg wrapper functions
-│   │   ├── ytdlp.ts            # yt-dlp wrapper functions
-│   │   ├── progress.ts          # Progress bar utilities
-│   │   ├── compact.ts           # Compact utilities
-│   │   ├── slice.ts            # Slice utilities
+│   │   ├── icons.ts            # Status icons
+│   │   ├── log.ts              # Logging utility
+│   │   ├── output.ts           # Output filename helpers
+│   │   ├── progress.ts         # Progress bar utilities
+│   │   ├── prompt.ts           # Overwrite prompts
+│   │   ├── sanitize.ts         # Filename sanitization
+│   │   ├── slice.ts            # Slice/trim utilities
 │   │   ├── split.ts            # Split utilities
-│   │   └── prompt.ts           # Prompt utilities
+│   │   ├── validations.ts      # Input validation
+│   │   └── ytdlp.ts            # yt-dlp wrapper functions
 │   └── types/
 │       └── index.ts             # TypeScript type definitions
 ├── package.json

@@ -64,6 +64,7 @@ src/
 │   │   ├── dependencies.test.ts
 │   │   ├── ffmpeg.test.ts
 │   │   ├── icons.test.ts
+│   │   ├── output.test.ts
 │   │   ├── progress.test.ts
 │   │   ├── prompt.test.ts
 │   │   ├── sanitize.test.ts
@@ -71,18 +72,19 @@ src/
 │   │   ├── split.test.ts
 │   │   ├── validations.test.ts
 │   │   └── ytdlp.test.ts
+│   ├── compact.ts       # Compact/two-pass encoding utilities
 │   ├── dependencies.ts  # ensureDependencies(), checkDependencies(), runCommand()
+│   ├── ffmpeg.ts        # FFmpeg wrappers
 │   ├── icons.ts         # Icons (info, success, warning, error, loading)
 │   ├── log.ts           # Logging utility (log.succeed, log.fail, etc.)
-│   ├── progress.ts      # Progress bar utilities
-│   ├── sanitize.ts      # Filename sanitization
-│   ├── validations.ts   # Input validation helpers
-│   ├── ffmpeg.ts        # FFmpeg wrappers
-│   ├── ytdlp.ts         # yt-dlp wrappers
-│   ├── compact.ts       # Compact/two-pass encoding utilities
-│   ├── slice.ts         # Slice/trim utilities
-│   ├── split.ts         # Split utilities (parseSplitValue, etc.)
-│   └── prompt.ts        # Prompt utilities (checkAndPromptOverwrite, etc.)
+│   ├── output.ts        # Output filename helpers (generateOutputFilename, getFileExtension, resolveOutputFile)
+│   ├── progress.ts      # Progress bar utilities (createFFmpegProgressCallback, parseYtDlpProgress)
+│   ├── prompt.ts        # Prompt utilities (checkAndPromptOverwrite, etc.)
+│   ├── sanitize.ts      # Filename sanitization (sanitizeFilename, slugify)
+│   ├── slice.ts         # Slice/trim utilities (parseTimeToSeconds, etc.)
+│   ├── split.ts         # Split utilities (parseSplitValue, calculateNumParts, etc.)
+│   ├── validations.ts   # Input validation helpers (validateUrl, validateFormat, validateFileExists)
+│   └── ytdlp.ts         # yt-dlp wrappers (getVideoInfo, downloadVideo, generateFilename)
 └── types/index.ts       # All shared interfaces
 ```
 
