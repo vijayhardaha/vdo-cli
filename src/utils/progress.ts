@@ -44,6 +44,34 @@ export function createProgressBar(message = 'Processing', unit = '%'): cliProgre
 }
 
 /**
+ * Create a progress callback that parses ffmpeg stderr lines and computes percentage.
+ *
+ * @param {number} totalTime - Total duration in seconds.
+ * @param {(progress: number) => void} [onProgress] - Callback receiving percentage (0-100).
+ *
+ * @returns {(line: string) => void} - Callback for ffmpeg stderr lines.
+ */
+export function createFFmpegProgressCallback(
+  totalTime: number,
+  onProgress?: (progress: number) => void
+): (line: string) => void {
+  let currentTime = 0;
+
+  return (line: string) => {
+    const progress = parseFFmpegProgress(line);
+    if (progress?.type === 'time' && progress.value !== undefined) {
+      if (totalTime > 0) {
+        currentTime = progress.value;
+        if (onProgress && currentTime > 0) {
+          const percentage = Math.min(100, Math.round((currentTime / totalTime) * 100));
+          onProgress(percentage);
+        }
+      }
+    }
+  };
+}
+
+/**
  * Parse ffmpeg output line to extract progress information.
  *
  * @param {string} line - Single output line from ffmpeg stderr.

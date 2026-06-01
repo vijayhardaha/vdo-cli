@@ -1,6 +1,32 @@
-import type { ProgressInfo, SliceSegment } from '@/types/index';
+import type { SliceSegment } from '@/types/index';
 import { runCommand } from '@/utils/dependencies';
-import { parseFFmpegProgress } from '@/utils/progress';
+import { createFFmpegProgressCallback } from '@/utils/progress';
+
+/**
+ * Parse time string to seconds.
+ *
+ * @param {string} timeStr - Time string (e.g., '10', '1:30', '00:01:30').
+ *
+ * @returns {number} Duration in seconds.
+ */
+export function parseTimeToSeconds(timeStr: string): number {
+  const hmsMatch = timeStr.match(/^(\d+):(\d{2}):(\d{2})(?:\.(\d+))?$/);
+  if (hmsMatch) {
+    const hours = parseInt(hmsMatch[1], 10);
+    const mins = parseInt(hmsMatch[2], 10);
+    const secs = parseInt(hmsMatch[3], 10);
+    return hours * 3600 + mins * 60 + secs;
+  }
+
+  const msMatch = timeStr.match(/^(\d+):(\d{2})(?:\.(\d+))?$/);
+  if (msMatch) {
+    const mins = parseInt(msMatch[1], 10);
+    const secs = parseInt(msMatch[2], 10);
+    return mins * 60 + secs;
+  }
+
+  return parseFloat(timeStr);
+}
 
 /**
  * Slice video segment using stream copy (fast, may not be frame-accurate).
@@ -20,25 +46,12 @@ export async function sliceVideoStreamCopy(
   end: string,
   onProgress?: (progress: number) => void
 ): Promise<void> {
-  const command = `ffmpeg -y -ss "${start}" -i "${inputPath}" -to "${end}" -c copy "${outputPath}"`;
+  const startSec = parseTimeToSeconds(start);
+  const endSec = parseTimeToSeconds(end);
+  const duration = Math.max(0, endSec - startSec);
+  const command = `ffmpeg -y -ss "${start}" -i "${inputPath}" -t "${duration}" -c copy "${outputPath}"`;
 
-  const totalTime = 0;
-  let currentTime = 0;
-
-  const progressCallback = (line: string) => {
-    const progress: ProgressInfo | null = parseFFmpegProgress(line);
-    if (progress?.type === 'time' && progress.value !== undefined) {
-      if (totalTime > 0) {
-        currentTime = progress.value;
-        if (onProgress && currentTime > 0) {
-          const percentage = Math.min(100, Math.round((currentTime / totalTime) * 100));
-          onProgress(percentage);
-        }
-      }
-    }
-  };
-
-  const result = await runCommand(command, progressCallback);
+  const result = await runCommand(command, createFFmpegProgressCallback(duration, onProgress));
   if (result.stderr && !result.stderr.includes('time=')) {
     throw new Error(`Slice failed: ${result.stderr}`);
   }
@@ -67,25 +80,12 @@ export async function sliceVideoReencode(
   onProgress?: (progress: number) => void
 ): Promise<void> {
   const videoCodec = codec === 'hevc' ? 'libx265' : 'libx264';
-  const command = `ffmpeg -y -ss "${start}" -i "${inputPath}" -to "${end}" -c:v ${videoCodec} -crf ${crf} -c:a aac "${outputPath}"`;
+  const startSec = parseTimeToSeconds(start);
+  const endSec = parseTimeToSeconds(end);
+  const duration = Math.max(0, endSec - startSec);
+  const command = `ffmpeg -y -ss "${start}" -i "${inputPath}" -t "${duration}" -c:v ${videoCodec} -crf ${crf} -c:a aac "${outputPath}"`;
 
-  const totalTime = 0;
-  let currentTime = 0;
-
-  const progressCallback = (line: string) => {
-    const progress: ProgressInfo | null = parseFFmpegProgress(line);
-    if (progress?.type === 'time' && progress.value !== undefined) {
-      if (totalTime > 0) {
-        currentTime = progress.value;
-        if (onProgress && currentTime > 0) {
-          const percentage = Math.min(100, Math.round((currentTime / totalTime) * 100));
-          onProgress(percentage);
-        }
-      }
-    }
-  };
-
-  const result = await runCommand(command, progressCallback);
+  const result = await runCommand(command, createFFmpegProgressCallback(duration, onProgress));
   if (result.stderr && !result.stderr.includes('frames')) {
     throw new Error(`Slice failed: ${result.stderr}`);
   }

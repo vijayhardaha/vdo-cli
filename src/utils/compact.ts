@@ -1,6 +1,6 @@
-import type { ProgressInfo } from '@/types/index';
 import { runCommand } from '@/utils/dependencies';
-import { parseFFmpegProgress } from '@/utils/progress';
+import { getVideoDuration } from '@/utils/ffmpeg';
+import { createFFmpegProgressCallback } from '@/utils/progress';
 import { checkAndPromptOverwrite } from '@/utils/prompt';
 
 /**
@@ -85,29 +85,17 @@ export async function compactVideo(
   const pass2Cmd = `ffmpeg -y -i "${inputPath}" -c:v ${videoCodec} -b:v ${targetBitrate}k -pass 2 -preset ${preset} -c:a aac -b:a ${audioBitrate} "${outputPath}"`;
 
   const totalTime = await getVideoDuration(inputPath);
-  let currentTime = 0;
 
-  const progressCallback = (data: string, _type: 'stdout' | 'stderr') => {
-    const progress: ProgressInfo | null = parseFFmpegProgress(data);
-    if (progress?.type === 'time' && progress.value !== undefined) {
-      if (totalTime > 0) {
-        currentTime = progress.value;
-        if (onProgress && currentTime > 0) {
-          const percentage = Math.min(100, Math.round((currentTime / totalTime) * 100));
-          onProgress(percentage);
-        }
-      }
-    }
-  };
+  const cb = createFFmpegProgressCallback(totalTime, onProgress);
 
   // check: if two-pass encoding is selected
   if (targetBitrate > 0) {
-    const pass1Result = await runCommand(pass1Cmd, progressCallback);
+    const pass1Result = await runCommand(pass1Cmd, cb);
     if (pass1Result.stderr && !pass1Result.stderr.includes('frames')) {
       throw new Error(`Pass 1 failed: ${pass1Result.stderr}`);
     }
 
-    const pass2Result = await runCommand(pass2Cmd, progressCallback);
+    const pass2Result = await runCommand(pass2Cmd, cb);
     if (pass2Result.stderr && !pass2Result.stderr.includes('frames')) {
       throw new Error(`Pass 2 failed: ${pass2Result.stderr}`);
     }
@@ -145,22 +133,8 @@ export async function compactVideoCRF(
   const command = `ffmpeg -y -i "${inputPath}" -c:v ${videoCodec} -crf ${crf} -preset ${preset} -c:a aac -b:a ${audioBitrate} "${outputPath}"`;
 
   const totalTime = await getVideoDuration(inputPath);
-  let currentTime = 0;
 
-  const progressCallback = (data: string, _type: 'stdout' | 'stderr') => {
-    const progress: ProgressInfo | null = parseFFmpegProgress(data);
-    if (progress?.type === 'time' && progress.value !== undefined) {
-      if (totalTime > 0) {
-        currentTime = progress.value;
-        if (onProgress && currentTime > 0) {
-          const percentage = Math.min(100, Math.round((currentTime / totalTime) * 100));
-          onProgress(percentage);
-        }
-      }
-    }
-  };
-
-  const result = await runCommand(command, progressCallback);
+  const result = await runCommand(command, createFFmpegProgressCallback(totalTime, onProgress));
   if (result.stderr && !result.stderr.includes('frames')) {
     throw new Error(`Compression failed: ${result.stderr}`);
   }
@@ -175,17 +149,4 @@ export async function compactVideoCRF(
  */
 export function getCRFForQuality(quality: string): number {
   return QUALITY_CRF[quality] ?? 23;
-}
-
-/**
- * Get video duration in seconds using ffprobe.
- *
- * @param {string} inputPath - Path to input video.
- *
- * @returns {Promise<number>} Duration in seconds.
- */
-export async function getVideoDuration(inputPath: string): Promise<number> {
-  const command = `ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "${inputPath}"`;
-  const result = await runCommand(command);
-  return parseFloat(result.stdout) || 0;
 }
