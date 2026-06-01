@@ -48,6 +48,10 @@ const VALID_PRESETS: SplitPreset[] = ['instagram', 'ig', 'whatsapp', 'wa', 'face
 
 /**
  * Result type for parseSplitValue.
+ *
+ * @type {ParseSplitValueResult}
+ * @property {'preset' | 'duration'} type - Whether the result is a platform preset or custom duration.
+ * @property {string | number} value - Preset name string or duration in seconds.
  */
 export interface ParseSplitValueResult {
   type: 'preset' | 'duration';

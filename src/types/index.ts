@@ -1,5 +1,13 @@
 /**
  * Progress information for ffmpeg or yt-dlp operations.
+ *
+ * @type {ProgressInfo}
+ * @property {'time' | 'size' | 'fps' | 'download' | 'destination'} type - Type of progress event.
+ * @property {number} [value] - Numeric value associated with the progress.
+ * @property {number} [percentage] - Completion percentage if available.
+ * @property {number} [size] - File size in bytes if applicable.
+ * @property {string} [unit] - Unit string for the size value.
+ * @property {string} [filename] - Output filename for download operations.
  */
 export interface ProgressInfo {
   type: 'time' | 'size' | 'fps' | 'download' | 'destination';
@@ -12,6 +20,10 @@ export interface ProgressInfo {
 
 /**
  * Dependency check result.
+ *
+ * @type {DependencyCheck}
+ * @property {boolean} ok - Whether all dependencies are installed.
+ * @property {string[]} missing - List of missing dependency names.
  */
 export interface DependencyCheck {
   ok: boolean;
@@ -20,6 +32,10 @@ export interface DependencyCheck {
 
 /**
  * Command execution result with stdout and stderr.
+ *
+ * @type {CommandResult}
+ * @property {string} stdout - Standard output from the command.
+ * @property {string} stderr - Standard error from the command.
  */
 export interface CommandResult {
   stdout: string;
@@ -28,26 +44,41 @@ export interface CommandResult {
 
 /**
  * Supported video formats.
+ *
+ * @type {VideoFormat}
  */
 export type VideoFormat = 'mp4' | 'mkv' | 'avi' | 'mov' | 'webm' | 'flv';
 
 /**
  * Supported audio formats.
+ *
+ * @type {AudioFormat}
  */
 export type AudioFormat = 'mp3' | 'wav' | 'aac';
 
 /**
  * Supported download formats.
+ *
+ * @type {DownloadFormat}
  */
 export type DownloadFormat = 'mp4' | 'mkv' | 'mp3';
 
 /**
  * FFmpeg encoding presets.
+ *
+ * @type {Preset}
  */
 export type Preset = 'ultrafast' | 'fast' | 'medium' | 'slow' | 'high-quality';
 
 /**
  * Options for download command.
+ *
+ * @type {DownloadOptions}
+ * @property {string} [output] - Custom output file path.
+ * @property {DownloadFormat} [format] - Target download format.
+ * @property {boolean} [convert] - Whether to convert after download.
+ * @property {string} [split] - Split value after download.
+ * @property {string} [cookies] - Browser name for cookie loading.
  */
 export interface DownloadOptions {
   output?: string;
@@ -59,6 +90,11 @@ export interface DownloadOptions {
 
 /**
  * Options for convert command.
+ *
+ * @type {ConvertOptions}
+ * @property {string} [output] - Custom output file path.
+ * @property {VideoFormat} [format] - Target video format.
+ * @property {Preset} [preset] - Encoding preset for conversion.
  */
 export interface ConvertOptions {
   output?: string;
@@ -68,6 +104,11 @@ export interface ConvertOptions {
 
 /**
  * Options for compress command.
+ *
+ * @type {CompressOptions}
+ * @property {string} [output] - Custom output file path.
+ * @property {number} [crf] - Constant Rate Factor value (0-51).
+ * @property {'ultrafast' | 'fast' | 'medium' | 'slow'} [preset] - Encoding preset for compression.
  */
 export interface CompressOptions {
   output?: string;
@@ -77,6 +118,10 @@ export interface CompressOptions {
 
 /**
  * Options for speedup command.
+ *
+ * @type {SpeedupOptions}
+ * @property {string} [output] - Custom output file path.
+ * @property {number} [rate] - Speed multiplier factor.
  */
 export interface SpeedupOptions {
   output?: string;
@@ -85,6 +130,11 @@ export interface SpeedupOptions {
 
 /**
  * Options for audio extraction command.
+ *
+ * @type {AudioOptions}
+ * @property {string} [output] - Custom output file path.
+ * @property {AudioFormat} [format] - Target audio format.
+ * @property {string} [bitrate] - Audio bitrate string (e.g., '192k').
  */
 export interface AudioOptions {
   output?: string;
@@ -94,11 +144,23 @@ export interface AudioOptions {
 
 /**
  * Quality preset for compact command.
+ *
+ * @type {CompactQuality}
  */
 export type CompactQuality = 'low' | 'medium' | 'high' | 'lossless';
 
 /**
  * Options for compact command.
+ *
+ * @type {CompactOptions}
+ * @property {string} [output] - Custom output file path.
+ * @property {string} [target] - Target file size string (e.g., '10MB').
+ * @property {number} [percent] - Target size reduction percentage.
+ * @property {CompactQuality} [quality] - Quality preset for encoding.
+ * @property {'ultrafast' | 'fast' | 'medium' | 'slow'} [preset] - Encoding preset for compaction.
+ * @property {string} [audioBitrate] - Audio bitrate for output.
+ * @property {boolean} [hevc] - Whether to use HEVC codec.
+ * @property {boolean} [discord] - Whether to target Discord file size limit.
  */
 export interface CompactOptions {
   output?: string;
@@ -113,6 +175,10 @@ export interface CompactOptions {
 
 /**
  * Segment definition for slice command.
+ *
+ * @type {SliceSegment}
+ * @property {string} start - Start time string (e.g., '00:01:30').
+ * @property {string} end - End time string (e.g., '00:02:00').
  */
 export interface SliceSegment {
   start: string;
@@ -121,6 +187,16 @@ export interface SliceSegment {
 
 /**
  * Options for slice command.
+ *
+ * @type {SliceOptions}
+ * @property {string} [output] - Custom output file path.
+ * @property {string} [start] - Start time for slicing.
+ * @property {string} [end] - End time for slicing.
+ * @property {string} [duration] - Duration for slicing.
+ * @property {SliceSegment[]} [segments] - Array of segments for batch slicing.
+ * @property {boolean} [fast] - Use stream copy for speed.
+ * @property {boolean} [precise] - Use re-encoding for frame accuracy.
+ * @property {'copy' | 'h264' | 'hevc'} [codec] - Codec for re-encoding.
  */
 export interface SliceOptions {
   output?: string;
@@ -135,11 +211,21 @@ export interface SliceOptions {
 
 /**
  * Platform preset for split command.
+ *
+ * @type {SplitPreset}
  */
 export type SplitPreset = 'instagram' | 'ig' | 'whatsapp' | 'wa' | 'facebook' | 'fb';
 
 /**
  * Options for split command.
+ *
+ * @type {SplitOptions}
+ * @property {string} [output] - Custom output file path.
+ * @property {SplitPreset} [preset] - Platform preset for split duration.
+ * @property {string} [duration] - Custom duration per segment.
+ * @property {boolean} [fast] - Use stream copy for speed.
+ * @property {boolean} [precise] - Use re-encoding for frame accuracy.
+ * @property {'h264' | 'hevc'} [codec] - Codec for re-encoding.
  */
 export interface SplitOptions {
   output?: string;

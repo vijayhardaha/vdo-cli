@@ -2,7 +2,15 @@ import { runCommand } from '@/utils/dependencies';
 import { parseYtDlpProgress } from '@/utils/progress';
 import { sanitizeFilename } from '@/utils/sanitize';
 
-/* Video information returned from yt-dlp */
+/**
+ * Video information returned from yt-dlp.
+ *
+ * @type {VideoInfo}
+ * @property {string} title - Video title.
+ * @property {string} video_id - Unique video identifier.
+ * @property {string} ext - File extension for the best available format.
+ * @property {number} [filesize] - File size in bytes if available.
+ */
 export interface VideoInfo {
   title: string;
   video_id: string;
