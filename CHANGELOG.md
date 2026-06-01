@@ -5,6 +5,51 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.6] - 2026-06-01
+
+### Added
+
+- **Code Quality**: Added `iterateSplitParts` generator to dedup split loop boilerplate
+- **Code Quality**: Added `resolveCodecWithOverwriteCheck` helper to dedup overwrite + codec logic
+- **Code Quality**: Added `resolveDownloadTarget` and `handlePostDownload` helpers extracted from downloadAction
+- **Code Quality**: Added `buildAudioFilter` and `buildAtempoChain` helpers extracted from speedUpVideo
+- **Code Quality**: Added `resolveCompactMode`, `resolvePartDuration`, `executeSplit`, `handleSliceSegments`, `resolveTimeRange`, `handleSingleSlice`, `executeSingleSlice`, `resolveSliceMode`, `validateSliceOptions` helpers from refactored command actions
+
+### Changed
+
+- **Refactored downloadAction**: Reduced cyclomatic complexity from 12 to 6 by extracting validation/output resolution and post-processing helpers
+- **Refactored speedUpVideo**: Reduced cyclomatic complexity from 8 to 4 by extracting audio filter chain generation
+- **Refactored command actions**: Extracted sliceAction (27 cyclomatic to 6 smaller functions), compactAction (17 to extracted helpers), splitAction (16 to extracted helpers)
+- **Deduplicated ffmpeg progress**: All 4 ffmpeg functions now share `createFFmpegProgressCallback` — removed 4 duplicated inline handlers (269→189 lines)
+- **Moved path utilities**: `getFileExtension` and `generateOutputFilename` moved from `validations.ts` to `output.ts`
+- **Removed duplicate `parseDuration`**: Now imports `parseTimeToSeconds` from `utils/slice.ts`
+- **Reordered function definitions**: Callees now precede callers in `progress.ts` and `split.ts`
+
+### Fixed
+
+- **Download split output**: `handleSplit` now shows `Output:` path when split is skipped (video too short)
+- **Sanitize filename**: Replaced platform-specific invalid-char lists with universal regex `[^A-Za-z0-9_-] → -`
+
+### Removed
+
+- **16 unused exports**:
+  - Dead code: `getFileExtension`, `generateOutputFilename`, `slugify`
+  - Internal-only (export keyword dropped): `checkCommand`, `checkDependencies`, `getInstallCommand`, `PRESET_DURATIONS`, `formatSeconds`, `promptOverwrite`, all 7 `*Action` functions
+- Removed corresponding direct test coverage (caller-level coverage preserved)
+- Removed stale imports and unused mocks from 13 test files
+
+### Documentation
+
+- Updated README with sanitization note, fixed convert preset list, updated project structure
+- Updated AGENTS.md with `output.ts`, `sanitize.ts`, alphabetized utils, function descriptions
+
+### Health
+
+- **Fallow health score**: 85 → 90 A
+- **Unit size deduction**: Eliminated
+- **p90 cyclomatic**: 7 → 6
+- **High-complexity functions**: downloadAction (CRITICAL 12) and speedUpVideo (HIGH 8) resolved
+
 ## [1.0.5] - 2026-05-07
 
 ### Added
