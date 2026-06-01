@@ -16,6 +16,7 @@ vi.mock('../../utils/dependencies', () => {
 });
 
 vi.mock('../../utils/slice', () => ({
+  parseTimeToSeconds: vi.fn((t) => parseFloat(t)),
   sliceVideoStreamCopy: vi.fn(),
   sliceVideoReencode: vi.fn(),
   sliceMultipleSegments: vi.fn(),

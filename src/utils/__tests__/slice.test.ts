@@ -63,7 +63,7 @@ describe('slice utils', () => {
 
       // Expect sliceVideoStreamCopy uses correct command arguments
       expect(runCommand).toHaveBeenCalledWith(
-        'ffmpeg -y -ss "00:00:10" -i "input.mp4" -to "00:00:30" -c copy "output.mp4"',
+        'ffmpeg -y -ss "00:00:10" -i "input.mp4" -t "20" -c copy "output.mp4"',
         expect.any(Function)
       );
     });
@@ -92,7 +92,7 @@ describe('slice utils', () => {
 
       // Expect sliceVideoReencode uses correct h264 command arguments
       expect(runCommand).toHaveBeenCalledWith(
-        'ffmpeg -y -ss "00:00:10" -i "input.mp4" -to "00:00:30" -c:v libx264 -crf 23 -c:a aac "output.mp4"',
+        'ffmpeg -y -ss "00:00:10" -i "input.mp4" -t "20" -c:v libx264 -crf 23 -c:a aac "output.mp4"',
         expect.any(Function)
       );
     });
@@ -105,7 +105,7 @@ describe('slice utils', () => {
 
       // Expect sliceVideoReencode uses libx265 for hevc
       expect(runCommand).toHaveBeenCalledWith(
-        'ffmpeg -y -ss "00:00:10" -i "input.mp4" -to "00:00:30" -c:v libx265 -crf 20 -c:a aac "output.mp4"',
+        'ffmpeg -y -ss "00:00:10" -i "input.mp4" -t "20" -c:v libx265 -crf 20 -c:a aac "output.mp4"',
         expect.any(Function)
       );
     });
