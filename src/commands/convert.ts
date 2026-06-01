@@ -80,8 +80,6 @@ export async function convertAction(input: string, options: ConvertOptions): Pro
  * Setup convert command with Commander.js.
  *
  * @param {Command} program - Commander program instance to register the command on.
- *
- * @returns {void}
  */
 export function setupConvert(program: Command): void {
   program

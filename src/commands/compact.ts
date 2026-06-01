@@ -159,8 +159,6 @@ export async function compactAction(input: string, options: CompactOptions): Pro
  * Setup compact command with Commander.js.
  *
  * @param {Command} program - Commander program instance to register the command on.
- *
- * @returns {void}
  */
 export function setupCompact(program: Command): void {
   program

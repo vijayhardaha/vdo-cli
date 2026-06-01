@@ -68,8 +68,6 @@ export async function speedupAction(input: string, options: SpeedupOptions): Pro
  * Setup speedup command with Commander.js.
  *
  * @param {Command} program - Commander program instance to register the command on.
- *
- * @returns {void}
  */
 export function setupSpeedup(program: Command): void {
   program

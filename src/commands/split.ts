@@ -164,8 +164,6 @@ export async function splitAction(input: string, options: SplitOptions): Promise
  * Setup split command with Commander.js.
  *
  * @param {Command} program - Commander program instance to register the command on.
- *
- * @returns {void}
  */
 export function setupSplit(program: Command): void {
   program

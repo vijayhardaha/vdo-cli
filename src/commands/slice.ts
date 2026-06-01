@@ -203,8 +203,6 @@ function parseSegments(segmentsStr: string): SliceSegment[] {
  * Setup slice command with Commander.js.
  *
  * @param {Command} program - Commander program instance to register the command on.
- *
- * @returns {void}
  */
 export function setupSlice(program: Command): void {
   program

@@ -78,8 +78,6 @@ export async function compressAction(input: string, options: CompressOptions): P
  * Setup compress command with Commander.js.
  *
  * @param {Command} program - Commander program instance to register the command on.
- *
- * @returns {void}
  */
 export function setupCompress(program: Command): void {
   program

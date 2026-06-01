@@ -40,8 +40,6 @@ export function validateUrl(url: string): boolean {
  * @param {string} format - Format string to validate.
  * @param {string[]} allowedFormats - Array of allowed format strings.
  *
- * @returns {void}
- *
  * @throws {Error} If format is not in the allowed formats list.
  */
 export function validateFormat(format: string, allowedFormats: string[]): void {
@@ -56,8 +54,6 @@ export function validateFormat(format: string, allowedFormats: string[]): void {
  * @param {string} preset - Preset string to validate.
  * @param {string[]} allowedPresets - Array of allowed preset strings.
  *
- * @returns {void}
- *
  * @throws {Error} If preset is not in the allowed presets list.
  */
 export function validatePreset(preset: string, allowedPresets: string[]): void {
@@ -70,8 +66,6 @@ export function validatePreset(preset: string, allowedPresets: string[]): void {
  * Validate CRF (Constant Rate Factor) value.
  *
  * @param {number | string} crf - CRF value to validate (number or string).
- *
- * @returns {void}
  *
  * @throws {Error} If CRF is not a number or is outside the valid range 0-51.
  */
@@ -87,8 +81,6 @@ export function validateCRF(crf: number | string): void {
  *
  * @param {number | string} rate - Speed rate to validate (number or string).
  *
- * @returns {void}
- *
  * @throws {Error} If rate is not a number or is outside the valid range (>0 and ≤16).
  */
 export function validateSpeedRate(rate: number | string): void {
@@ -102,8 +94,6 @@ export function validateSpeedRate(rate: number | string): void {
  * Validate bitrate format.
  *
  * @param {string} bitrate - Bitrate string to validate (e.g., "192k", "128M").
- *
- * @returns {void}
  *
  * @throws {Error} If bitrate format is invalid (must be number optionally followed by k, K, m, or M).
  */

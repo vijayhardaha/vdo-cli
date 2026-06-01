@@ -88,8 +88,6 @@ export async function audioAction(input: string, options: AudioOptions): Promise
  * Setup audio command with Commander.js.
  *
  * @param {Command} program - Commander program instance to register the command on.
- *
- * @returns {void}
  */
 export function setupAudio(program: Command): void {
   program
