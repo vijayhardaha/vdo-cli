@@ -9,13 +9,8 @@ import { loading } from '@/utils/icons';
 import { log, handleError } from '@/utils/log';
 import { createProgressBar } from '@/utils/progress';
 import { checkAndPromptOverwrite } from '@/utils/prompt';
-import {
-  splitVideoReencode,
-  splitVideoStreamCopy,
-  parseDuration,
-  getPresetDuration,
-  calculateNumParts,
-} from '@/utils/split';
+import { parseTimeToSeconds } from '@/utils/slice';
+import { splitVideoReencode, splitVideoStreamCopy, getPresetDuration, calculateNumParts } from '@/utils/split';
 import { validateFileExists } from '@/utils/validations';
 
 /**
@@ -85,7 +80,7 @@ export async function splitAction(input: string, options: SplitOptions): Promise
     if (options.preset) {
       partDuration = getPresetDuration(options.preset as SplitPreset);
     } else {
-      partDuration = parseDuration(options.duration!);
+      partDuration = parseTimeToSeconds(options.duration!);
       if (partDuration <= 0) {
         log.fail('Duration must be greater than 0.');
         process.exit(1);

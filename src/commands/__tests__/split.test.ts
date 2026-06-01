@@ -15,10 +15,10 @@ vi.mock('../../utils/dependencies', () => {
   return { checkDependencies: mockCheckDependencies, ensureDependencies: mockEnsureDependencies, runCommand: vi.fn() };
 });
 
+vi.mock('../../utils/slice', () => ({ parseTimeToSeconds: vi.fn() }));
 vi.mock('../../utils/split', () => ({
   splitVideoReencode: vi.fn(() => Promise.resolve(['output_001.mp4', 'output_002.mp4'])),
   splitVideoStreamCopy: vi.fn(() => Promise.resolve(['output_001.mp4', 'output_002.mp4'])),
-  parseDuration: vi.fn(),
   getPresetDuration: vi.fn(),
   calculateNumParts: vi.fn(),
 }));
@@ -164,11 +164,11 @@ describe('split command', () => {
     it('should exit when duration is zero or negative', async () => {
       const { checkDependencies } = await import('../../utils/dependencies');
       const { validateFileExists } = await import('../../utils/validations');
-      const { parseDuration } = await import('../../utils/split');
+      const { parseTimeToSeconds } = await import('../../utils/slice');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateFileExists).mockResolvedValue(undefined);
-      vi.mocked(parseDuration).mockReturnValue(0);
+      vi.mocked(parseTimeToSeconds).mockReturnValue(0);
 
       const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
 
@@ -183,12 +183,13 @@ describe('split command', () => {
       const { checkDependencies } = await import('../../utils/dependencies');
       const { validateFileExists } = await import('../../utils/validations');
       const { getVideoDuration } = await import('../../utils/ffmpeg');
-      const { parseDuration, calculateNumParts } = await import('../../utils/split');
+      const { calculateNumParts } = await import('../../utils/split');
+      const { parseTimeToSeconds } = await import('../../utils/slice');
 
       vi.mocked(checkDependencies).mockResolvedValue({ ok: true, missing: [] });
       vi.mocked(validateFileExists).mockResolvedValue(undefined);
       vi.mocked(getVideoDuration).mockResolvedValue(30);
-      vi.mocked(parseDuration).mockReturnValue(60);
+      vi.mocked(parseTimeToSeconds).mockReturnValue(60);
       vi.mocked(calculateNumParts).mockReturnValue(1);
 
       await splitAction('input.mp4', { duration: '60' });

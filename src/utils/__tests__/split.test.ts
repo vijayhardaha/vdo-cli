@@ -2,7 +2,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 import { runCommand } from '@/utils/dependencies';
 import {
-  parseDuration,
   calculateNumParts,
   getPresetDuration,
   formatSeconds,
@@ -18,42 +17,6 @@ vi.mock('../dependencies', () => ({ runCommand: vi.fn() }));
 describe('split utils', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-  });
-
-  // Tests for parseDuration
-  describe('parseDuration', () => {
-    // Should parse plain seconds
-    it('should parse plain seconds', () => {
-      // Expect parseDuration returns correct seconds
-      expect(parseDuration('60')).toBe(60);
-
-      // Expect parseDuration handles multiple values
-      expect(parseDuration('90')).toBe(90);
-    });
-
-    // Should parse M:SS format
-    it('should parse M:SS format', () => {
-      // Expect parseDuration converts M:SS to seconds
-      expect(parseDuration('1:30')).toBe(90);
-
-      // Expect parseDuration handles various M:SS values
-      expect(parseDuration('2:15')).toBe(135);
-    });
-
-    // Should parse HH:MM:SS format
-    it('should parse HH:MM:SS format', () => {
-      // Expect parseDuration converts HH:MM:SS to seconds
-      expect(parseDuration('01:30:00')).toBe(5400);
-
-      // Expect parseDuration handles various HH:MM:SS values
-      expect(parseDuration('00:01:30')).toBe(90);
-    });
-
-    // Should parse float
-    it('should parse float', () => {
-      // Expect parseDuration handles decimal values
-      expect(parseDuration('1.5')).toBe(1.5);
-    });
   });
 
   // Tests for calculateNumParts

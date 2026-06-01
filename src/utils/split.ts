@@ -14,35 +14,6 @@ export const PRESET_DURATIONS: Record<SplitPreset, number> = {
   fb: 120,
 };
 
-/**
- * Parse duration string to seconds.
- *
- * @param {string} durationStr - Duration string (e.g., '60', '1:30', '00:01:30').
- *
- * @returns {number} Duration in seconds.
- */
-export function parseDuration(durationStr: string): number {
-  // check: if in HH:MM:SS format
-  const hmsMatch = durationStr.match(/^(\d+):(\d{2}):(\d{2})(?:\.(\d+))?$/);
-  if (hmsMatch) {
-    const hours = parseInt(hmsMatch[1], 10);
-    const mins = parseInt(hmsMatch[2], 10);
-    const secs = parseInt(hmsMatch[3], 10);
-    return hours * 3600 + mins * 60 + secs;
-  }
-
-  // check: if in M:SS format
-  const msMatch = durationStr.match(/^(\d+):(\d{2})(?:\.(\d+))?$/);
-  if (msMatch) {
-    const mins = parseInt(msMatch[1], 10);
-    const secs = parseInt(msMatch[2], 10);
-    return mins * 60 + secs;
-  }
-
-  // check: if plain number (seconds)
-  return parseFloat(durationStr);
-}
-
 /* Valid preset names for split value parsing */
 const VALID_PRESETS: SplitPreset[] = ['instagram', 'ig', 'whatsapp', 'wa', 'facebook', 'fb'];
 
