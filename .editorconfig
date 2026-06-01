@@ -57,6 +57,11 @@ indent_size = 2
 [*.{js,ts,mjs,cjs,jsx,tsx}]
 indent_size = 2
 
+# ---- Shell scripts ----
+# Standard: 2 spaces for Bash scripts
+[*.{sh,bash}]
+indent_size = 2
+
 # ---- Data & documentation ----
 # Standard: 2 spaces for JSON/YAML/Markdown files
 [*.{md,mdx,json,jsonc,yml,yaml}]
