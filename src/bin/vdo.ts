@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-import { createRequire } from 'module';
-
 import { Command } from 'commander';
 
 import { setupAudio } from '@/commands/audio';
@@ -13,10 +11,7 @@ import { setupSlice } from '@/commands/slice';
 import { setupSpeedup } from '@/commands/speedup';
 import { setupSplit } from '@/commands/split';
 
-/* Create require function for ESM modules */
-const require = createRequire(import.meta.url);
-/* Load package.json for version info */
-const packageJson = require('../package.json');
+import packageJson from '../../package.json';
 
 /* Initialize CLI program */
 const program = new Command();
