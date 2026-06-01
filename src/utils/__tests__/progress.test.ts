@@ -1,13 +1,7 @@
 import cliProgress from 'cli-progress';
 import { describe, it, expect, vi } from 'vitest';
 
-import {
-  parseFFmpegProgress,
-  parseYtDlpProgress,
-  kbToMB,
-  createProgressBar,
-  createProgressCallback,
-} from '@/utils/progress';
+import { parseFFmpegProgress, parseYtDlpProgress, createProgressBar, createProgressCallback } from '@/utils/progress';
 
 vi.mock('cli-progress', () => ({
   default: {
@@ -246,21 +240,6 @@ describe('Progress', () => {
 
       // Expect result is null
       expect(result).toBeNull();
-    });
-  });
-
-  // Tests for kbToMB
-  describe('kbToMB', () => {
-    // Should convert KB to MB correctly
-    it('should convert KB to MB correctly', () => {
-      // Expect conversion is correct
-      expect(kbToMB(1024)).toBe(1);
-
-      // Expect 512 KB is 0.5 MB
-      expect(kbToMB(512)).toBe(0.5);
-
-      // Expect 2048 KB is 2 MB
-      expect(kbToMB(2048)).toBe(2);
     });
   });
 

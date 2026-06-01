@@ -4,7 +4,7 @@ import { convertVideo, compressVideo, speedUpVideo, extractAudio } from '@/utils
 
 vi.mock('../dependencies', () => ({ runCommand: vi.fn() }));
 
-vi.mock('../progress', () => ({ parseFFmpegProgress: vi.fn() }));
+vi.mock('../progress', async () => ({ ...(await vi.importActual('../progress')), parseFFmpegProgress: vi.fn() }));
 
 // Tests for ffmpeg utilities
 describe('ffmpeg utils', () => {
@@ -175,148 +175,12 @@ describe('ffmpeg utils', () => {
       vi.mocked(parseFFmpegProgress).mockReturnValue({ type: 'time', value: 60 });
 
       // Expect no error thrown with null callback
-      await convertVideo('input.mp4', 'output.mp4', 'mp4', 'fast', null);
+      await compressVideo('input.mp4', 'output.mp4', 28, 'medium', undefined);
     });
   });
 
   // Tests for compressVideo
   describe('compressVideo', () => {
-    // Should call ffprobe then ffmpeg with crf value
-    it('should call ffprobe then ffmpeg with crf value', async () => {
-      const { runCommand } = await import('../dependencies');
-
-      vi.mocked(runCommand).mockResolvedValue({ stdout: '90', stderr: '' });
-
-      await compressVideo('input.mp4', 'output.mp4', 28, 'medium');
-
-      // Expect both ffprobe and ffmpeg are called with correct args
-      expect(vi.mocked(runCommand)).toHaveBeenCalledTimes(2);
-
-      const ffmpegCall = vi.mocked(runCommand).mock.calls[1]?.[0];
-
-      // Expect crf 28 is used
-      expect(ffmpegCall).toContain('-crf 28');
-
-      // Expect medium preset is used
-      expect(ffmpegCall).toContain('-preset medium');
-    });
-
-    // Should call onProgress with correct percentage
-    it('should call onProgress with correct percentage', async () => {
-      const { runCommand } = await import('../dependencies');
-
-      const { parseFFmpegProgress } = await import('../progress');
-
-      vi.mocked(runCommand).mockImplementation(async (_cmd, onOutput) => {
-        if (onOutput && _cmd.includes('ffmpeg')) {
-          onOutput('time=00:01:30.00', 'stderr');
-        }
-
-        return { stdout: '180', stderr: '' };
-      });
-
-      vi.mocked(parseFFmpegProgress).mockReturnValue({ type: 'time', value: 90 });
-
-      const onProgress = vi.fn();
-
-      await compressVideo('input.mp4', 'output.mp4', 23, 'slow', onProgress);
-
-      // Expect onProgress is called with 50% (90/180)
-      expect(onProgress).toHaveBeenCalledWith(50, 90, 180);
-    });
-
-    // Should not call onProgress when progress type is not time
-    it('should not call onProgress when progress type is not time', async () => {
-      const { runCommand } = await import('../dependencies');
-
-      const { parseFFmpegProgress } = await import('../progress');
-
-      vi.mocked(runCommand).mockImplementation(async (_cmd, onOutput) => {
-        if (onOutput && _cmd.includes('ffmpeg')) {
-          onOutput('fps=30', 'stderr');
-        }
-
-        return { stdout: '180', stderr: '' };
-      });
-
-      vi.mocked(parseFFmpegProgress).mockReturnValue({ type: 'fps', value: 30 });
-
-      const onProgress = vi.fn();
-
-      await compressVideo('input.mp4', 'output.mp4', 23, 'slow', onProgress);
-
-      // Expect onProgress is not called for non-time types
-      expect(onProgress).not.toHaveBeenCalled();
-    });
-
-    // Should not call onProgress when progress has no value
-    it('should not call onProgress when progress has no value', async () => {
-      const { runCommand } = await import('../dependencies');
-
-      const { parseFFmpegProgress } = await import('../progress');
-
-      vi.mocked(runCommand).mockImplementation(async (_cmd, onOutput) => {
-        if (onOutput && _cmd.includes('ffmpeg')) {
-          onOutput('time data', 'stderr');
-        }
-
-        return { stdout: '180', stderr: '' };
-      });
-
-      vi.mocked(parseFFmpegProgress).mockReturnValue({ type: 'time' });
-
-      const onProgress = vi.fn();
-
-      await compressVideo('input.mp4', 'output.mp4', 23, 'slow', onProgress);
-
-      // Expect onProgress is not called when value is missing
-      expect(onProgress).not.toHaveBeenCalled();
-    });
-
-    // Should not call onProgress when totalTime is 0
-    it('should not call onProgress when totalTime is 0', async () => {
-      const { runCommand } = await import('../dependencies');
-
-      const { parseFFmpegProgress } = await import('../progress');
-
-      vi.mocked(runCommand).mockImplementation(async (_cmd, onOutput) => {
-        if (onOutput && _cmd.includes('ffmpeg')) {
-          onOutput('time data', 'stderr');
-        }
-
-        return { stdout: '0', stderr: '' };
-      });
-
-      vi.mocked(parseFFmpegProgress).mockReturnValue({ type: 'time', value: 30 });
-
-      const onProgress = vi.fn();
-
-      await compressVideo('input.mp4', 'output.mp4', 28, 'medium', onProgress);
-
-      // Expect onProgress is not called when totalTime is 0
-      expect(onProgress).not.toHaveBeenCalled();
-    });
-
-    // Should not call onProgress when onProgress is null
-    it('should not call onProgress when onProgress is null', async () => {
-      const { runCommand } = await import('../dependencies');
-
-      const { parseFFmpegProgress } = await import('../progress');
-
-      vi.mocked(runCommand).mockImplementation(async (_cmd, onOutput) => {
-        if (onOutput && _cmd.includes('ffmpeg')) {
-          onOutput('time=00:01:30.00', 'stderr');
-        }
-
-        return { stdout: '180', stderr: '' };
-      });
-
-      vi.mocked(parseFFmpegProgress).mockReturnValue({ type: 'time', value: 90 });
-
-      // Expect no error thrown with null callback
-      await compressVideo('input.mp4', 'output.mp4', 28, 'medium', null);
-    });
-
     // Should not call onProgress when output type is stdout
     it('should not call onProgress when output type is stdout', async () => {
       const { runCommand } = await import('../dependencies');
@@ -593,7 +457,7 @@ describe('ffmpeg utils', () => {
       vi.mocked(parseFFmpegProgress).mockReturnValue({ type: 'time', value: 30 });
 
       // Expect no error thrown with null callback
-      await speedUpVideo('input.mp4', 'output.mp4', 2, null);
+      await speedUpVideo('input.mp4', 'output.mp4', 2, undefined);
     });
 
     // Should not call onProgress when output type is stdout

@@ -47,24 +47,25 @@ export function createProgressBar(message = 'Processing', unit = '%'): cliProgre
  * Create a progress callback that parses ffmpeg stderr lines and computes percentage.
  *
  * @param {number} totalTime - Total duration in seconds.
- * @param {(progress: number) => void} [onProgress] - Callback receiving percentage (0-100).
+ * @param {(percentage: number, currentTime: number, totalTime: number) => void} [onProgress] - Callback receiving percentage (0-100), current time, and total time.
  *
- * @returns {(line: string) => void} - Callback for ffmpeg stderr lines.
+ * @returns {(data: string, type: 'stdout' | 'stderr') => void} - Callback compatible with runCommand's output handler.
  */
 export function createFFmpegProgressCallback(
   totalTime: number,
-  onProgress?: (progress: number) => void
-): (line: string) => void {
+  onProgress?: (percentage: number, currentTime: number, totalTime: number) => void
+): (data: string, type: 'stdout' | 'stderr') => void {
   let currentTime = 0;
 
-  return (line: string) => {
-    const progress = parseFFmpegProgress(line);
+  return (data: string, type: 'stdout' | 'stderr') => {
+    if (type !== 'stderr') return;
+    const progress = parseFFmpegProgress(data);
     if (progress?.type === 'time' && progress.value !== undefined) {
       if (totalTime > 0) {
         currentTime = progress.value;
         if (onProgress && currentTime > 0) {
           const percentage = Math.min(100, Math.round((currentTime / totalTime) * 100));
-          onProgress(percentage);
+          onProgress(percentage, currentTime, totalTime);
         }
       }
     }
@@ -130,17 +131,6 @@ export function parseYtDlpProgress(line: string): ProgressInfo | null {
   }
 
   return null;
-}
-
-/**
- * Convert kilobytes to megabytes.
- *
- * @param {number} kb - Size in kilobytes.
- *
- * @returns {number} Size in megabytes.
- */
-export function kbToMB(kb: number): number {
-  return kb / 1024;
 }
 
 /**

@@ -1,5 +1,5 @@
 import { runCommand } from '@/utils/dependencies';
-import { parseFFmpegProgress } from '@/utils/progress';
+import { createFFmpegProgressCallback } from '@/utils/progress';
 import { checkAndPromptOverwrite } from '@/utils/prompt';
 
 /**
@@ -33,7 +33,7 @@ export async function convertVideo(
   outputPath: string,
   _format = 'mp4',
   preset = 'fast',
-  onProgress: ((percentage: number, currentTime: number, totalTime: number) => void) | null = null
+  onProgress?: (percentage: number, currentTime: number, totalTime: number) => void
 ): Promise<void> {
   const shouldProceed = await checkAndPromptOverwrite([outputPath]);
   if (!shouldProceed) {
@@ -52,29 +52,9 @@ export async function convertVideo(
 
   const command = `ffmpeg -y -i "${inputPath}" -c:v libx264 -preset ${ffmpegPreset} -c:a aac "${outputPath}"`;
 
-  let totalTime = 0;
-  let currentTime = 0;
+  const totalTime = await getVideoDuration(inputPath);
 
-  const outputHandler = (data: string, type: 'stdout' | 'stderr') => {
-    if (type === 'stderr') {
-      const progress = parseFFmpegProgress(data);
-      if (progress && progress.type === 'time' && progress.value !== undefined) {
-        currentTime = progress.value;
-        if (totalTime > 0 && onProgress) {
-          const percentage = Math.min(100, Math.round((currentTime / totalTime) * 100));
-          onProgress(percentage, currentTime, totalTime);
-        }
-      }
-    }
-  };
-
-  // First, get total duration
-  const infoCommand = `ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "${inputPath}"`;
-  const infoResult = await runCommand(infoCommand);
-  totalTime = parseFloat(infoResult.stdout);
-
-  // Then convert
-  await runCommand(command, outputHandler);
+  await runCommand(command, createFFmpegProgressCallback(totalTime, onProgress));
 }
 
 /**
@@ -95,7 +75,7 @@ export async function compressVideo(
   outputPath: string,
   crf = 28,
   preset = 'medium',
-  onProgress: ((percentage: number, currentTime: number, totalTime: number) => void) | null = null
+  onProgress?: (percentage: number, currentTime: number, totalTime: number) => void
 ): Promise<void> {
   const shouldProceed = await checkAndPromptOverwrite([outputPath]);
   if (!shouldProceed) {
@@ -104,29 +84,9 @@ export async function compressVideo(
 
   const command = `ffmpeg -y -i "${inputPath}" -c:v libx264 -crf ${crf} -preset ${preset} -c:a copy "${outputPath}"`;
 
-  let totalTime = 0;
-  let currentTime = 0;
+  const totalTime = await getVideoDuration(inputPath);
 
-  const outputHandler = (data: string, type: 'stdout' | 'stderr') => {
-    if (type === 'stderr') {
-      const progress = parseFFmpegProgress(data);
-      if (progress && progress.type === 'time' && progress.value !== undefined) {
-        currentTime = progress.value;
-        if (totalTime > 0 && onProgress) {
-          const percentage = Math.min(100, Math.round((currentTime / totalTime) * 100));
-          onProgress(percentage, currentTime, totalTime);
-        }
-      }
-    }
-  };
-
-  // First, get total duration
-  const infoCommand = `ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "${inputPath}"`;
-  const infoResult = await runCommand(infoCommand);
-  totalTime = parseFloat(infoResult.stdout);
-
-  // Then compress
-  await runCommand(command, outputHandler);
+  await runCommand(command, createFFmpegProgressCallback(totalTime, onProgress));
 }
 
 /**
@@ -145,7 +105,7 @@ export async function speedUpVideo(
   inputPath: string,
   outputPath: string,
   rate = 2,
-  onProgress: ((percentage: number, currentTime: number, totalTime: number) => void) | null = null
+  onProgress?: (percentage: number, currentTime: number, totalTime: number) => void
 ): Promise<void> {
   // For audio, use atempo filter (limited to 0.5-2.0 per filter chain)
   // For video, use setpts filter
@@ -184,29 +144,9 @@ export async function speedUpVideo(
 
   const command = `ffmpeg -y -i "${inputPath}" ${videoFilter} ${audioFilter} -c:v libx264 -c:a aac "${outputPath}"`;
 
-  let totalTime = 0;
-  let currentTime = 0;
+  const totalTime = await getVideoDuration(inputPath);
 
-  const outputHandler = (data: string, type: 'stdout' | 'stderr') => {
-    if (type === 'stderr') {
-      const progress = parseFFmpegProgress(data);
-      if (progress && progress.type === 'time' && progress.value !== undefined) {
-        currentTime = progress.value;
-        if (totalTime > 0 && onProgress) {
-          const percentage = Math.min(100, Math.round((currentTime / totalTime) * 100));
-          onProgress(percentage, currentTime, totalTime);
-        }
-      }
-    }
-  };
-
-  // First, get total duration
-  const infoCommand = `ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "${inputPath}"`;
-  const infoResult = await runCommand(infoCommand);
-  totalTime = parseFloat(infoResult.stdout);
-
-  // Then speed up
-  await runCommand(command, outputHandler);
+  await runCommand(command, createFFmpegProgressCallback(totalTime, onProgress));
 }
 
 /**
@@ -243,27 +183,7 @@ export async function extractAudio(
 
   const command = `ffmpeg -y -i "${inputPath}" -vn -acodec ${ffmpegCodec} -b:a ${bitrate} -f ${ffmpegFormat} "${outputPath}"`;
 
-  let totalTime = 0;
-  let currentTime = 0;
+  const totalTime = await getVideoDuration(inputPath);
 
-  const outputHandler = (data: string, type: 'stdout' | 'stderr') => {
-    if (type === 'stderr' && onProgress) {
-      const progress = parseFFmpegProgress(data);
-      if (progress && progress.type === 'time' && progress.value !== undefined) {
-        currentTime = progress.value;
-        if (totalTime > 0) {
-          const percentage = Math.min(100, Math.round((currentTime / totalTime) * 100));
-          onProgress(percentage);
-        }
-      }
-    }
-  };
-
-  // First, get total duration
-  const infoCommand = `ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "${inputPath}"`;
-  const infoResult = await runCommand(infoCommand);
-  totalTime = parseFloat(infoResult.stdout);
-
-  // Then extract audio
-  await runCommand(command, outputHandler);
+  await runCommand(command, createFFmpegProgressCallback(totalTime, onProgress));
 }
