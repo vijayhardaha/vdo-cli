@@ -1,7 +1,8 @@
 import { Command } from 'commander';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-import { setupCompact } from '@/commands/compact';
+import { setupCompact, compactAction } from '@/commands/compact';
+import { compactVideo, compactVideoCRF } from '@/utils/compact';
 import { checkAndPromptOverwrite } from '@/utils/prompt';
 
 vi.mock('../../utils/dependencies', () => {
@@ -31,17 +32,21 @@ vi.mock('../../utils/prompt', () => ({
 }));
 
 vi.mock('../../utils/progress', () => ({
-  createProgressBar: vi.fn(),
+  createProgressBar: vi.fn(() => ({ start: vi.fn(), stop: vi.fn() })),
   createProgressCallback: vi.fn().mockReturnValue(vi.fn()),
   formatFileSize: vi.fn(() => ({ value: 100, unit: 'MB' })),
 }));
+
+vi.mock('../../utils/validations', () => ({ validateFileExists: vi.fn().mockResolvedValue(undefined) }));
+
+vi.mock('../../utils/ffmpeg', () => ({ getVideoDuration: vi.fn().mockResolvedValue(60) }));
 
 vi.mock('../../utils/compact', () => ({
   compactVideo: vi.fn(),
   compactVideoCRF: vi.fn(),
   getCRFForQuality: vi.fn((q: string) => ({ low: 28, medium: 23, high: 18, lossless: 0 })[q] ?? 23),
   calculateTargetBitrate: vi.fn(() => 1000),
-  parseSizeToMB: vi.fn(),
+  parseSizeToMB: vi.fn(() => 50),
 }));
 
 vi.mock('fs/promises', () => ({ access: vi.fn().mockRejectedValue(new Error('File not found')) }));
@@ -105,6 +110,64 @@ describe('compact command', () => {
       const hevcOption = cmd?.options.find((opt) => opt.long === '--hevc');
 
       expect(hevcOption).toBeDefined();
+    });
+  });
+
+  // Tests for compactAction
+  describe('compactAction', () => {
+    // Should use two-pass compactVideo for discord mode
+    it('should run two-pass mode for discord option', async () => {
+      await compactAction('input.mp4', { discord: true });
+
+      // Expect compactVideo (two-pass) is called for discord
+      expect(compactVideo).toHaveBeenCalled();
+
+      // Expect compactVideoCRF is not called for two-pass mode
+      expect(compactVideoCRF).not.toHaveBeenCalled();
+    });
+
+    // Should use two-pass compactVideo for target mode
+    it('should run two-pass mode for target option', async () => {
+      await compactAction('input.mp4', { target: '50MB' });
+
+      // Expect compactVideo (two-pass) is called for target size
+      expect(compactVideo).toHaveBeenCalled();
+
+      // Expect compactVideoCRF is not called for two-pass mode
+      expect(compactVideoCRF).not.toHaveBeenCalled();
+    });
+
+    // Should use CRF compactVideoCRF for quality mode
+    it('should run CRF mode for quality option', async () => {
+      await compactAction('input.mp4', { quality: 'high' });
+
+      // Expect compactVideoCRF is called for quality preset
+      expect(compactVideoCRF).toHaveBeenCalled();
+
+      // Expect compactVideo is not called for CRF mode
+      expect(compactVideo).not.toHaveBeenCalled();
+    });
+
+    // Should use two-pass compactVideo for percent mode
+    it('should run two-pass mode for percent option', async () => {
+      await compactAction('input.mp4', { percent: 50 });
+
+      // Expect compactVideo (two-pass) is called for percent reduction
+      expect(compactVideo).toHaveBeenCalled();
+
+      // Expect compactVideoCRF is not called for two-pass mode
+      expect(compactVideoCRF).not.toHaveBeenCalled();
+    });
+
+    // Should use CRF compactVideoCRF as fallback with empty options
+    it('should run CRF mode with empty options', async () => {
+      await compactAction('input.mp4', {});
+
+      // Expect compactVideoCRF is called for fallback mode
+      expect(compactVideoCRF).toHaveBeenCalled();
+
+      // Expect compactVideo is not called for CRF mode
+      expect(compactVideo).not.toHaveBeenCalled();
     });
   });
 });
