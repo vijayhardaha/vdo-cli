@@ -37,7 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated @typescript-eslint/* to 8.67.0, typescript-eslint to 8.67.0
 - Updated @vitest/coverage-v8 to 4.1.10, vitest to 4.1.10, vite to 8.2.1
 - Updated eslint to 10.8.1, eslint-plugin-import-x to 4.17.1, eslint-plugin-jsdoc to 64.1.0
-- Updated globals to 17.9.0, prettier to 3.9.6, release-it to 21.0.2
+- Updated globals to 17.10.0, prettier to 3.9.6, release-it to 21.0.2
 
 ## [1.0.7] - 2026-06-02
 
