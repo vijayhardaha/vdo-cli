@@ -1,10 +1,16 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import os from 'node:os';
 
-import { runCommand } from '@/utils/dependencies';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+
+import { runCommand, ensureDependencies } from '@/utils/dependencies';
+import { log } from '@/utils/log';
 
 type MockFn = ReturnType<typeof vi.fn>;
 
 vi.mock('child_process', () => ({ exec: vi.fn(), spawn: vi.fn() }));
+vi.mock('@/utils/log', () => ({
+  log: { fail: vi.fn(), warn: vi.fn(), info: vi.fn(), succeed: vi.fn(), loading: vi.fn() },
+}));
 
 // Tests for dependency utility functions
 describe('dependencies', () => {
@@ -118,6 +124,94 @@ describe('dependencies', () => {
       const result = await runCommand('cmd', null);
 
       expect(result.stdout).toBe('data');
+    });
+  });
+
+  // Tests for ensureDependencies function
+  describe('ensureDependencies', () => {
+    let exitSpy: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+
+    beforeEach(() => {
+      exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => {
+        return undefined as never;
+      });
+    });
+
+    afterEach(() => {
+      exitSpy.mockRestore();
+    });
+
+    it('should return true if all dependencies are installed', async () => {
+      const cp = await import('child_process');
+      // Mock exec to return no error for both ffmpeg and yt-dlp
+      (cp.exec as unknown as MockFn).mockImplementation((_cmd, cb) => {
+        cb(null);
+      });
+
+      const result = await ensureDependencies();
+      expect(result).toBe(true);
+      expect(exitSpy).not.toHaveBeenCalled();
+    });
+
+    it('should exit with 1 and log error if dependencies are missing', async () => {
+      const cp = await import('child_process');
+      // Mock exec to return error for both
+      (cp.exec as unknown as MockFn).mockImplementation((_cmd, cb) => {
+        cb(new Error('not found'));
+      });
+
+      await ensureDependencies();
+
+      expect(log.fail).toHaveBeenCalledWith('Missing dependencies: ffmpeg, yt-dlp');
+      expect(exitSpy).toHaveBeenCalledWith(1);
+    });
+
+    it('should log correct install command for darwin', async () => {
+      const cp = await import('child_process');
+      (cp.exec as unknown as MockFn).mockImplementation((_cmd, cb) => {
+        cb(new Error('not found'));
+      });
+      vi.spyOn(os, 'platform').mockReturnValue('darwin');
+
+      await ensureDependencies();
+
+      expect(log.warn).toHaveBeenCalledWith('Install using: brew install ffmpeg yt-dlp');
+    });
+
+    it('should log correct install command for linux', async () => {
+      const cp = await import('child_process');
+      (cp.exec as unknown as MockFn).mockImplementation((_cmd, cb) => {
+        cb(new Error('not found'));
+      });
+      vi.spyOn(os, 'platform').mockReturnValue('linux');
+
+      await ensureDependencies();
+
+      expect(log.warn).toHaveBeenCalledWith('Install using: sudo apt install ffmpeg yt-dlp');
+    });
+
+    it('should log correct install command for win32', async () => {
+      const cp = await import('child_process');
+      (cp.exec as unknown as MockFn).mockImplementation((_cmd, cb) => {
+        cb(new Error('not found'));
+      });
+      vi.spyOn(os, 'platform').mockReturnValue('win32');
+
+      await ensureDependencies();
+
+      expect(log.warn).toHaveBeenCalledWith('Install using: winget install ffmpeg yt-dlp');
+    });
+
+    it('should log fallback install command for unknown platform', async () => {
+      const cp = await import('child_process');
+      (cp.exec as unknown as MockFn).mockImplementation((_cmd, cb) => {
+        cb(new Error('not found'));
+      });
+      vi.spyOn(os, 'platform').mockReturnValue('unknown' as any); // eslint-disable-line @typescript-eslint/no-explicit-any
+
+      await ensureDependencies();
+
+      expect(log.warn).toHaveBeenCalledWith('Install using: install ffmpeg yt-dlp manually');
     });
   });
 });
