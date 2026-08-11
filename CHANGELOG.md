@@ -5,6 +5,40 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.8] - 2026-08-12
+
+### Added
+
+- **Tests**: Full action-level test coverage for all 8 command modules (`audioAction`, `compactAction`, `compressAction`, `convertAction`, `downloadAction`, `sliceAction`, `speedupAction`, `splitAction`)
+- **Tests**: Edge case coverage for zero progress update, unknown file size, invalid duration, and missing extension paths
+- **Tests**: New/expanded util suites — `log`, `dependencies`, `ffmpeg` (NaN rate), `sanitize` (truncation), `slice` (`parseTimeToSeconds`), `split` (`onProgress` callback), `compact`, `ytdlp` (merge format fallback), overwrite-decline paths
+
+### Changed
+
+- **Refactored command modules**: Exported action and helper functions (`resolveDownloadTarget`, `handlePostDownload`, `resolveCompactMode`, `resolvePartDuration`, `executeSplit`, `handleSliceSegments`, `resolveTimeRange`, `handleSingleSlice`, `executeSingleSlice`, `resolveSliceMode`, `validateSliceOptions`) for direct testing
+- **Simplified `CompactMode` type**: Replaced union with dedicated fields
+- **Coverage config**: Excluded `src/types` from coverage; updated vitest config to use `import.meta.dirname`
+- **Pinned TypeScript to 6.0.3** and added typescript-eslint plugin/parser
+
+### Documentation
+
+- Updated README with 100% coverage note, `__tests__` directories in project tree, and `vitest.setup.ts` listing
+- Updated AGENTS.md with TypeScript 6 version, coverage requirement, current CLI option tables, utility signatures, and command test conventions
+
+### Health
+
+- Test suite now maintains **100% coverage** (statements, branches, functions, lines) across all modules
+
+### Dependencies
+
+- Updated yoctocolors to 2.2.0
+- Updated @commitlint/cli to 21.2.1, @commitlint/config-conventional to 21.2.0
+- Updated @types/node to 26.2.0, @vijayhardaha/dev-config to 2.3.0
+- Updated @typescript-eslint/* to 8.67.0, typescript-eslint to 8.67.0
+- Updated @vitest/coverage-v8 to 4.1.10, vitest to 4.1.10, vite to 8.2.1
+- Updated eslint to 10.8.1, eslint-plugin-import-x to 4.17.1, eslint-plugin-jsdoc to 64.1.0
+- Updated globals to 17.9.0, prettier to 3.9.6, release-it to 21.0.2
+
 ## [1.0.7] - 2026-06-02
 
 ### Dependencies
