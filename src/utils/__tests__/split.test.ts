@@ -146,6 +146,62 @@ describe('split utils', () => {
       // Expect splitVideoReencode throws when ffmpeg fails
       await expect(splitVideoReencode('input.mp4', outputPaths, 60, 120, 'h264', 23)).rejects.toThrow('Split failed');
     });
+
+    // Should call onProgress during progress and after each part
+    it('should call onProgress during progress and after each part', async () => {
+      vi.mocked(runCommand).mockImplementation(async (_cmd, onOutput) => {
+        if (onOutput) {
+          onOutput('time=00:01:00.00', 'stderr');
+        }
+        return { stdout: '', stderr: 'frames: 100' };
+      });
+
+      const outputPaths = ['/output/video_001.mp4', '/output/video_002.mp4'];
+      const onProgress = vi.fn();
+
+      await splitVideoReencode('input.mp4', outputPaths, 60, 120, 'h264', 23, onProgress);
+
+      // Expect onProgress is called during progress reporting with overall percentage
+      // Part 0 (i=0): overallProgress = ((0*60+60)/120)*100 = 50
+      expect(onProgress).toHaveBeenCalledWith(50, 1, 2);
+
+      // Part 1 (i=1): overallProgress = ((1*60+60)/120)*100 = 100
+      expect(onProgress).toHaveBeenCalledWith(100, 2, 2);
+    });
+
+    // Should not call onProgress from callback when progress is not time-based
+    it('should not call onProgress from callback for non-time progress', async () => {
+      vi.mocked(runCommand).mockImplementation(async (_cmd, onOutput) => {
+        if (onOutput) {
+          onOutput('fps=30', 'stderr');
+        }
+        return { stdout: '', stderr: 'frames: 100' };
+      });
+
+      const outputPaths = ['/output/video_001.mp4'];
+      const onProgress = vi.fn();
+
+      await splitVideoReencode('input.mp4', outputPaths, 60, 120, 'h264', 23, onProgress);
+
+      // Expect onProgress is called only for part completion (once), not from callback
+      expect(onProgress).toHaveBeenCalledTimes(1);
+      expect(onProgress).toHaveBeenCalledWith(100, 1, 1);
+    });
+
+    // Should not call onProgress when callback receives progress but onProgress is undefined
+    it('should handle progress callback without onProgress', async () => {
+      vi.mocked(runCommand).mockImplementation(async (_cmd, onOutput) => {
+        if (onOutput) {
+          onOutput('time=00:01:00.00', 'stderr');
+        }
+        return { stdout: '', stderr: 'frames: 100' };
+      });
+
+      const outputPaths = ['/output/video_001.mp4'];
+
+      // Expect no error thrown when onProgress is undefined but callback receives progress
+      await splitVideoReencode('input.mp4', outputPaths, 60, 120, 'h264', 23);
+    });
   });
 
   // Tests for splitVideoStreamCopy
@@ -166,6 +222,23 @@ describe('split utils', () => {
       expect(result[0]).toBe('/output/video_001.mp4');
 
       expect(result[1]).toBe('/output/video_002.mp4');
+    });
+
+    // Should call onProgress after each part
+    it('should call onProgress after each part', async () => {
+      vi.mocked(runCommand).mockResolvedValue({ stdout: '', stderr: '' });
+
+      const outputPaths = ['/output/video_001.mp4', '/output/video_002.mp4'];
+      const onProgress = vi.fn();
+
+      await splitVideoStreamCopy('input.mp4', outputPaths, 60, 120, onProgress);
+
+      // Expect onProgress is called after each part with correct progress percentage
+      // Part 0 (i=0): partProgress = ((0+1)/2)*100 = 50
+      expect(onProgress).toHaveBeenCalledWith(50, 1, 2);
+
+      // Part 1 (i=1): partProgress = ((1+1)/2)*100 = 100
+      expect(onProgress).toHaveBeenCalledWith(100, 2, 2);
     });
   });
 });
