@@ -13,7 +13,7 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   // Shorthand for src/ imports
-  resolve: { alias: { '@': resolve(__dirname, 'src') } },
+  resolve: { alias: { '@': resolve(import.meta.dirname, 'src') } },
 
   // --- Tests Configs ---
   test: {
