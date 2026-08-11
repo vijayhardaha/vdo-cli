@@ -95,5 +95,18 @@ describe('sanitize utils', () => {
       // Expect truncation at exact maxLength
       expect(result.length).toBe(100);
     });
+
+    // Should truncate at the last punctuation mark within max length
+    it('should truncate at the last punctuation mark within max length', () => {
+      const name = 'a'.repeat(100) + '-' + 'b'.repeat(110);
+
+      const result = sanitizeFilename(name, 200);
+
+      // Expect truncation occurs at the dash (index 100)
+      expect(result).toBe('a'.repeat(100));
+
+      // Expect truncated result length is 100
+      expect(result.length).toBe(100);
+    });
   });
 });
