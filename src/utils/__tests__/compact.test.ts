@@ -50,6 +50,12 @@ describe('compact utils', () => {
       // Expect parseSizeToMB throws for invalid input
       expect(() => parseSizeToMB('invalid')).toThrow();
     });
+
+    // Should default to MB when no unit suffix is provided
+    it('should default to MB for value without unit suffix', () => {
+      // Expect parseSizeToMB('25') returns 25 (line 42 false branch)
+      expect(parseSizeToMB('25')).toBe(25);
+    });
   });
 
   // Tests for calculateTargetBitrate
@@ -142,6 +148,21 @@ describe('compact utils', () => {
       );
     });
 
+    // Should skip two-pass when targetBitrate is non-positive
+    it('should skip two-pass encoding when targetBitrate is zero', async () => {
+      vi.mocked(runCommand).mockResolvedValue({ stdout: '', stderr: '' });
+
+      // Expect targetBitrate: 0 skips the two-pass block (line 103 false branch)
+      await compactVideo('input.mp4', 'output.mp4', 0, '128k', 'medium', false);
+
+      // Expect runCommand is only called once for ffprobe (no two-pass ffmpeg)
+      expect(vi.mocked(runCommand)).toHaveBeenCalledTimes(1);
+      // Expect the ffprobe duration probe was called, not the ffmpeg pass commands
+      const probeCmd = vi.mocked(runCommand).mock.calls[0]?.[0];
+      expect(probeCmd).toContain('ffprobe');
+      expect(probeCmd).not.toContain('-pass');
+    });
+
     // Should throw error on pass 2 failure
     it('should throw error on pass 2 failure', async () => {
       vi.mocked(runCommand)
@@ -153,6 +174,23 @@ describe('compact utils', () => {
       await expect(compactVideo('input.mp4', 'output.mp4', 1000, '128k', 'medium', false)).rejects.toThrow(
         'Pass 2 failed'
       );
+    });
+
+    // Should exit process when user declines overwrite
+    it('should exit when user declines overwrite', async () => {
+      vi.mocked(checkAndPromptOverwrite).mockResolvedValue(false);
+      vi.mocked(runCommand).mockResolvedValue({ stdout: '', stderr: 'frames: 100' });
+      const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
+
+      await compactVideo('input.mp4', 'output.mp4', 1000, '128k', 'medium', false);
+
+      // Expect process.exit is called with 0 when overwrite is declined
+      expect(exitSpy).toHaveBeenCalledWith(0);
+
+      // Expect overwrite prompt is raised for the output file
+      expect(checkAndPromptOverwrite).toHaveBeenCalledWith(['output.mp4']);
+
+      exitSpy.mockRestore();
     });
   });
 
