@@ -1,15 +1,19 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 import { convertVideo, compressVideo, speedUpVideo, extractAudio } from '@/utils/ffmpeg';
+import { checkAndPromptOverwrite } from '@/utils/prompt';
 
 vi.mock('../dependencies', () => ({ runCommand: vi.fn() }));
 
 vi.mock('../progress', async () => ({ ...(await vi.importActual('../progress')), parseFFmpegProgress: vi.fn() }));
 
+vi.mock('../prompt', () => ({ checkAndPromptOverwrite: vi.fn().mockResolvedValue(true) }));
+
 // Tests for ffmpeg utilities
 describe('ffmpeg utils', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(checkAndPromptOverwrite).mockResolvedValue(true);
   });
 
   // Tests for convertVideo
@@ -177,6 +181,27 @@ describe('ffmpeg utils', () => {
       // Expect no error thrown with null callback
       await compressVideo('input.mp4', 'output.mp4', 28, 'medium', undefined);
     });
+
+    // Should exit process when user declines overwrite
+    it('should exit when user declines overwrite', async () => {
+      const { runCommand } = await import('../dependencies');
+
+      vi.mocked(checkAndPromptOverwrite).mockResolvedValue(false);
+
+      vi.mocked(runCommand).mockResolvedValue({ stdout: '120.5', stderr: '' });
+
+      const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
+
+      await convertVideo('input.mp4', 'output.mp4');
+
+      // Expect process.exit is called with 0 when overwrite is declined
+      expect(exitSpy).toHaveBeenCalledWith(0);
+
+      // Expect overwrite prompt is raised for the output file
+      expect(checkAndPromptOverwrite).toHaveBeenCalledWith(['output.mp4']);
+
+      exitSpy.mockRestore();
+    });
   });
 
   // Tests for compressVideo
@@ -203,6 +228,27 @@ describe('ffmpeg utils', () => {
 
       // Expect onProgress is not called for stdout output
       expect(onProgress).not.toHaveBeenCalled();
+    });
+
+    // Should exit process when user declines overwrite
+    it('should exit when user declines overwrite', async () => {
+      const { runCommand } = await import('../dependencies');
+
+      vi.mocked(checkAndPromptOverwrite).mockResolvedValue(false);
+
+      vi.mocked(runCommand).mockResolvedValue({ stdout: '60', stderr: '' });
+
+      const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
+
+      await compressVideo('input.mp4', 'output.mp4', 28, 'medium');
+
+      // Expect process.exit is called with 0 when overwrite is declined
+      expect(exitSpy).toHaveBeenCalledWith(0);
+
+      // Expect overwrite prompt is raised for the output file
+      expect(checkAndPromptOverwrite).toHaveBeenCalledWith(['output.mp4']);
+
+      exitSpy.mockRestore();
     });
   });
 
@@ -483,6 +529,27 @@ describe('ffmpeg utils', () => {
       // Expect onProgress is not called for stdout output
       expect(onProgress).not.toHaveBeenCalled();
     });
+
+    // Should exit process when user declines overwrite
+    it('should exit when user declines overwrite', async () => {
+      const { runCommand } = await import('../dependencies');
+
+      vi.mocked(checkAndPromptOverwrite).mockResolvedValue(false);
+
+      vi.mocked(runCommand).mockResolvedValue({ stdout: '60', stderr: '' });
+
+      const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
+
+      await speedUpVideo('input.mp4', 'output.mp4', 2);
+
+      // Expect process.exit is called with 0 when overwrite is declined
+      expect(exitSpy).toHaveBeenCalledWith(0);
+
+      // Expect overwrite prompt is raised for the output file
+      expect(checkAndPromptOverwrite).toHaveBeenCalledWith(['output.mp4']);
+
+      exitSpy.mockRestore();
+    });
   });
 
   // Tests for extractAudio
@@ -556,6 +623,27 @@ describe('ffmpeg utils', () => {
 
       // Expect default bitrate is 192k
       expect(cmd).toContain('-b:a 192k');
+    });
+
+    // Should exit process when user declines overwrite
+    it('should exit when user declines overwrite', async () => {
+      const { runCommand } = await import('../dependencies');
+
+      vi.mocked(checkAndPromptOverwrite).mockResolvedValue(false);
+
+      vi.mocked(runCommand).mockResolvedValue({ stdout: '120', stderr: '' });
+
+      const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
+
+      await extractAudio('input.mp4', 'output.mp3');
+
+      // Expect process.exit is called with 0 when overwrite is declined
+      expect(exitSpy).toHaveBeenCalledWith(0);
+
+      // Expect overwrite prompt is raised for the output file
+      expect(checkAndPromptOverwrite).toHaveBeenCalledWith(['output.mp3']);
+
+      exitSpy.mockRestore();
     });
   });
 });
