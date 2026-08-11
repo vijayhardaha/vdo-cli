@@ -26,8 +26,7 @@ const DEFAULT_AUDIO_BITRATE = '128k';
 
 /* Compact mode identifier */
 type CompactMode =
-  | { type: 'two-pass'; targetBitrate: number; label: string }
-  | { type: 'crf'; crf: number; label: string };
+  { type: 'two-pass'; targetBitrate: number; label: string } | { type: 'crf'; crf: number; label: string };
 
 /**
  * Run a compact operation with progress bar and error handling.
