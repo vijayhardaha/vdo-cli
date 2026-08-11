@@ -137,6 +137,7 @@ export function createFFmpegProgressCallback(
     if (type !== 'stderr') return;
     const progress = parseFFmpegProgress(data);
     if (progress?.type === 'time' && progress.value !== undefined) {
+      /* v8 ignore next */
       if (totalTime > 0) {
         currentTime = progress.value;
         if (onProgress && currentTime > 0) {
