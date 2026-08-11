@@ -7,22 +7,22 @@
 `vdo` is a Node.js CLI for video utilities wrapping `yt-dlp` (download) and `ffmpeg` (convert/compress/slice/split/speedup/audio).
 
 - **Runtime:** Node.js ≥ 20, ESM only, bun package manager
-- **Language:** TypeScript 5, strict mode, `moduleResolution: bundler`
+- **Language:** TypeScript 6, strict mode, `moduleResolution: bundler`
 - **Build:** Vite (SSR/Node target) → `dist/vdo.js`
-- **Tests:** Vitest with globals enabled
+- **Tests:** Vitest with globals enabled, V8 coverage at 100% statements/branches/functions/lines
 
 ## Commands
 
-| Command            | Alias | Description            | Key Options                                           |
-| ------------------ | ----- | ---------------------- | ----------------------------------------------------- |
-| `download <url>`   | `dl`  | Download from URL      | `-o`, `--format`, `--convert`, `--split`, `--cookies` |
-| `convert <input>`  | `cvt` | Convert video format   | `--format`, `--preset`, `-o`                          |
-| `compress <input>` | `cps` | Compress with CRF      | `--crf`, `--preset`, `-o`                             |
-| `compact <input>`  | `cpt` | Compact to target size | `--target`, `--discord`, `--percent`                  |
-| `slice <input>`    | `slc` | Slice/trim segment     | `--start`, `--end`, `--segments`                      |
-| `split <input>`    | `spl` | Split into parts       | `--preset`, `--duration`                              |
-| `speedup <input>`  | `sup` | Change playback speed  | `--rate`, `-o`                                        |
-| `audio <input>`    | `au`  | Extract audio          | `--format`, `--bitrate`, `-o`                         |
+| Command            | Alias | Description            | Key Options                                                                                      |
+| ------------------ | ----- | ---------------------- | ------------------------------------------------------------------------------------------------ |
+| `download <url>`   | `dl`  | Download from URL      | `-o`, `--format`, `--convert`, `--split`, `--cookies`                                            |
+| `convert <input>`  | `cvt` | Convert video format   | `--format`, `--preset`, `-o`                                                                     |
+| `compress <input>` | `cps` | Compress with CRF      | `--crf`, `--preset`, `-o`                                                                        |
+| `compact <input>`  | `cpt` | Compact to target size | `--target`, `--percent`, `--discord`, `--quality`, `--preset`, `--audio-bitrate`, `--hevc`, `-o` |
+| `slice <input>`    | `slc` | Slice/trim segment     | `--start`, `--end`, `--duration`, `--segments`, `--fast`, `--precise`, `--codec`, `-o`           |
+| `split <input>`    | `spl` | Split into parts       | `--preset`, `--duration`, `--fast`, `--precise`, `--codec`, `-o`                                 |
+| `speedup <input>`  | `sup` | Change playback speed  | `--rate`, `-o`                                                                                   |
+| `audio <input>`    | `au`  | Extract audio          | `--format`, `--bitrate`, `-o`                                                                    |
 
 ### Download Command Options
 
@@ -74,21 +74,21 @@ src/
 │   │   └── ytdlp.test.ts
 │   ├── compact.ts       # Compact/two-pass encoding utilities
 │   ├── dependencies.ts  # ensureDependencies(), checkDependencies(), runCommand()
-│   ├── ffmpeg.ts        # FFmpeg wrappers
+│   ├── ffmpeg.ts        # FFmpeg wrappers (getVideoDuration, convertVideo, compressVideo, speedUpVideo, extractAudio)
 │   ├── icons.ts         # Icons (info, success, warning, error, loading)
-│   ├── log.ts           # Logging utility (log.succeed, log.fail, etc.)
-│   ├── output.ts        # Output filename helpers (generateOutputFilename, getFileExtension, resolveOutputFile)
-│   ├── progress.ts      # Progress bar utilities (createFFmpegProgressCallback, parseYtDlpProgress)
+│   ├── log.ts           # Logging utility (log.succeed, log.fail, etc.) + handleError()
+│   ├── output.ts        # Output filename helper (resolveOutputFile)
+│   ├── progress.ts      # Progress bar utilities (createProgressBar, createProgressCallback, createFFmpegProgressCallback, parseFFmpegProgress, parseYtDlpProgress, formatFileSize)
 │   ├── prompt.ts        # Prompt utilities (checkAndPromptOverwrite, etc.)
-│   ├── sanitize.ts      # Filename sanitization (sanitizeFilename, slugify)
-│   ├── slice.ts         # Slice/trim utilities (parseTimeToSeconds, etc.)
-│   ├── split.ts         # Split utilities (parseSplitValue, calculateNumParts, etc.)
-│   ├── validations.ts   # Input validation helpers (validateUrl, validateFormat, validateFileExists)
+│   ├── sanitize.ts      # Filename sanitization (sanitizeFilename)
+│   ├── slice.ts         # Slice/trim utilities (parseTimeToSeconds, formatTimeForFFmpeg, sliceVideoStreamCopy, sliceVideoReencode, sliceMultipleSegments)
+│   ├── split.ts         # Split utilities (parseSplitValue, getPresetDuration, calculateNumParts, splitVideoStreamCopy, splitVideoReencode)
+│   ├── validations.ts   # Input validation helpers (validateUrl, validateFormat, validatePreset, validateCRF, validateSpeedRate, validateBitrate, validateFileExists)
 │   └── ytdlp.ts         # yt-dlp wrappers (getVideoInfo, downloadVideo, generateFilename)
 └── types/index.ts       # All shared interfaces
 ```
 
-**Dependency flow:** `commands/` → `utils/` → `types/` (one-way only)
+**Dependency flow:** `commands/` → `utils/` → `types/`; utils may import other utils (e.g., `split.ts` → `progress.ts`, `dependencies.ts`), and command files may cross-import each other (e.g., `download.ts` → `split.ts`).
 
 ## Development Commands
 
@@ -103,6 +103,8 @@ bun run lint           # ESLint check
 bun run lint:fix       # ESLint auto-fix
 bun run format         # Format code
 bun run format:check   # Check formatting
+bun run release        # Release new version
+bun run release:dry    # Dry-run release
 ```
 
 ## Coding Conventions
@@ -204,6 +206,26 @@ Every action must:
 - Vitest globals available without importing (`describe`, `it`, `expect`, `vi`)
 - Mock all external dependencies (no real ffmpeg/yt-dlp processes)
 - `vitest.setup.ts` mocks `console.*` globally
+- Coverage config lives in `vitest.config.ts` (`provider: 'v8'`, include `src/**/*.ts`); keep coverage at 100%
+
+### Command Action Test Conventions
+
+Every command test file covers both `setup<Name>()` (Commander registration) and the action/helper
+functions. Established patterns:
+
+1. Mock `@/utils/log` as `{ log: { succeed, fail, info, loading, warn }, handleError }` and
+   `@/utils/progress` with `createProgressBar: vi.fn(() => ({ start, stop, update, render }))`.
+2. In each test, `exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never)` and restore it
+   in `afterEach`. With a non-throwing `exitSpy`, code after `process.exit()` still runs — for "declined overwrite"
+   tests, make `exitSpy` throw and assert the rejection.
+3. `vi.clearAllMocks()` does NOT reset implementations set via `mockResolvedValue`/`mockRejectedValue`/
+   `mockImplementation`. Re-establish every mock's default behavior in `beforeEach` (e.g.,
+   `vi.mocked(ensureDependencies).mockResolvedValue(true)`) or rejections leak into later tests.
+4. For `program.parseAsync(argv, ...)`, pass user args with `{ from: 'user' }` as the second argument.
+   When a command's `.action()` does not `return` its async call (e.g., `slice`), `parseAsync` resolves before
+   the action finishes — flush microtasks with `await new Promise((resolve) => setTimeout(resolve, 0))`.
+5. To cover progress-callback branches, have the mocked ffmpeg/yt-dlp/slice/split functions invoke their
+   callback argument (e.g., `cb?.(50, 1, 2)`) and assert on the captured progress bar mock.
 
 ### CLI Integration Tests
 
