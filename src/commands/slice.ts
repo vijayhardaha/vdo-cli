@@ -33,7 +33,7 @@ const DEFAULT_CRF = 23;
  *
  * @returns {string} Smart formatted string (e.g., "10s", "1m_30s", "00h_10m_30s").
  */
-function formatSecondsToFilename(seconds: number): string {
+export function formatSecondsToFilename(seconds: number): string {
   const hours = Math.floor(seconds / 3600);
   const mins = Math.floor((seconds % 3600) / 60);
   const secs = Math.floor(seconds % 60);
@@ -55,7 +55,7 @@ function formatSecondsToFilename(seconds: number): string {
  *
  * @returns {Promise<void>}
  */
-async function handleSliceSegments(input: string, options: SliceOptions): Promise<void> {
+export async function handleSliceSegments(input: string, options: SliceOptions): Promise<void> {
   const dir = dirname(input);
   const mode = options.fast ? 'fast' : 'precise';
   const segments = options.segments!;
@@ -101,7 +101,7 @@ async function handleSliceSegments(input: string, options: SliceOptions): Promis
  *
  * @returns {{ startTime: number; endTime: number; startFFmpeg: string; endFFmpeg: string }} Resolved time range.
  */
-function resolveTimeRange(options: SliceOptions): {
+export function resolveTimeRange(options: SliceOptions): {
   startTime: number;
   endTime: number;
   startFFmpeg: string;
@@ -130,7 +130,7 @@ function resolveTimeRange(options: SliceOptions): {
  *
  * @param {SliceOptions} options - Slice options.
  */
-function validateSliceOptions(options: SliceOptions): void {
+export function validateSliceOptions(options: SliceOptions): void {
   if (!options.start || (!options.end && !options.duration)) {
     log.fail('Please provide --start and --end (or --duration) options');
     process.exit(1);
@@ -144,7 +144,7 @@ function validateSliceOptions(options: SliceOptions): void {
  *
  * @returns {'fast' | 'precise' | 'auto'} Mode string.
  */
-function resolveSliceMode(options: SliceOptions): 'fast' | 'precise' | 'auto' {
+export function resolveSliceMode(options: SliceOptions): 'fast' | 'precise' | 'auto' {
   if (options.fast) return 'fast';
   if (options.precise) return 'precise';
   return 'auto';
@@ -164,7 +164,7 @@ function resolveSliceMode(options: SliceOptions): 'fast' | 'precise' | 'auto' {
  *
  * @returns {Promise<void>}
  */
-async function executeSingleSlice(
+export async function executeSingleSlice(
   input: string,
   outputFile: string,
   startFFmpeg: string,
@@ -191,7 +191,7 @@ async function executeSingleSlice(
  *
  * @returns {Promise<void>}
  */
-async function handleSingleSlice(input: string, options: SliceOptions): Promise<void> {
+export async function handleSingleSlice(input: string, options: SliceOptions): Promise<void> {
   validateSliceOptions(options);
 
   const { startTime, endTime, startFFmpeg, endFFmpeg } = resolveTimeRange(options);
@@ -233,7 +233,7 @@ async function handleSingleSlice(input: string, options: SliceOptions): Promise<
  *
  * @throws {void} Exits with code 1 on error.
  */
-async function sliceAction(input: string, options: SliceOptions): Promise<void> {
+export async function sliceAction(input: string, options: SliceOptions): Promise<void> {
   try {
     log.loading('Preparing slice operation...');
 
@@ -263,7 +263,7 @@ async function sliceAction(input: string, options: SliceOptions): Promise<void> 
  *
  * @returns {SliceSegment[]} Array of segments.
  */
-function parseSegments(segmentsStr: string): SliceSegment[] {
+export function parseSegments(segmentsStr: string): SliceSegment[] {
   const segments: SliceSegment[] = [];
   const parts = segmentsStr.split(',');
 

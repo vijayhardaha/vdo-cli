@@ -30,7 +30,7 @@ const DEFAULT_CONVERT_PRESET = 'fast';
  *
  * @returns {Promise<{ format: string; outputFile: string; videoInfo: VideoInfo }>} Resolved download target.
  */
-async function resolveDownloadTarget(
+export async function resolveDownloadTarget(
   url: string,
   options: DownloadOptions
 ): Promise<{ format: string; outputFile: string; videoInfo: VideoInfo }> {
@@ -70,7 +70,7 @@ async function resolveDownloadTarget(
  *
  * @returns {Promise<void>}
  */
-async function handlePostDownload(outputFile: string, format: string, options: DownloadOptions): Promise<void> {
+export async function handlePostDownload(outputFile: string, format: string, options: DownloadOptions): Promise<void> {
   let finalOutput = outputFile;
 
   if (options.convert) {
@@ -94,7 +94,7 @@ async function handlePostDownload(outputFile: string, format: string, options: D
  *
  * @throws {void} Exits with code 1 on error.
  */
-async function downloadAction(url: string, options: DownloadOptions): Promise<void> {
+export async function downloadAction(url: string, options: DownloadOptions): Promise<void> {
   try {
     await ensureDependencies();
 
@@ -144,7 +144,7 @@ async function downloadAction(url: string, options: DownloadOptions): Promise<vo
  *
  * @returns {Promise<string>} Path to the converted file.
  */
-async function handleConvert(downloadedFile: string, format: string): Promise<string> {
+export async function handleConvert(downloadedFile: string, format: string): Promise<string> {
   const dir = dirname(downloadedFile);
   const ext = extname(downloadedFile);
   const baseName = basename(downloadedFile, ext);
@@ -188,7 +188,7 @@ async function handleConvert(downloadedFile: string, format: string): Promise<st
  *
  * @returns {Promise<void>}
  */
-async function handleSplit(inputFile: string, splitValue: string): Promise<void> {
+export async function handleSplit(inputFile: string, splitValue: string): Promise<void> {
   let parsed: ParseSplitValueResult;
 
   try {

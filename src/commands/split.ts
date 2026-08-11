@@ -21,7 +21,7 @@ import { validateFileExists } from '@/utils/validations';
  *
  * @returns {string[]} Array of output file paths.
  */
-function generateSplitOutputPaths(input: string, numParts: number): string[] {
+export function generateSplitOutputPaths(input: string, numParts: number): string[] {
   const dir = dirname(input);
   const ext = extname(input).slice(1) || 'mp4';
   const baseName = basename(input, extname(input));
@@ -47,7 +47,7 @@ const DEFAULT_CRF = 23;
  *
  * @returns {number} Part duration in seconds.
  */
-function resolvePartDuration(options: SplitOptions): number {
+export function resolvePartDuration(options: SplitOptions): number {
   if (options.preset && options.duration) {
     log.fail('Cannot use both --preset and --duration. Please choose one.');
     process.exit(1);
@@ -82,7 +82,7 @@ function resolvePartDuration(options: SplitOptions): number {
  *
  * @returns {Promise<void>}
  */
-async function executeSplit(
+export async function executeSplit(
   input: string,
   outputPaths: string[],
   partDuration: number,

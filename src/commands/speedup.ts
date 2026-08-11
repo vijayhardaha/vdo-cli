@@ -21,7 +21,7 @@ import { validateFileExists, validateSpeedRate } from '@/utils/validations';
  *
  * @throws {void} Exits with code 1 on error.
  */
-async function speedupAction(input: string, options: SpeedupOptions): Promise<void> {
+export async function speedupAction(input: string, options: SpeedupOptions): Promise<void> {
   try {
     log.loading('Preparing speed adjustment...');
 

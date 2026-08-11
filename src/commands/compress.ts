@@ -24,7 +24,7 @@ const ALLOWED_PRESETS = ['ultrafast', 'fast', 'medium', 'slow'];
  *
  * @throws {void} Exits with code 1 on error.
  */
-async function compressAction(input: string, options: CompressOptions): Promise<void> {
+export async function compressAction(input: string, options: CompressOptions): Promise<void> {
   try {
     log.loading('Preparing compression...');
 

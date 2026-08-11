@@ -26,7 +26,7 @@ const ALLOWED_PRESETS = ['ultrafast', 'fast', 'medium', 'slow', 'high-quality'];
  *
  * @throws {void} Exits with code 1 on error.
  */
-async function convertAction(input: string, options: ConvertOptions): Promise<void> {
+export async function convertAction(input: string, options: ConvertOptions): Promise<void> {
   try {
     log.loading('Preparing conversion...');
 

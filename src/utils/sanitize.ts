@@ -6,7 +6,7 @@
  *
  * @returns {string} Sanitized filename.
  */
-export function sanitizeFilename(name: string, maxLength = 200): string {
+export function sanitizeFilename(name: string, maxLength: number = 200): string {
   let safe = name.trim();
 
   // Replace anything not A-Z, a-z, 0-9, dash, or underscore with dash
