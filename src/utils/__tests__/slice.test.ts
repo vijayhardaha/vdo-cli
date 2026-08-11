@@ -1,7 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 import { runCommand } from '@/utils/dependencies';
-import { sliceVideoStreamCopy, sliceVideoReencode, sliceMultipleSegments, formatTimeForFFmpeg } from '@/utils/slice';
+import {
+  sliceVideoStreamCopy,
+  sliceVideoReencode,
+  sliceMultipleSegments,
+  formatTimeForFFmpeg,
+  parseTimeToSeconds,
+} from '@/utils/slice';
 
 vi.mock('../dependencies', () => ({ runCommand: vi.fn() }));
 
@@ -180,6 +186,30 @@ describe('slice utils', () => {
 
       // Expect sliceMultipleSegments updates progress correctly at 100%
       expect(progressCallback).toHaveBeenCalledWith(100, 2);
+    });
+  });
+
+  // Tests for parseTimeToSeconds
+  describe('parseTimeToSeconds', () => {
+    // Should parse M:SS format
+    it('should parse M:SS format', () => {
+      expect(parseTimeToSeconds('1:30')).toBe(90);
+      expect(parseTimeToSeconds('10:00')).toBe(600);
+      expect(parseTimeToSeconds('0:45')).toBe(45);
+    });
+
+    // Should parse HH:MM:SS format
+    it('should parse HH:MM:SS format', () => {
+      // Expect HH:MM:SS with two-digit minutes is converted to seconds
+      expect(parseTimeToSeconds('00:01:30')).toBe(90);
+    });
+
+    // Should parse plain seconds
+    it('should parse plain seconds', () => {
+      const result = parseTimeToSeconds('90');
+
+      // Expect plain seconds are returned as-is
+      expect(result).toBe(90);
     });
   });
 });
