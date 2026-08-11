@@ -550,6 +550,20 @@ describe('ffmpeg utils', () => {
 
       exitSpy.mockRestore();
     });
+
+    // Should return empty audio filter for NaN rate to cover fallthrough return
+    it('should return empty audio filter for NaN rate', async () => {
+      const { runCommand } = await import('../dependencies');
+
+      vi.mocked(runCommand).mockResolvedValue({ stdout: '60', stderr: '' });
+
+      await speedUpVideo('input.mp4', 'output.mp4', NaN);
+
+      const ffmpegCall = vi.mocked(runCommand).mock.calls[1]?.[0];
+
+      // Expect ffmpeg command has no audio filter since NaN bypasses all preset ranges
+      expect(ffmpegCall).not.toContain('-af');
+    });
   });
 
   // Tests for extractAudio
