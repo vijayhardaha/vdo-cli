@@ -43,6 +43,7 @@ export default defineConfig({
         '**/dist/',
         '**/build/',
         'src/bin/vdo.ts',
+        'src/types/',
       ],
     },
   },
