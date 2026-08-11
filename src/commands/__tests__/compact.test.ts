@@ -1,9 +1,12 @@
 import { Command } from 'commander';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 import { setupCompact, compactAction } from '@/commands/compact';
 import { compactVideo, compactVideoCRF } from '@/utils/compact';
+import { ensureDependencies } from '@/utils/dependencies';
+import { handleError } from '@/utils/log';
 import { checkAndPromptOverwrite } from '@/utils/prompt';
+import { validateFileExists } from '@/utils/validations';
 
 vi.mock('../../utils/dependencies', () => {
   const mockCheckDependencies = vi.fn().mockResolvedValue({ ok: true, missing: [] });
@@ -32,7 +35,7 @@ vi.mock('../../utils/prompt', () => ({
 }));
 
 vi.mock('../../utils/progress', () => ({
-  createProgressBar: vi.fn(() => ({ start: vi.fn(), stop: vi.fn() })),
+  createProgressBar: vi.fn(() => ({ start: vi.fn(), stop: vi.fn(), update: vi.fn(), render: vi.fn() })),
   createProgressCallback: vi.fn().mockReturnValue(vi.fn()),
   formatFileSize: vi.fn(() => ({ value: 100, unit: 'MB' })),
 }));
@@ -49,13 +52,29 @@ vi.mock('../../utils/compact', () => ({
   parseSizeToMB: vi.fn(() => 50),
 }));
 
+vi.mock('../../utils/log', () => ({
+  log: { succeed: vi.fn(), fail: vi.fn(), info: vi.fn(), loading: vi.fn(), warn: vi.fn() },
+  handleError: vi.fn(),
+}));
+
 vi.mock('fs/promises', () => ({ access: vi.fn().mockRejectedValue(new Error('File not found')) }));
 
 // Tests for compact command
 describe('compact command', () => {
+  let exitSpy: ReturnType<typeof vi.spyOn>;
+
   beforeEach(() => {
     vi.clearAllMocks();
+    exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
     vi.mocked(checkAndPromptOverwrite).mockResolvedValue(true);
+    vi.mocked(ensureDependencies).mockResolvedValue(true);
+    vi.mocked(validateFileExists).mockResolvedValue(undefined);
+    vi.mocked(compactVideo).mockResolvedValue(undefined);
+    vi.mocked(compactVideoCRF).mockResolvedValue(undefined);
+  });
+
+  afterEach(() => {
+    exitSpy.mockRestore();
   });
 
   // Tests for setupCompact
@@ -168,6 +187,65 @@ describe('compact command', () => {
 
       // Expect compactVideo is not called for CRF mode
       expect(compactVideo).not.toHaveBeenCalled();
+    });
+
+    // Should pass hevc flag to compactVideoCRF for HEVC encoding
+    it('should pass hevc flag to compactVideoCRF for HEVC encoding', async () => {
+      await compactAction('input.mp4', { hevc: true });
+
+      // Expect compactVideoCRF is called with hevc true and compact suffix
+      expect(compactVideoCRF).toHaveBeenCalledWith(
+        'input.mp4',
+        'input_compact_hevc.mp4',
+        23,
+        'medium',
+        '128k',
+        true,
+        expect.any(Function)
+      );
+
+      // Expect compactVideo is not called for CRF mode
+      expect(compactVideo).not.toHaveBeenCalled();
+    });
+
+    // Should call handleError when compactVideo fails
+    it('should call handleError when compactVideo fails', async () => {
+      vi.mocked(compactVideo).mockRejectedValue(new Error('Two-pass failed'));
+
+      await compactAction('input.mp4', { discord: true });
+
+      // Expect handleError is called with the error and compact prefix
+      expect(handleError).toHaveBeenCalledWith(expect.any(Error), 'Compact failed: ');
+    });
+
+    // Should call handleError when compactVideoCRF fails
+    it('should call handleError when compactVideoCRF fails', async () => {
+      vi.mocked(compactVideoCRF).mockRejectedValue(new Error('CRF failed'));
+
+      await compactAction('input.mp4', {});
+
+      // Expect handleError is called with the error and compact prefix
+      expect(handleError).toHaveBeenCalledWith(expect.any(Error), 'Compact failed: ');
+    });
+
+    // Should call handleError when validateFileExists fails
+    it('should call handleError when validateFileExists fails', async () => {
+      vi.mocked(validateFileExists).mockRejectedValue(new Error('File not found'));
+
+      await compactAction('input.mp4', {});
+
+      // Expect handleError is called with the validation error
+      expect(handleError).toHaveBeenCalledWith(expect.any(Error));
+    });
+
+    // Should call handleError when ensureDependencies fails
+    it('should call handleError when ensureDependencies fails', async () => {
+      vi.mocked(ensureDependencies).mockRejectedValue(new Error('Missing dependencies'));
+
+      await compactAction('input.mp4', {});
+
+      // Expect handleError is called with the dependency error
+      expect(handleError).toHaveBeenCalledWith(expect.any(Error));
     });
   });
 });
