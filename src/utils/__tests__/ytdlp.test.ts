@@ -81,6 +81,21 @@ describe('ytdlp utils', () => {
       expect(cmd).toContain('yt-dlp');
     });
 
+    // Should default merge format to mp4 when format normalizes to empty
+    it('should default merge format to mp4 when format is empty', async () => {
+      const { runCommand } = await import('../dependencies');
+
+      vi.mocked(runCommand).mockResolvedValue({ stdout: '', stderr: '' });
+
+      // Expect format '' falls back to mp4 merge format (line 83 || branch)
+      await downloadVideo('https://example.com/video', 'output.mp4', '');
+
+      const cmd = vi.mocked(runCommand).mock.calls[0]?.[0];
+
+      // Expect command uses mp4 merge format as fallback
+      expect(cmd).toContain('--merge-output-format mp4');
+    });
+
     // Should call onProgress when download progress parsed
     it('should call onProgress when download progress parsed', async () => {
       const { runCommand } = await import('../dependencies');
