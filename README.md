@@ -530,6 +530,8 @@ bun run test
 bun run test:coverage
 ```
 
+The test suite maintains 100% coverage (statements, branches, functions, and lines) — keep it green when contributing.
+
 ### Linting
 
 ```bash
@@ -559,25 +561,28 @@ vdo/
 │   │   ├── slice.ts            # Slice command
 │   │   ├── speedup.ts          # Speed adjustment command
 │   │   ├── split.ts            # Split command
-│   │   └── audio.ts            # Audio extraction command
+│   │   ├── audio.ts            # Audio extraction command
+│   │   └── __tests__/          # Per-command unit tests
 │   ├── utils/
 │   │   ├── compact.ts          # Compact/two-pass encoding
 │   │   ├── dependencies.ts     # Dependency checking
 │   │   ├── ffmpeg.ts           # FFmpeg wrapper functions
 │   │   ├── icons.ts            # Status icons
 │   │   ├── log.ts              # Logging utility
-│   │   ├── output.ts           # Output filename helpers
+│   │   ├── output.ts           # Output filename helper
 │   │   ├── progress.ts         # Progress bar utilities
 │   │   ├── prompt.ts           # Overwrite prompts
 │   │   ├── sanitize.ts         # Filename sanitization
 │   │   ├── slice.ts            # Slice/trim utilities
 │   │   ├── split.ts            # Split utilities
 │   │   ├── validations.ts      # Input validation
-│   │   └── ytdlp.ts            # yt-dlp wrapper functions
+│   │   ├── ytdlp.ts            # yt-dlp wrapper functions
+│   │   └── __tests__/          # Per-utility unit tests
 │   └── types/
 │       └── index.ts             # TypeScript type definitions
 ├── package.json
 ├── vitest.config.ts
+├── vitest.setup.ts
 └── README.md
 ```
 
