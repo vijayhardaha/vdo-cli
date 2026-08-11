@@ -5,6 +5,7 @@ import { setupAudio, audioAction } from '@/commands/audio';
 import { ensureDependencies } from '@/utils/dependencies';
 import { extractAudio } from '@/utils/ffmpeg';
 import { log, handleError } from '@/utils/log';
+import { createProgressBar } from '@/utils/progress';
 import { validateFileExists, validateFormat, validateBitrate } from '@/utils/validations';
 
 vi.mock('../../utils/dependencies', () => {
@@ -203,6 +204,22 @@ describe('audio command', () => {
 
       // Expect extractAudio is called (which invokes the progress callback)
       expect(extractAudio).toHaveBeenCalled();
+    });
+
+    // Should not update progress bar when progress is 0
+    it('should not update progress bar when progress is 0', async () => {
+      const bar = { start: vi.fn(), stop: vi.fn(), update: vi.fn(), render: vi.fn() } as unknown as ReturnType<
+        typeof createProgressBar
+      >;
+      vi.mocked(createProgressBar).mockReturnValue(bar);
+      vi.mocked(extractAudio).mockImplementation(async (_input, _output, _format, _bitrate, onProgress) => {
+        onProgress?.(0);
+      });
+
+      await audioAction('input.mp4', {});
+
+      // Expect progress bar is not updated for zero progress
+      expect(bar.update).not.toHaveBeenCalled();
     });
   });
 });

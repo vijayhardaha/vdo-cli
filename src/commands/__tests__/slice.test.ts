@@ -218,6 +218,13 @@ describe('slice command', () => {
 
       expect(result).toEqual({ startTime: 10, endTime: 30, startFFmpeg: '10', endFFmpeg: '30' });
     });
+
+    // Should leave end time undefined when duration is invalid
+    it('should leave end time undefined when duration is invalid', () => {
+      const result = resolveTimeRange({ start: '10', duration: 'abc' });
+
+      expect(result.endTime).toBeUndefined();
+    });
   });
 
   // Tests for validateSliceOptions
@@ -269,6 +276,10 @@ describe('slice command', () => {
 
     // Should use stream copy for fast mode
     it('should use stream copy for fast mode', async () => {
+      vi.mocked(sliceVideoStreamCopy).mockImplementation(async (_i, _o, _s, _e, cb) => {
+        cb?.(0);
+      });
+
       await executeSingleSlice('input.mp4', 'output.mp4', '0', '10', {}, progressBar);
 
       expect(sliceVideoStreamCopy).toHaveBeenCalledWith('input.mp4', 'output.mp4', '0', '10', expect.any(Function));

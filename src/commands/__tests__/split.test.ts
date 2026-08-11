@@ -149,6 +149,13 @@ describe('split command', () => {
 
       expect(paths).toEqual(['/videos/my_clip_001.mkv', '/videos/my_clip_002.mkv']);
     });
+
+    // Should default to mp4 extension when input has no extension
+    it('should default to mp4 extension when input has no extension', () => {
+      const paths = generateSplitOutputPaths('video', 1);
+
+      expect(paths).toEqual(['./video_001.mp4']);
+    });
   });
 
   // Tests for resolvePartDuration

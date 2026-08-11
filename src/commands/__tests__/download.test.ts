@@ -294,6 +294,16 @@ describe('download command', () => {
       expect(bar.update).toHaveBeenCalledWith(50, { total: 100 });
     });
 
+    // Should handle download with unknown file size
+    it('should handle download with unknown file size', async () => {
+      vi.mocked(getVideoInfo).mockResolvedValue({ ...mockVideoInfo, filesize: 0 });
+
+      await downloadAction('https://example.com/video', {});
+
+      // Expect process completes with zero file size
+      expect(log.succeed).toHaveBeenCalledWith('Download completed successfully!');
+    });
+
     // Should call handleError when ensureDependencies fails
     it('should call handleError when ensureDependencies fails', async () => {
       vi.mocked(ensureDependencies).mockRejectedValue(new Error('Missing dependencies'));
